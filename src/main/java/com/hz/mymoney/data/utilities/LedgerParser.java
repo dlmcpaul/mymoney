@@ -210,7 +210,7 @@ public class LedgerParser {
 				return LocalDate.parse(datePart, DateTimeFormatter.ofPattern(DATE_FORMAT_1));
 			}
 			return LocalDate.parse(datePart, DateTimeFormatter.ofPattern(DATE_FORMAT_2));
-		} catch (DateTimeParseException _) {
+		} catch (DateTimeParseException e) {
 			return null;
 		}
 	}
