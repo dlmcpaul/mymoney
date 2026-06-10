@@ -22,6 +22,14 @@ It will make use of 3 files
   Equity:Mortgage:Opening Balances          $100,000.00
   Liabilities:Mortgage:Principal
 ```
+
+If your ledger file just uses the basic format then you should be ok.
+
+Your account entries should follow the convention of
+Assets, Liabilities, Expenses, Income, Equity
+
+case is not important.
+
 ## A commodities file for historical pricing of commodities with entries such as
 ```
 P 2018/11/28 COL 12.85 AUD
@@ -40,7 +48,7 @@ P 2026/03/01 COL 21.36 AUD
 ```
 This is the same format as a ledger file but the entry comment specifies the schedule period in d,w,m,y
 
-Only the ledger file is mandatory but if not supplied some test data may be used.
+Only the ledger file is mandatory.  For the other files if they are not supplied then some test data may be used.
 
 If the ledger file is read ok then a web page at http://localhost:8081 will be available with 9 pages
 
