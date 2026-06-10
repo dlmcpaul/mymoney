@@ -1,0 +1,11 @@
+@media screen and (width <= 1900px) {
+    #primary-menu {
+        display: none;
+    }
+}
+
+@media screen and (width > 1900px) {
+    #primary-tabs {
+        display: none;
+    }
+}

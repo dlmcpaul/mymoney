@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: PageHeader('Financial Trends')}, content=~{::main}, menucode='Trends', scripts=~{::script})}"
+      lang="en">
+<body>
+<main>
+    <form class="ui form" hx-include="#trend-account-input"
+          th:attr="hx-get=|@{/accountChanged}?trendType=${activeButton}|"
+          hx-trigger="focusout[event.target.matches('input')] from:body" hx-select-oob="#trendsGraph,#trendsTotal"
+          hx-target="none">
+        <div class="two fields">
+            <div th:replace="~{fragments/Journal :: AccountInputField ('trend-account', 'Account to Track', '', null, false)}"></div>
+            <div class="required field" id="TrendTypeButtons">
+                <label>Trend Type</label>
+                <div class="six ui buttons">
+                    <input type="hidden" th:value="${activeButton}" name="trendType">
+                    <div th:class="${activeButton} eq '30d' ? 'ui active button' : 'ui button'"
+                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=30d|" hx-target="#TrendTypeButtons"
+                         hx-select-oob="#trendsGraph,#trendsTotal">
+                        30d
+                    </div>
+                    <div th:class="${activeButton} eq '6m' ? 'ui active button' : 'ui button'"
+                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=6m|" hx-target="#TrendTypeButtons"
+                         hx-select-oob="#trendsGraph,#trendsTotal">
+                        6m
+                    </div>
+                    <div th:class="${activeButton} eq '1y' ? 'ui active button' : 'ui button'"
+                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=1y|" hx-target="#TrendTypeButtons"
+                         hx-select-oob="#trendsGraph,#trendsTotal">
+                        1y
+                    </div>
+                    <div th:class="${activeButton} eq '2y' ? 'ui active button' : 'ui button'"
+                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=2y|" hx-target="#TrendTypeButtons"
+                         hx-select-oob="#trendsGraph,#trendsTotal">
+                        2y
+                    </div>
+                    <div th:class="${activeButton} eq '5y' ? 'ui active button' : 'ui button'"
+                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=5y|" hx-target="#TrendTypeButtons"
+                         hx-select-oob="#trendsGraph,#trendsTotal">
+                        5y
+                    </div>
+                    <div th:class="${activeButton} eq '10y' ? 'ui active button' : 'ui button'"
+                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=10y|" hx-target="#TrendTypeButtons"
+                         hx-select-oob="#trendsGraph,#trendsTotal">
+                        10y
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="ui raised segment">
+        <div id="trendsGraph" style="height: 400px;width: 100%"
+             th:attr="data-trend-chart=${trendsData.dataSetAsJson()}">
+        </div>
+    </div>
+    <div class="ui raised segment">
+        <div class="ui center aligned header" id="trendsTotal"
+             th:text="|Total ${#numbers.formatCurrency(trendsData.total())}|">Total $0.00
+        </div>
+    </div>
+</main>
+<script th:inline="javascript" type="text/javascript">
+    const moneyFmt = new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: 'AUD',
+
+        minimumFractionDigits: 2, // This suffices for whole numbers, but will
+        // print 2500.10 as $2,500.1
+        maximumFractionDigits: 2, // Causes 2500.99 to be printed as $2,501
+    });
+
+    document.body.addEventListener('htmx:afterSwap', function (event) {
+        // Initialize the echarts instance based on the prepared dom
+        let trendsChart = echarts.init(document.getElementById('trendsGraph'));
+        let trendsChartDataSet = JSON.parse(document.getElementById('trendsGraph').dataset.trendChart);
+
+        // Specify the configuration items and data for the chart
+        let trendsOption = {
+            title: {
+                text: 'Account Trend'
+            },
+            tooltip: {
+                valueFormatter: (value) => moneyFmt.format(value.toFixed(2))
+            },
+
+            legend: {
+                orient: 'vertical',
+                right: 10,
+                top: 'center',
+            },
+            dataset: {
+                source: trendsChartDataSet
+            },
+            xAxis: {type: 'category'},
+            yAxis: {},
+            series: [
+                {
+                    type: 'bar',
+                    itemStyle: {
+                        color: '#00FF00'
+                    }
+                }
+            ]
+        };
+
+        // Display the chart using the configuration items and data just specified.
+        trendsChart.setOption(trendsOption);
+    })
+</script>
+</body>
+</html>

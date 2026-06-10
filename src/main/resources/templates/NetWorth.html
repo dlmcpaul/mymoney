@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: PageHeader('Current Assets vs Liabilities')}, content=~{::main}, menucode='NetWorth', scripts=~{::script})}"
+      lang="en">
+<body>
+<main>
+    <div class="ui basic segment">
+        <div class="ui four column celled grid">
+            <div class="row">
+                <div class="ten wide column"></div>
+                <div class="right aligned two wide column">Current</div>
+                <div class="right aligned two wide column">Last Year</div>
+                <div class="right aligned two wide column">Difference</div>
+            </div>
+            <div class="row">
+                <div class="ten wide column">Assets</div>
+                <div class="right aligned two wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentAssetBalance())}"></div>
+                <div class="right aligned two wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearAssetBalance())}"></div>
+                <div class="right aligned two wide column" th:if="${netWorth.assetDifference()} lt 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.assetDifference())}">$0</span><span> <i
+                        class="arrow down icon"></i></span></div>
+                <div class="right aligned two wide column" th:if="${netWorth.assetDifference()} ge 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.assetDifference())}">$0</span><span> <i
+                        class="arrow up icon"></i></span></div>
+            </div>
+            <div class="row">
+                <div class="ten wide column">Liabilities</div>
+                <div class="right aligned two wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentLiabilityBalance())}"></div>
+                <div class="right aligned two wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearLiabilityBalance())}"></div>
+                <div class="right aligned two wide column" th:if="${netWorth.liabilityDifference()} lt 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.liabilityDifference())}">$0</span><span> <i
+                        class="arrow down icon"></i></span></div>
+                <div class="right aligned two wide column" th:if="${netWorth.liabilityDifference()} ge 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.liabilityDifference())}">$0</span><span> <i
+                        class="arrow up icon"></i></span></div>
+            </div>
+            <div class="row">
+                <div class="ten wide column">Net Worth</div>
+                <div class="right aligned two wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentNetPosition())}"></div>
+                <div class="right aligned two wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearNetPosition())}"></div>
+                <div class="right aligned two wide column" th:if="${netWorth.netWorthDifference()} lt 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.netWorthDifference())}">$0</span><span> <i
+                        class="arrow down icon"></i></span></div>
+                <div class="right aligned two wide column" th:if="${netWorth.netWorthDifference()} ge 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.netWorthDifference())}">$0</span><span> <i
+                        class="arrow up icon"></i></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="ui horizontal divider"
+         data-th-text="|${#temporals.format(netWorth.earliestDate(), 'MMM yyyy')} - ${#temporals.format(netWorth.latestDate(), 'MMM yyyy')}|">
+        Graph
+    </div>
+    <div class="ui basic segment">
+        <div id="netWorthGraph" style="height: 400px;width: 100%"></div>
+    </div>
+</main>
+<script th:inline="javascript" type="text/javascript">
+    function onPageLoad() {
+
+        const moneyFmt = new Intl.NumberFormat(undefined, {
+            style: 'currency',
+            currency: 'AUD',
+
+            minimumFractionDigits: 2, // This suffices for whole numbers, but will
+            // print 2500.10 as $2,500.1
+            maximumFractionDigits: 2, // Causes 2500.99 to be printed as $2,501
+        });
+
+        // Initialize the echarts instance based on the prepared dom
+        let netWorthChart = echarts.init(document.getElementById('netWorthGraph'));
+
+        var xData = /*[[${netWorth.xAxisLabels()}]]*/ [''];
+        var yNetData = /*[[${netWorth.yAxisNetValues()}]]*/ [''];
+        var yAssetData = /*[[${netWorth.yAxisAssetValues()}]]*/ [''];
+        var yLiabilityData = /*[[${netWorth.yAxisLiabValues()}]]*/ [''];
+
+        // Specify the configuration items and data for the chart
+        let netWorthOption = {
+            title: {
+                text: 'Net Worth Chart'
+            },
+            tooltip: {
+                valueFormatter: (value) => moneyFmt.format(value.toFixed(2))
+            },
+            legend: {
+                orient: 'vertical',
+                right: 10,
+                top: 'center',
+            },
+            xAxis: {
+                data: xData
+            },
+            yAxis: {},
+            series: [
+                {
+                    name: 'asset',
+                    type: 'line',
+                    itemStyle: {
+                        color: '#00FF00'
+                    },
+                    areaStyle: {},
+                    data: yAssetData
+                },
+                {
+                    name: 'liability',
+                    type: 'line',
+                    itemStyle: {
+                        color: '#FF0000'
+                    },
+                    areaStyle: {},
+                    data: yLiabilityData
+                },
+                {
+                    name: 'net worth',
+                    type: 'line',
+                    itemStyle: {
+                        color: '#000000'
+                    },
+                    data: yNetData
+                }
+            ]
+        };
+
+        // Display the chart using the configuration items and data just specified.
+        netWorthChart.setOption(netWorthOption);
+    }
+</script>
+<link rel="stylesheet" data-th-href="@{/css/default.css}"/>
+</body>
+</html>

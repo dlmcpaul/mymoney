@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<!--/*@thymesVar id="shareGraphData" type="com.hz.mymoney.ui.models.templates.InvestmentsTemplateData"*/-->
+<table id="InvestmentTable" th:fragment="InvestmentTable (investmentsData)" class="ui fixed small compact celled table">
+    <thead>
+    <tr>
+        <th>Investment</th>
+        <th class="left aligned">Purchase Date</th>
+        <th class="right aligned" th:if="${#strings.contains(header,'Current')}">Quantity</th>
+        <th class="right aligned" th:if="${#strings.contains(header,'Current')}">Last Price</th>
+        <th class="right aligned">Outlay</th>
+        <th class="right aligned">Earnings</th>
+        <th class="right aligned">Sales</th>
+        <th class="right aligned" th:if="${#strings.contains(header,'Current')}">Market Value</th>
+        <th class="right aligned">Net Profit/Loss</th>
+        <th class="right aligned">Annualised Return</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:unless="${investmentsData.investmentSummaries.isEmpty()}"
+        th:each="investment : ${investmentsData.investmentSummaries}">
+        <td th:text="${investment.code}"></td>
+        <td th:text="${#temporals.format(investment.firstPurchase, 'dd MMM yyyy')}"></td>
+        <td class="right aligned" th:if="${#strings.contains(header,'Current')}" th:text="${investment.count}"></td>
+        <td class="right aligned" th:if="${#strings.contains(header,'Current')}"
+            th:text="${#numbers.formatCurrency(investment.lastPrice)}"></td>
+        <td class="right aligned" th:text="${#numbers.formatCurrency(investment.costBase)}"></td>
+        <td class="right aligned" th:text="${#numbers.formatCurrency(investment.earnings)}"></td>
+        <td class="right aligned" th:text="${#numbers.formatCurrency(investment.sales)}"></td>
+        <td class="right aligned" th:if="${#strings.contains(header,'Current')}"
+            th:text="${#numbers.formatCurrency(investment.balance)}"></td>
+        <td th:text="${#numbers.formatCurrency(investment.netProfitLoss)}"
+            th:attr="class=${investment.isProfit() ? 'right aligned green' : 'right aligned red'}"></td>
+        <td th:text="${#numbers.formatPercent(investment.yearlyReturn,1,2)}"
+            th:attr="class=${investment.isProfit() ? 'right aligned green' : 'right aligned red'}"></td>
+    </tr>
+    <tr th:unless="${investmentsData.investmentSummaries.isEmpty()}">
+        <td th:if="${#strings.contains(header,'Current')}"></td>
+        <td th:if="${#strings.contains(header,'Current')}"></td>
+        <td></td>
+        <td class="right aligned" th:if="${#strings.contains(header,'Current')}"><b>Total Outlay</b></td>
+        <td class="right aligned blue" th:if="${#strings.contains(header,'Current')}"
+            th:text="${#numbers.formatCurrency(investmentsData.getTotalOutlay())}">$0.00
+        </td>
+        <td th:if="${#strings.contains(header,'Current')}"></td>
+        <td class="right aligned" th:unless="${#strings.contains(header,'Current')}"><b>Total Outlay</b></td>
+        <td class="right aligned blue" th:unless="${#strings.contains(header,'Current')}"
+            th:text="${#numbers.formatCurrency(investmentsData.getTotalOutlay())}">$0.00
+        </td>
+        <td></td>
+        <td class="right aligned"><b>Total Profit/Loss</b></td>
+        <td class="right aligned blue" th:text="${#numbers.formatCurrency(investmentsData.getTotalProfitOrLoss())}">
+            $0.00
+        </td>
+        <td></td>
+    </tr>
+    </tbody>
+</table>
+
+<div id="InvestmentChart" th:fragment="InvestmentChart(investmentsData, header)" class="ui grid">
+    <div class="eight wide column">
+        <div th:if="${#strings.contains(header,'Current')}" id="investmentsTotalChart"
+             style="width: 100%; height: 600px"></div>
+        <div th:if="${#strings.contains(header,'Historical')}" style="width: 100%; height: 600px"></div>
+    </div>
+    <div class="eight wide column">
+        <div id="marketValueChart"
+             th:attr="data-chart-data=${investmentsData.getMarketValuesJson()}, data-chart-title=${#strings.contains(header,'Current')?'Market Value':'Net Profit/Loss'}"
+             style="width: 100%; height: 600px"></div>
+    </div>
+</div>
+</body>
+</html>

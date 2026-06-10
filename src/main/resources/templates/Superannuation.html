@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: PageHeader('Superannuation Accounts')}, content=~{::main}, menucode='Superannuation')}"
+      lang="en">
+<body>
+<main>
+    <div class="ui raised horizontal equal width segments" th:with="open=${account.balance() gt 0}"
+         th:unless="${accounts.superAccounts.isEmpty()}"
+         th:each="account, stats : ${accounts.superAccounts}">
+        <div class="ui segment">
+            <a th:attr="class=${open ? 'ui green ribbon label' : 'ui gray ribbon label'}"
+               th:text="${open ? 'Open Super Account' : 'Closed Super Account'}"
+               th:href="|@{/Accounts/}${#uris.escapePathSegment(account.fullName)}|">Super Account</a>
+            <div class="ui very compact grid">
+                <div th:if="${open}" class="ten wide column"><span
+                        th:text="|${account.name()} (${#temporals.format(account.openingDate(), 'MMM yyyy')})|"></span>
+                </div>
+                <div th:if="${open}" class="right aligned six wide column"><b><span
+                        th:text="${#numbers.formatCurrency(account.balance())}"></span></b></div>
+                <div th:unless="${open}" class="column"
+                     th:text="|${account.name()} (${#temporals.format(account.openingDate(), 'MMM yyyy')} - ${#temporals.format(account.closingDate(), 'MMM yyyy')})|"></div>
+            </div>
+        </div>
+        <div class="ui segment">
+            <div class="ui three column very compact grid">
+                <div class="row">
+                    <div class="center aligned column"><b>Starting</b></div>
+                    <div class="center aligned column"><b>Contributions</b></div>
+                    <div class="center aligned column"><b>Earnings</b></div>
+                </div>
+                <div class="row">
+                    <div class="center aligned column"
+                         th:text="${#numbers.formatCurrency(account.openingBalance())}">Opening Balance
+                    </div>
+                    <div class="center aligned column"
+                         th:text="${#numbers.formatCurrency(account.contributions())}">Contributions
+                    </div>
+                    <div class="center aligned column" th:text="${#numbers.formatCurrency(account.earnings())}">
+                        Earnings
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui segment">
+            <div class="ui three column very compact grid">
+                <div class="row">
+                    <div class="center aligned column"><b>Losses</b></div>
+                    <div class="center aligned column"><b>Admin</b></div>
+                    <div class="center aligned column"><b>Taxes</b></div>
+                </div>
+                <div class="row">
+                    <div class="center aligned column" th:text="${#numbers.formatCurrency(account.losses())}">
+                        Opening Balance
+                    </div>
+                    <div class="center aligned column"
+                         th:text="${#numbers.formatCurrency(account.insurance() + account.fees())}">Contributions
+                    </div>
+                    <div class="center aligned column" th:text="${#numbers.formatCurrency(account.taxes())}">
+                        Contributions
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui segment">
+            <div class="ui one column center aligned relaxed grid">
+                <div class="stretched row">
+                    <div class="ui tiny statistic">
+                        <div class="label">
+                            Yearly Return
+                        </div>
+                        <div class="value" th:text="${#numbers.formatPercent(account.yearlyReturn(),1,2)}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

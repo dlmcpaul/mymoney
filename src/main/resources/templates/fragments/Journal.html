@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:fragment="InvestmentAccountInput (id, label, value)" class="ui input right icon">
+    <input th:id="|${id}-input|" name="accounts" placeholder="Code"
+           th:attr="hx-get=|@{/investmentsSearch}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
+           th:value="${value}"
+           hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+           hx-swap="morph:outerHTML focus-scroll:true" type="search"
+    >
+    <i class="dropdown icon"></i>
+</div>
+
+<div th:fragment="StandardAccountInput (id, label, value)" class="ui input right icon">
+    <input th:id="|${id}-input|" name="accounts" placeholder="Account"
+           th:attr="hx-get=|@{/accountSearch}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
+           th:value="${value}"
+           hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+           hx-swap="morph:outerHTML focus-scroll:true" type="search"
+    >
+    <i class="dropdown icon"></i>
+</div>
+
+<div th:fragment="InvestmentAccountInputField (id, label, value, accounts, showError)" th:attr="id=${id}"
+     th:class="${showError} ? 'ten wide required error field' : 'ten wide required field'">
+    <label th:for="|${id}-input|" th:text="${label}">Account</label>
+    <div th:replace="~{fragments/Journal :: InvestmentAccountInput (${id}, ${label}, ${value})}"></div>
+    <datalist th:id="|${id}-list|">
+        <option th:each="account : ${accounts}" th:value="${account}">
+    </datalist>
+</div>
+
+<div th:fragment="AccountInputField (id, label, value, accounts, showError)" th:attr="id=${id}"
+     th:class="${showError} ? 'ten wide required error field' : 'ten wide required field'">
+    <label th:for="|${id}-input|" th:text="${label}">Account</label>
+    <div th:replace="~{fragments/Journal :: StandardAccountInput (${id}, ${label}, ${value})}"></div>
+    <datalist th:id="|${id}-list|">
+        <option th:each="account : ${accounts}" th:value="${account}">
+    </datalist>
+</div>
+
+<div th:fragment="DescriptionInputField (id, label, value, descriptions, showError)"
+     th:attr="id=${id}"
+     th:class="${showError} ? 'required warning field' : 'required field'" id="DescriptionInputField">
+    <label th:for="|${id}-input|" for="desc-id" th:text="${label}">Why</label>
+    <div class="ui input right icon">
+        <input id="desc-id" th:id="|${id}-input|" name="description" placeholder="Description"
+               th:attr="hx-get=|@{/descriptionSearch}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
+               hx-select-oob="#from-account,#to-account"
+               hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+               hx-swap="morph:outerHTML focus-scroll:true"
+               th:value="${value}"
+        >
+        <i class="dropdown icon"></i>
+    </div>
+    <datalist th:id="|${id}-list|">
+        <option th:each="description : ${descriptions}" th:value="${description}">
+    </datalist>
+</div>
+
+<div th:fragment="DateInputField (defaultDate)" class="eight wide required field">
+    <label for="txn-date">When</label>
+    <div class="ui calendar" id="type_calendar" data-type="date" th:attr="data-date=${defaultDate}">
+        <div class="ui input left icon">
+            <input name="journalDate" id="txn-date" type="date" placeholder="Date" th:value="${defaultDate}">
+            <i class="calendar icon"></i>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="AmountInputField (label, isRequired)" class="six wide field"
+     th:attrprepend="class=${isRequired} ? 'required ' : _">
+    <label th:text="${label}">Amount</label>
+    <div class="ui labeled input">
+        <label for="debit-amount" class="ui label">$</label>
+        <input name="amounts" type="number" step="any" placeholder="100.00" id="debit-amount">
+    </div>
+</div>
+
+<div th:fragment="DistributionButtons (activeButton)" class="required field" id="DistributionButtons">
+    <label>Distribution Type</label>
+    <div class="three ui buttons">
+        <input type="hidden" th:value="${activeButton}" name="distributionType">
+        <div th:class="${activeButton} eq 'distribution' ? 'ui active button' : 'ui button'"
+             th:attr="hx-get=|@{/distributionButtonClick}?button=distribution|" hx-target="#DistributionButtons">
+            Distribution
+        </div>
+        <div th:class="${activeButton} eq 'capital-gain' ? 'ui active button' : 'ui button'"
+             th:attr="hx-get=|@{/distributionButtonClick}?button=capital-gain|" hx-target="#DistributionButtons">
+            Capital Gain
+        </div>
+        <div th:class="${activeButton} eq 'capital-return' ? 'ui active button' : 'ui button'"
+             th:attr="hx-get=|@{/distributionButtonClick}?button=capital-return|" hx-target="#DistributionButtons">
+            Capital Return
+        </div>
+    </div>
+</div>
+
+<form th:fragment="NewJournal (defaultDate)" class="ui form" th:attr="hx-post=|@{/newJournal}|" hx-swap="outerHTML"
+      hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
+      id="NewJournalForm">
+    <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
+    <div th:replace="~{fragments/Journal :: DescriptionInputField ('journal-desc', 'Why', '', null, false)}"></div>
+    <div class="two fields">
+        <div th:replace="~{fragments/Journal :: AccountInputField ('from-account', 'From Account', '', null, false)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('Amount', true)}"></div>
+    </div>
+    <div class="fields">
+        <div th:replace="~{fragments/Journal :: AccountInputField ('to-account', 'To Account', '', null, false)}"></div>
+    </div>
+    <button type="submit" class="ui right floated submit button">Post</button>
+</form>
+
+<form th:fragment="NewDividendIncome (defaultDate)" class="ui form" th:attr="hx-post=|@{/newDividend}|" hx-swap="none"
+      hx-swap-oob="true" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
+>
+    <div class="two fields">
+        <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
+        <div class="field"></div>
+    </div>
+    <div class="two fields">
+        <div th:replace="~{fragments/Journal :: InvestmentAccountInputField ('investment', 'Investment', '', null, false)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('Franked Dividend', true)}"></div>
+    </div>
+    <div class="two fields">
+        <div th:replace="~{fragments/Journal :: AccountInputField ('brokerage-account', 'Brokerage Account', '', null, false)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('Unfranked Dividend', true)}"></div>
+    </div>
+    <div class="two fields">
+        <div th:replace="~{fragments/Journal :: AccountInputField ('dividend-disb', 'Disbursement Account', '', null, false)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('Imputation Credit', true)}"></div>
+    </div>
+    <button type="submit" class="ui right floated submit button">Post</button>
+</form>
+
+<form th:fragment="NewDistributionIncome (defaultDate, activeButton)" class="ui form" th:attr="hx-post=|@{/newDistribution}|"
+      hx-swap="outerHTML"
+      hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
+      id="NewFundIncomeForm">
+    <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
+    <div th:replace="~{fragments/Journal :: DistributionButtons (${activeButton})}"></div>
+    <div class="two fields">
+        <div th:replace="~{fragments/Journal :: AccountInputField ('fund-distribution', 'Fund Account', '', null, false)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('Amount', true)}"></div>
+    </div>
+    <div class="fields">
+        <div th:replace="~{fragments/Journal :: AccountInputField ('fund-income-disb', 'Disbursement Account', '', null, false)}"></div>
+        <div class="field"></div>
+    </div>
+    <button type="submit" class="ui right floated submit button" id="fund-income-button">Post</button>
+</form>
+</body>
+</html>

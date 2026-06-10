@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div id="BalanceSheet" th:fragment="BalanceSheet (currentPosition)">
+    <div th:replace="~{fragments/Account :: AccountItem (${currentPosition.assetAccounts}, 'Assets', 0, '')}"></div>
+    <div th:replace="~{fragments/Account :: AccountItem (${currentPosition.liabilityAccounts}, 'Liabilities', 0, '')}"></div>
+    <div th:replace="~{fragments/Account :: AccountBalance(${currentPosition.getNetPosition()}, 'Net Position')}"></div>
+</div>
+
+<div id="AccountsBody" th:fragment="AccountsBody (accounts)" class="ui three column divided grid">
+    <div class="row">
+        <div class="five wide column">
+            <h3 class="ui header">Assets and Liabilities</h3>
+        </div>
+        <div class="six wide column">
+            <h3 class="ui header">Incoming</h3>
+        </div>
+        <div class="five wide column">
+            <h3 class="ui header">Outgoing</h3>
+        </div>
+    </div>
+    <div class="relaxed row">
+        <div class="five wide column">
+            <div class="ui fluid vertical menu">
+                <div th:replace="~{fragments/Account :: AccountItem (${accounts.assetAccounts}, 'Assets', 0, ${accounts.financialYear})}"></div>
+                <div th:replace="~{fragments/Account :: AccountItem (${accounts.liabilityAccounts}, 'Liabilities', 0, ${accounts.financialYear})}"></div>
+                <div th:replace="~{fragments/Account :: AccountBalance(${accounts.getNetPosition()}, 'Net Position')}"></div>
+            </div>
+        </div>
+        <div class="six wide column">
+            <div class="ui fluid vertical menu">
+                <div th:replace="~{fragments/Account :: AccountItem (${accounts.incomeAccounts}, 'Income', ${accounts.getHighestIncome()}, ${accounts.financialYear})}"></div>
+                <div th:replace="~{fragments/Account :: AccountBalance(${accounts.getTotalIncome()}, 'Total Income')}"></div>
+            </div>
+        </div>
+        <div class="five wide column">
+            <div class="ui fluid vertical menu">
+                <div th:replace="~{fragments/Account :: AccountItem (${accounts.expenseAccounts}, 'Expenses', ${accounts.getHighestExpense()}, ${accounts.financialYear})}"></div>
+                <div th:replace="~{fragments/Account :: AccountBalance(${accounts.getTotalExpenses()}, 'Total Expenses')}"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--/*@thymesVar id="accountList" type="java.util.List<com.hz.mymoney.ui.models.Account>"*/-->
+<div th:fragment="AccountItem(accountList, header, highest, fy)" class="item">
+    <div class="header" th:text="${header}">Assets</div>
+    <div class="menu" th:unless="${accountList.isEmpty()}"
+         th:each="account, stats : ${accountList}">
+        <div th:if="${stats.first or account.category != accountList[stats.index-1].category}"
+             class="ui horizontal mini fitted divider"
+             th:text="${account.category}"></div>
+        <a th:href="|@{/Accounts/}${#uris.escapePathSegment(account.fullName)}| + (${#strings.isEmpty(fy)} ? '' : '?fy=' + ${fy})" class="item" th:attr="data-tooltip = ${account.hasNote()} ? ${account.note} : _">
+            <div class="ui grid">
+                <div class="left aligned attached eight wide column">
+                    <div class="header" th:text="${account.name}">name</div>
+                </div>
+                <div class="right aligned eight wide column">
+                    <div class="description">
+                        <span th:attr="class=${account.balance == highest ? 'ui teal text' : 'ui text'}"
+                              th:text="${#numbers.formatCurrency(account.balance)}">$0</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div th:fragment="AccountBalance(balance, header)" class="item">
+    <div class="ui grid">
+        <div class="left aligned attached eight wide column">
+            <div class="header" th:text="${header}">Net Position</div>
+        </div>
+        <div class="right aligned eight wide column">
+            <div class="description"
+                 th:text="${#numbers.formatCurrency(balance)}">$0
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

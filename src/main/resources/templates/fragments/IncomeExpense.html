@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<!--/*@thymesVar id="monthlyChange" type="com.hz.mymoney.ui.models.MonthlyIncomeExpense"*/-->
+<div id="IncomeExpenseHeader" th:fragment="IncomeExpenseHeader (monthlyChange)" class="ui four column compact grid">
+    <div class="seven wide column"><h3 class="ui header">Profit & Loss For</h3></div>
+    <div class="one wide column">
+        <a class="header" data-tooltip="Previous Month" th:href="@{/prevMonth}" th:attr="hx-get=@{/prevMonth}" hx-select-oob="#IncomeExpenseHeader,#IncomeExpenseBody" hx-swap="outerHTML"><i class="angle left icon"></i></a>
+    </div>
+    <div class="six wide center aligned column"><span class="ui subheader" data-th-text="${#temporals.monthName(monthlyChange.asAt())} + ' ' + ${#temporals.year(monthlyChange.asAt())}"></span></div>
+    <div class="one wide column">
+        <a class="header" data-tooltip="Next Month" th:href="@{/nextMonth}" th:attr="hx-get=@{/nextMonth}" hx-select-oob="#IncomeExpenseHeader,#IncomeExpenseBody" hx-swap="outerHTML"><i class="angle right icon"></i></a>
+    </div>
+</div>
+
+<!--/*@thymesVar id="monthlyChange" type="com.hz.mymoney.ui.models.MonthlyIncomeExpense"*/-->
+<div id="IncomeExpenseBody" th:fragment="IncomeExpenseBody (monthlyChange)" class="ui segment">
+    <div class="ui two column grid">
+        <div class="row">
+            <div class="left attached left aligned column">
+                <div class="description">Income</div>
+            </div>
+            <div class="right attached right aligned column">
+                <div class="description" data-th-text="${#numbers.formatCurrency(monthlyChange.incoming())}">$0</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="left attached left aligned column">
+                <div class="description">Expenses</div>
+            </div>
+            <div class="right attached right aligned column">
+                <div class="description" data-th-text="${#numbers.formatCurrency(monthlyChange.outgoing())}">$0</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="left attached left aligned column">
+                <div class="description">Net</div>
+            </div>
+            <div class="right attached right aligned column">
+                <div th:if="${monthlyChange.getBalance()} lt 0" class="description"><span><i class="minus icon"></i></span><span data-th-text="${#numbers.formatCurrency(monthlyChange.getBalance())}">$0</span></div>
+                <div th:if="${monthlyChange.getBalance()} ge 0" class="description"><span><i class="plus icon"></i></span><span data-th-text="${#numbers.formatCurrency(monthlyChange.getBalance())}">$0</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="ui horizontal divider">Composed of</div>
+    <table class="ui fixed single line small compact celled table">
+        <thead>
+        <tr>
+            <th style="width:75%">Description</th>
+            <th class="right aligned">Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:unless="${monthlyChange.transactions().isEmpty()}" th:each="txn, stats : ${monthlyChange.transactions()}">
+            <td data-label="Description" data-th-text="${txn.description()}"></td>
+            <td class="right aligned" data-label="Amount" data-th-text="${#numbers.formatCurrency(txn.amount())}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

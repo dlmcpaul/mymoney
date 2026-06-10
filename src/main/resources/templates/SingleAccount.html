@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Minimal :: layout(content=~{::main})}" lang="en">
+<body>
+<main>
+    <div class="ui raised segment">
+        <div class="ui center aligned icon message">
+            <div class="content">
+                <div class="ui breadcrumb">
+                    <th:block th:each="elem, stats : ${singleAccount.breadcrumb()}">
+                        <div th:unless="${stats.last}" class="section" th:text="${elem}"></div>
+                        <div th:unless="${stats.last}" class="divider"><span class="ui large black text">:</span></div>
+                        <div th:if="${stats.last}" class="active section" th:text="${elem}">T-Shirt</div>
+                    </th:block>
+                </div>
+                <p th:text="${singleAccount.description()} + ${#numbers.formatCurrency(singleAccount.balance())} + ' at end of period'"></p>
+            </div>
+        </div>
+        <div class="ui horizontal center aligned divider" th:unless="${singleAccount.fyTransactions.isEmpty()}"
+             th:text="|Account Transactions for period ${singleAccount.financialPeriod()}|"></div>
+        <div class="ui horizontal center aligned divider" th:if="${singleAccount.fyTransactions.isEmpty()}"
+             th:text="|No Transactions for period ${singleAccount.financialPeriod()}|"></div>
+        <div th:replace="~{fragments/Transactions :: ListTransactions(${singleAccount.fyTransactions}, ${totaler}, ${singleAccount.showRunningTotal()}, ${singleAccount.isShareAccount()}, ${singleAccount.isAmountOnly()})}"></div>
+    </div>
+</main>
+</body>
+</html>

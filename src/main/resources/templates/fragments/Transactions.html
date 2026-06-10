@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<div th:fragment="ListTransactions(transactions, totaler, showRunningTotal, isShareAccount, isAmountOnly)" class="ui segment" th:unless="${transactions.isEmpty()}">
+    <div class="ui long scrolling container">
+        <table class="ui compact celled head stuck table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th th:unless="${isAmountOnly}" class="right aligned" th:text="${isShareAccount} ? 'Bought' : 'Debit'">Debit</th>
+                <th th:unless="${isAmountOnly}" class="right aligned" th:text="${isShareAccount} ? 'Sold' : 'Credit'">Credit</th>
+                <th th:if="${isAmountOnly}" class="right aligned">Amount</th>
+                <th>Source Account</th>
+                <th th:if="${showRunningTotal}" class="right aligned">Running Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="elem, stats : ${transactions}"
+                th:with="runningTotal = ${totaler.calculateTotal(stats.count, transactions)}" th:unless="${isAmountOnly}">
+                <td th:text="${#temporals.format(elem.asAt,'dd MMM yyyy', #locale)}" class="two wide"></td>
+                <td th:text="${elem.description}" class="four wide"></td>
+                <td th:if="${elem.isDebit()}" class="right aligned two wide"
+                    th:text="${elem.isShares} ? ${elem.debitAmount()} + ' @ ' + ${#numbers.formatCurrency(elem.sharePrice())} : ${#numbers.formatCurrency(elem.debitAmount())}"></td>
+                <td th:if="${elem.isCredit()}" class="right aligned two wide"></td>
+                <td th:if="${elem.isCredit()}" class="right aligned two wide"
+                    th:text="${elem.isShares} ? ${elem.creditAmount()} + ' @ ' + ${#numbers.formatCurrency(elem.sharePrice())} : ${#numbers.formatCurrency(elem.creditAmount())}"></td>
+                <td th:if="${elem.isDebit()}" class="right aligned two wide"></td>
+                <td th:text="${elem.sourceAccount()}" class="four wide"></td>
+                <td th:if="${showRunningTotal}" class="right aligned two wide"
+                    th:text="${elem.isShares} ? ${runningTotal} : ${#numbers.formatCurrency(runningTotal)}"></td>
+            </tr>
+            <tr th:each="elem, stats : ${transactions}"
+                th:with="runningTotal = ${totaler.calculateTotal(stats.count, transactions)}" th:if="${isAmountOnly}">
+                <td th:text="${#temporals.format(elem.asAt,'dd MMM yyyy', #locale)}" class="two wide"></td>
+                <td th:text="${elem.description}" class="five wide"></td>
+                <td th:text="${#numbers.formatCurrency(elem.amount.abs())}" class="right aligned two wide"></td>
+                <td th:text="${elem.sourceAccount()}" class="five wide"></td>
+                <td th:if="${showRunningTotal}" class="right aligned two wide"
+                    th:text="${elem.isShares} ? ${runningTotal} : ${#numbers.formatCurrency(runningTotal)}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

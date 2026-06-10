@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:fragment="ScheduleList (schedules)" id="ScheduleList" class="ui segment">
+    <div class="ui relaxed divided list">
+        <div class="item" th:unless="${schedules.isEmpty()}" th:each="txn : ${schedules}">
+            <div class="ui grid">
+                <div class="middle aligned row">
+                    <div class="left attached left aligned seven wide column">
+                        <div class="description">
+                            <i class="small " th:classappend="${txn.isIncoming()} ? 'plus icon' : 'minus icon'"></i>
+                            <span th:text="${txn.description()}">Description</span>
+                        </div>
+                    </div>
+                    <div class="left attached right aligned three wide column">
+                        <div class="description" th:text="${#numbers.formatCurrency(txn.amount())}">$30</div>
+                    </div>
+                    <div class="right aligned six wide column">
+                        <div class="description" th:if="${txn.isNotYetDue()}">
+                            <span th:text="|due ${#temporals.format(txn.dueDate(),'dd MMM yyyy', #locale)}|">dd MMM yyyy</span>
+                            <span>&nbsp;<button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                        </div>
+                        <div class="description" th:if="${txn.isDueSoon()}">
+                            <span class="ui warn text"><b>due soon&nbsp;</b>
+                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                        </div>
+                        <div class="description" th:if="${txn.isDueTomorrow()}">
+                            <span class="ui info text"><b>due tomorrow&nbsp;</b>
+                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                        </div>
+                        <div class="description" th:if="${txn.isDueToday()}">
+                            <span class="ui success text"><b>due today&nbsp;</b>
+                                <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                        </div>
+                        <div class="description" th:if="${txn.isInPast()}">
+                            <span class="ui error text"><b>overdue&nbsp;</b>
+                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

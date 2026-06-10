@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<div th:fragment="Feed (subaccounts, accountFilter)">
+    <div class="ui divider"></div>
+    <div class="ui small list" th:unless="${subaccounts.isEmpty()}" th:each="account, stats : ${subaccounts}">
+        <div class="item">
+            <div class="right floated content">
+                <div th:text="${#numbers.formatCurrency(account.balance)}">$0</div>
+            </div>
+            <div class="content">
+                <div class="ui small breadcrumb" th:with="breadcrums=${account.breadcrumb(accountFilter)}">
+                    <th:block th:unless="${breadcrums.isEmpty()}" th:each="crumb, cstat : ${breadcrums}">
+                        <a th:attr="class=${cstat.last} ? 'active section' : 'section'" th:text="${crumb}" th:href="|@{/Accounts/}${#uris.escapePathSegment(account.fullName())}|">Home</a>
+                        <div th:unless="${cstat.last} or ${cstat.first}" class="divider"> / </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

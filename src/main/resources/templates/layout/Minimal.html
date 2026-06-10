@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(content)" lang="en"
+      th:with="scripts=${scripts?:null}">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="My Money Visualiser">
+    <title>My Money Visualiser</title>
+    <link rel="stylesheet" th:href="@{/_static/fomantic-ui-css/2.9.4/semantic.min.css}">
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/_static/fomantic-ui-css/2.9.4/semantic.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/echarts/dist/echarts.min.js}"></script>
+    <script src="https://unpkg.com/idiomorph@0.7.4/dist/idiomorph-ext.min.js"
+            integrity="sha384-SsScJKzATF/w6suEEdLbgYGsYFLzeKfOA6PY+/C5ZPxOSuA+ARquqtz/BZz9JWU8"
+            crossorigin="anonymous"></script>
+</head>
+<body hx-ext="morph" th:attr="onload=${scripts != null} ? 'onPageLoad()' : _">
+<div class="ui wide container">
+    <div th:replace="~{fragments/Common :: Banner}"></div>
+    <th:block th:replace="${content}"/>
+</div>
+<th:block th:if="${scripts != null}">
+    <th:block th:replace="${scripts}"/>
+</th:block>
+<link rel="stylesheet" data-th-href="@{/css/default.css}"/>
+</body>
+</html>

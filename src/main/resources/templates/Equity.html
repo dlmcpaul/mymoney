@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: PageHeader('Equity Accounts')}, content=~{::main}, menucode='Equity')}"
+      lang="en">
+<body>
+<main>
+    <div class="ui raised horizontal equal width segments">
+        <th:block th:unless="${accounts.equityAccounts.isEmpty()}"
+                  th:each="account, stats : ${accounts.equityAccounts}"
+                  th:with="break=${stats.first or account.category != accounts.equityAccounts[stats.index-1].category}">
+            <div th:if="${break}" class="ui segment">
+                <a th:if="${break}" class="ui green ribbon label" th:text="${account.category()}"
+                   th:href="|@{/Accounts/}${#uris.escapePathSegment(account.fullName())}|">Super Account</a>
+                <div th:replace="~{fragments/Equity :: Feed (${accounts.filterAccounts('Equity:' + account.category())}, 'Equity:' + ${account.category()})}"></div>
+            </div>
+        </th:block>
+    </div>
+</main>
+</body>
+</html>

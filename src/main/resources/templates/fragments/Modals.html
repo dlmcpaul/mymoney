@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<div th:fragment="ScheduleModal (schedule)" id="scheduleModal" class="ui tiny modal" hx-include="#amounts">
+    <div th:unless="${schedule} eq null" class="header" th:text="|Post Journal for ${schedule.ledgerEntry.description} as at ${#temporals.format(schedule.ledgerEntry.date,'dd MMM yyyy', #locale)}|">Header</div>
+    <div th:unless="${schedule} eq null" class="content">
+        <div class="ui compact grid">
+            <div th:each="posting : ${schedule.ledgerEntry.postings}" class="middle aligned row">
+                <div class="ten wide column">
+                    <div class="ui sub header" th:text="${posting.account}"></div>
+                </div>
+                <div class="right aligned two wide column">
+                    <div class="ui labeled input">
+                        <label for="amounts" class="ui label">$</label>
+                        <input name="amounts" type="number" step="any" placeholder="100.00" id="amounts" size="6" th:value="${posting.amount}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions" th:unless="${schedule} eq null">
+            <div class="ui green approve button"
+                 th:attr="hx-post=|@{/schedulePost}?scheduleDescription=${#uris.escapeQueryParam(schedule.ledgerEntry.description)}|"
+                 hx-swap="none" hx-swap-oob="true" hx-select-oob="#ScheduleList,#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
+                 hx-trigger="click">Accept&nbsp;</div>
+            <div class="ui blue approve button"
+                 th:attr="hx-post=|@{/scheduleSkip}?scheduleDescription=${#uris.escapeQueryParam(schedule.ledgerEntry.description)}|"
+                 hx-swap="none" hx-swap-oob="true" hx-select-oob="#ScheduleList"
+                 hx-trigger="click">&nbsp;Skip&nbsp;</div>
+            <div class="ui negative cancel button">Cancel</div>
+    </div>
+</div>
+</body>
+</html>

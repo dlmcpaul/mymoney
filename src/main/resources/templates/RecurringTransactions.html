@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: PageHeader('Recurring Transactions')}, content=~{::main}, menucode='Recurring', scripts=~{::script})}"
+      lang="en">
+<body>
+<main>
+    <table class="ui compact celled table">
+        <thead>
+        <tr>
+            <th>Description</th>
+            <th>Next Due Date</th>
+            <th>Recurrence</th>
+            <th class="right aligned">Amount</th>
+            <th class="right aligned">Estimate over Year</th>
+            <th class="center aligned">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="schedule : ${schedules}">
+            <td data-label="Description" th:text="${schedule.description()}">James</td>
+            <td data-label="Due Date" th:text="${#temporals.format(schedule.dueDate(),'dd MMM yyyy', #locale)}">24</td>
+            <td data-label="Recurrence" th:text="${schedule.recurrenceDescription()}">Engineer</td>
+            <td data-label="Amount" class="right aligned" th:text="${#numbers.formatCurrency(schedule.amount())}"></td>
+            <td data-label="Estimate over Year" class="right aligned"
+                th:text="${#numbers.formatCurrency(schedule.totalForYear())}"></td>
+            <td data-label="Actions" class="center aligned">
+                <div class="ui small spaced buttons">
+                    <button class="ui compact button">Edit</button>
+                    <button class="ui compact button">Skip</button>
+                    <button class="ui compact button">Post</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+<script th:inline="javascript" type="text/javascript">
+    function onPageLoad() {
+        console.log("Setting up event listeners for Recurring Transactions Page");
+        // Placing inside onPageLoad ensures these event listeners are registered only once
+
+        document.body.addEventListener("showMessage", function (event) {
+            $.toast({
+                class: event.detail.level,
+                title: event.detail.title,
+                message: event.detail.message,
+                showProgress: 'bottom',
+                classProgress: 'black'
+            });
+        });
+
+        document.body.addEventListener('htmx:timeout', function (event) {
+            $.toast({
+                class: 'error',
+                title: 'Network',
+                message: 'Request timed out',
+                showProgress: 'bottom',
+                classProgress: 'black'
+            });
+        });
+
+        document.body.addEventListener('htmx:sendError', function (event) {
+            $.toast({
+                class: 'error',
+                title: 'Network',
+                message: 'Could not connect to server',
+                showProgress: 'bottom',
+                classProgress: 'black'
+            });
+        });
+    }
+</script>
+<link rel="stylesheet" data-th-href="@{/css/default.css}"/>
+</body>
+</html>

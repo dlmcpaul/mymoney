@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: InvestmentHeader (${nextDisplayMode}, ${header})}, content=~{::main}, menucode='Investments', scripts=~{::script})}" lang="en">
+<body>
+<main>
+        <div th:replace="~{fragments/Investment :: InvestmentTable (${investmentsData})}"></div>
+        <div class="ui horizontal divider">Investment Details</div>
+        <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${header})}"></div>
+</main>
+<script th:inline="javascript">
+    htmx.onLoad(function updateInvestmentsTotalChart(target) {
+        // Initialize the echarts instance based on the prepared dom
+        let chartDiv = document.getElementById('investmentsTotalChart');
+        if (chartDiv != null) {
+            let shareTotalChart = echarts.init(chartDiv);
+
+            let shareTotalChartData = /*[[${investmentsData.getInvestmentTotals()}]]*/ [''];
+
+            // Specify the configuration items and data for the chart
+            let shareTotalOption = {
+                title: {
+                    text: 'Investment Totals',
+                    left: 'center',
+                    top: 'center'
+                },
+                tooltip: {},
+                series: [
+                    {
+                        type: 'pie',
+                        data: shareTotalChartData,
+                        radius: ['40%', '70%']
+                    }
+                ]
+            };
+
+            // Display the chart using the configuration items and data just specified.
+            shareTotalChart.setOption(shareTotalOption);
+        }
+    });
+</script>
+<script th:inline="javascript">
+    const moneyFmt = new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: 'AUD',
+
+        minimumFractionDigits: 2, // This suffices for whole numbers, but will
+        // print 2500.10 as $2,500.1
+        maximumFractionDigits: 2, // Causes 2500.99 to be printed as $2,501
+    });
+
+    htmx.onLoad(function updateMarketValueChart(target) {
+        let chartDiv = document.getElementById('marketValueChart');
+
+        if (chartDiv != null) {
+            // Initialize the echarts instance based on the prepared dom
+            let marketValueChart = echarts.init(chartDiv);
+
+            let marketValueChartData = JSON.parse(chartDiv.dataset.chartData);
+            let marketValueChartTitle = chartDiv.dataset.chartTitle;
+
+            // Specify the configuration items and data for the chart
+            let marketValueOption = {
+                title: {
+                    text: marketValueChartTitle,
+                    left: 'center',
+                    top: 'center'
+                },
+                tooltip: {
+                    valueFormatter: (value) => moneyFmt.format(value.toFixed(2))
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        data: marketValueChartData,
+                        radius: ['40%', '70%']
+                    }
+                ]
+            };
+
+            // Display the chart using the configuration items and data just specified.
+            marketValueChart.setOption(marketValueOption);
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: DashboardHeader (${today})}, content=~{::main}, menucode='Home', scripts=~{::script})}"
+      lang="en">
+<body>
+<main>
+    <div class="ui three column divided grid">
+            <div class="row">
+                <div class="five wide column">
+                    <h3 class="ui header">Balance Sheet</h3>
+                </div>
+                <div class="six wide column">
+                    <h3 class="ui header">Recurring Transactions</h3>
+                </div>
+                <div class="five wide column">
+                    <div th:replace="~{fragments/IncomeExpense :: IncomeExpenseHeader (${monthlyChange})}"></div>
+                </div>
+            </div>
+            <div class="stretched row">
+                <div class="five wide column">
+                    <div class="ui fluid vertical menu">
+                        <div th:replace="~{fragments/Account :: BalanceSheet (${currentPosition})}"></div>
+                    </div>
+                </div>
+                <div class="six wide column">
+                    <div class="ui one column grid">
+                        <div class="row">
+                            <div class="column">
+                                <div th:replace="~{fragments/Schedules :: ScheduleList (${scheduledTransactions})}"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <div class="ui segment">
+                                    <div class="ui top attached tabular menu" id="journal-tabs">
+                                        <div class="item active" data-tab="one" id="journal-tab-item-1">Journal Entry
+                                        </div>
+                                        <div class="item" data-tab="two" id="journal-tab-item-2">Dividend Income</div>
+                                        <div class="item" data-tab="three" id="journal-tab-item-3">Fund Income</div>
+                                    </div>
+                                    <div class="ui bottom attached tab segment active" data-tab="one">
+                                        <div th:replace="~{fragments/Journal :: NewJournal (${today})}"></div>
+                                    </div>
+                                    <div class="ui bottom attached tab segment" data-tab="two">
+                                        <div th:replace="~{fragments/Journal :: NewDividendIncome (${today})}"></div>
+                                    </div>
+                                    <div class="ui bottom attached tab segment" data-tab="three">
+                                        <div th:replace="~{fragments/Journal :: NewDistributionIncome (${today}, 'distribution')}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="five wide column">
+                    <div th:replace="~{fragments/IncomeExpense :: IncomeExpenseBody (${monthlyChange})}"></div>
+                </div>
+            </div>
+        </div>
+</main>
+<div th:replace="~{fragments/Modals :: ScheduleModal (null)}"></div>
+<script th:inline="javascript" type="text/javascript">
+    // These Listeners need to be re-registered each page load
+    document.getElementById('journal-tabs').addEventListener('click', function (event) {
+        if (event.target.id.includes('journal-tab-item')) {
+            $('#' + event.target.id)
+                .tab();
+        }
+    });
+
+    function onPageLoad() {
+        console.log("Setting up event listeners for Dashboard Page");
+        // Placing inside onPageLoad ensures these event listeners are registered only once
+
+        document.body.addEventListener("showScheduleModal", function (event) {
+            $('#scheduleModal')
+                .modal('show');
+        });
+
+        document.body.addEventListener("showMessage", function (event) {
+            $.toast({
+                class: event.detail.level,
+                title: event.detail.title,
+                message: event.detail.message,
+                showProgress: 'bottom',
+                classProgress: 'black'
+            });
+        });
+
+        document.body.addEventListener('htmx:timeout', function (event) {
+            $.toast({
+                class: 'error',
+                title: 'Network',
+                message: 'Request timed out',
+                showProgress: 'bottom',
+                classProgress: 'black'
+            });
+        });
+
+        document.body.addEventListener('htmx:sendError', function (event) {
+            $.toast({
+                class: 'error',
+                title: 'Network',
+                message: 'Could not connect to server',
+                showProgress: 'bottom',
+                classProgress: 'black'
+            });
+        });
+    }
+</script>
+</body>
+</html>

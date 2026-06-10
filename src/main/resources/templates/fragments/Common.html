@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:fragment="Banner" class="ui inverted segment">
+    <div class="ui two column grid middle aligned">
+        <div class="column">
+            <h1 class="ui inverted header">My Money Visualiser<span class="ui small text"
+                                                                    data-th-text="' (' + ${releaseVersion} + ')'"></span>
+            </h1>
+        </div>
+        <div class="right aligned column">
+            <div class="ui small text">
+                <i class="copyright icon"></i> David McPaul 2026
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="PageHeader (header)" class="ui one column middle aligned grid">
+    <div class="row">
+        <div class="column">
+            <div class="ui center aligned huge header" th:text="${header}">Page</div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="DashboardHeader (today)" class="ui two column middle aligned grid">
+    <div class="row">
+        <div class="one wide column">
+            <div class="ui icon buttons">
+                <div th:replace="~{fragments/Common :: RefreshButton}"></div>
+                <div th:replace="~{fragments/Common :: SaveButton}"></div>
+            </div>
+        </div>
+        <div class="fifteen wide column">
+            <div class="ui center aligned huge header">Dashboard for <span
+                    th:text="${#temporals.format(today, 'EEEE dd MMM yyyy')}"></span></div>
+        </div>
+    </div>
+</div>
+
+<div id="InvestmentHeader" th:fragment="InvestmentHeader (nextDisplayMode, header)"
+     class="ui one column middle aligned grid">
+    <div class="row">
+        <div class="column">
+            <div class="ui center aligned huge header"><span th:text="${header}">Current Investments</span> <a
+                    th:href="|@{/Investments}?nextDisplayMode=${nextDisplayMode}|"
+                    th:attr="hx-get=|@{/Investments}?nextDisplayMode=${nextDisplayMode}|,data-tooltip=|Switch to ${nextDisplayMode}|"
+                    hx-select-oob="#InvestmentTable, #InvestmentHeader, #InvestmentChart"
+                    hx-swap="outerHTML"><i class="exchange alternate icon"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="AccountsHeader" th:fragment="AccountsHeader (accounts)" class="ui one column middle aligned grid">
+    <div class="row">
+        <div class="column">
+            <div class="ui center aligned huge header">All Open Accounts for Financial Year
+                <a class="header" data-tooltip="Previous Financial Year"
+                   th:href="|@{/Accounts/changeFY}?currentFY=${accounts.financialYear}&direction=prev|"
+                   th:attr="hx-get=|@{/Accounts/changeFY}?currentFY=${accounts.financialYear}&direction=prev|"
+                   hx-select-oob="#AccountsHeader,#AccountsBody"
+                   hx-swap="outerHTML"><i class="angle left icon"></i></a>
+                <span data-th-text="${accounts.financialPeriod()}"></span>
+                <a class="header" data-tooltip="Next Financial Year" th:with="url=|@{/Accounts/changeFY}?currentFY=${accounts.financialYear}&direction=next|"
+                   th:href="${url}"
+                   th:attr="hx-get=${url}"
+                   hx-select-oob="#AccountsHeader,#AccountsBody"
+                   hx-swap="outerHTML"><i class="angle right icon"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="SaveButton" data-tooltip="Save" class="ui large icon button" id="SaveButton"
+     th:attr="hx-post=|@{/save}|" hx-swap="outerHTML" hx-select="#SaveButton"
+><i class="fitted inverted black save icon"></i>
+</div>
+
+<div th:fragment="RefreshButton" data-tooltip="Reload Files" class="ui large icon button" id="RefreshButton"
+     th:attr="hx-post=|@{/reload}|" hx-swap="none"
+     hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody,#DashboardHeader,#ScheduleList"
+><i class="fitted inverted black sync icon"></i>
+</div>
+
+<button th:fragment="ScheduleButton (description)" class="mini ui compact icon button" data-tooltip="Post or Skip"
+        data-inverted=""
+        th:attr="hx-get=|@{/showScheduleModal}?scheduleDescription=${#uris.escapeQueryParam(description)}|"
+        hx-swap="none" hx-trigger="click" hx-select-oob="#scheduleModal">
+    <i class="balance scale icon"></i>
+</button>
+
+<div id="primary-menu" th:fragment="PrimaryMenu (active, menuList)" class="ui left very close rail">
+    <div class="ui vertical fluid pointing menu">
+        <a th:each="menu : ${menuList}" th:text="${menu.getText()}" th:href="|@{/}${menu.getUri()}|" class="item"
+           th:attrprepend="class = ${active} eq ${menu.getCode()} ? 'active ' : _"></a>
+    </div>
+</div>
+
+<div id="primary-tabs" th:fragment="PrimaryTabs (active, menuList)" class="ui nine item menu">
+    <a th:each="menu : ${menuList}" th:text="${menu.getText()}" th:href="|@{/}${menu.getUri()}|" class="item"
+       th:attrprepend="class = ${active} eq ${menu.getCode()} ? 'active ' : _"></a>
+</div>
+</body>
+</html>
