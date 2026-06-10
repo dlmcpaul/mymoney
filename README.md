@@ -23,7 +23,21 @@ It will make use of 3 files
   Liabilities:Mortgage:Principal
 ```
 
-If your ledger file just uses the basic format then you should be ok.
+If your ledger file just uses the basic format then you should be ok.  Date format can be yyyy/MM/dd or yyyy-MM-dd
+
+Entries can be open (no closing value) and will be calculated or closed (all values provided) and must sum to 0
+
+commodities can be entered as well eg
+```
+2026/04/16 * ETF purchase
+  assets:shares:VDHG  10  VDHG @ $75.5
+  assets:bank:checking  $-755.00
+2026/05/15 * Dividends received VDHG ; Needs code at end or start to link to share or fund
+  assets:broker:schwabb  $128.40
+  income:investment:distribution  $-128.40  ;Needs account to match with breakdown accounts
+```
+
+Note the second entry has the description ending in the commodity code.  This will allow linking events other than buy/sell with the commodity.
 
 Your account entries should follow the convention of
 Assets, Liabilities, Expenses, Income, Equity
@@ -68,7 +82,13 @@ I may look to document these or try to make them configurable.
 
 There are mechanisms to update the ledger file (accepting a schedule, posting a new journal) but you can primarily use it for visualisation.
 
-This is a Java Application based on Java 21 so download the jar and 
+This is a Java Application built using Java 21 so download the jar and using a java 21 runtime
 ```
-java -jar mymoney.jar
+java -jar mymoney.jar --ledger=myledger.ledger
+```
+
+The other files can be loaded with additional params
+
+```
+java -jar mymoney.jar --ledger=myledger.ledger --schedules=schedules.ledger --commodities=commodities.txt
 ```
