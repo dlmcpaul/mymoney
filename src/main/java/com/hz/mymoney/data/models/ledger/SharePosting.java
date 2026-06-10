@@ -1,6 +1,7 @@
 package com.hz.mymoney.data.models.ledger;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class SharePosting extends Posting implements IPosting {
 	protected final BigDecimal price;
@@ -42,7 +43,7 @@ public class SharePosting extends Posting implements IPosting {
 
 	@Override
 	public BigDecimal getValue() {
-		return price.multiply(amount);
+		return price.multiply(amount).setScale(2, RoundingMode.HALF_UP);
 	}
 
 	@Override

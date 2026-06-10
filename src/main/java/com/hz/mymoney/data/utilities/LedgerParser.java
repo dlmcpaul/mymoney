@@ -44,7 +44,11 @@ public class LedgerParser {
 
 				if (isNewLedgerEntry(line)) {
 					if (ledgerEntry != null) {
-						ledger.getLedgerEntries().add(ledgerEntry);
+						if (ledgerEntry.isBalanced()) {
+							ledger.getLedgerEntries().add(ledgerEntry);
+						} else {
+							log.error("Ledger Entry is not balanced {}", ledgerEntry);
+						}
 					}
 					ledgerEntry = makeLedgerEntryFromLine(line);
 				} else if (ledgerEntry != null) {
@@ -68,7 +72,11 @@ public class LedgerParser {
 				line = ledgerReader.readLine();
 			}
 			if (ledgerEntry != null) {
-				ledger.getLedgerEntries().add(ledgerEntry);
+				if (ledgerEntry.isBalanced()) {
+					ledger.getLedgerEntries().add(ledgerEntry);
+				} else {
+					log.error("Final Ledger Entry is not balanced {}", ledgerEntry);
+				}
 			}
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());
