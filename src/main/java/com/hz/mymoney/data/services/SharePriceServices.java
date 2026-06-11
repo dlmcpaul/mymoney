@@ -51,23 +51,18 @@ public class SharePriceServices implements ApplicationRunner {
 			loadCommoditiesFromQuickenFile(Objects.requireNonNull(args.getOptionValues("quicken")).getFirst(), investmentHistoryEntries);
 		} else {
 			commodityOption = "internal";
-			loadCommoditiesFromInternal(investmentHistoryEntries);
+			loadCommoditiesFromArgs("classpath:test.commodities", investmentHistoryEntries);
 		}
 	}
 
 	public void reloadCommodities() throws IOException {
 		Map<String, List<InvestmentHistoryEntry>> investmentHistoryEntries = new HashMap<>();
 		switch (commodityOption) {
-			case "internal" -> loadCommoditiesFromInternal(investmentHistoryEntries);
+			case "internal" -> loadCommoditiesFromArgs("classpath:test.commodities", investmentHistoryEntries);
 			case "quicken" -> loadCommoditiesFromQuickenFile(commodityFileName, investmentHistoryEntries);
 			case "commodities" -> loadCommoditiesFromArgs(commodityFileName, investmentHistoryEntries);
 			default -> throw new IllegalStateException("Unexpected value: " + commodityOption);
 		}
-	}
-
-	private void loadCommoditiesFromInternal(Map<String, List<InvestmentHistoryEntry>> entries) {
-		List.of("COL", "IAG", "NAB", "WES", "TLS", "VDHG").forEach(code -> addEntry(entries, code, LocalDate.now(), getInvestmentValue(code)));
-		this.investmentHistory = new InvestmentHistory(entries);
 	}
 
 	// Exported Quicken commodities file format
@@ -151,23 +146,6 @@ public class SharePriceServices implements ApplicationRunner {
 		InvestmentHistoryEntry entry = new InvestmentHistoryEntry(asAt, value);
 		entries.computeIfAbsent(commodityCode, k -> new ArrayList<>());
 		entries.get(commodityCode).add(entry);
-	}
-
-	private BigDecimal getInvestmentValue(String shareCode) {
-		return switch (shareCode) {
-			case "COL" -> new BigDecimal("21.36");
-			case "IAG" -> new BigDecimal("6.61");
-			case "NAB" -> new BigDecimal("46.82");
-			case "WES" -> new BigDecimal("75.82");
-			case "TLS" -> new BigDecimal("5.24");
-			case "VDHG" -> new BigDecimal("73.72");
-			case "AMP" -> new BigDecimal("1.00");
-			case "APT" -> new BigDecimal("1.40");
-			case "CYB" -> new BigDecimal("5.00");
-			case "EAI" -> new BigDecimal("1.20");
-			case "MRV" -> new BigDecimal("2.00");
-			default -> BigDecimal.ZERO;
-		};
 	}
 
 }

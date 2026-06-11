@@ -1,0 +1,638 @@
+2025/06/01 Checking Opening balance
+  Assets:Cash:Checking  $1000.00
+  Equity:Opening Balances:Cash  $-1000.00
+2025/06/01 Savings Opening balance
+  Assets:Bank:NAB Savings  $10000.00
+  Equity:Opening Balances:Bank  $-10000.00
+2025/06/01 Mortgage Opening balance
+  Equity:Opening Balances:Mortgage  $100000.00
+  Liabilities:Mortgage:House Mortgage  $-100000.00
+2025/06/01 Credit Card Opening balance
+  Equity:Opening Balances:Credit Card  $3376.99
+  Liabilities:Credit Card:NAB Visa  $-3376.99
+2025/06/01 My Super Opening balance
+  Assets:Superannuation:My Super Fund  $10000.00
+  Equity:Opening Balances:Superannuation  $-10000.00
+2026/01/19 Grocery Store
+  Expenses:Food:Groceries  $44.00
+  Liabilities:Credit Card:NAB Visa  $-44.00
+2026/01/27 Book Store
+  Expenses:Entertain:Books  $20.00
+  Liabilities:Credit Card:NAB Visa  $-20.00
+2026/04/16 ETF purchase ; Shares have their code as the account in the Assets:Shares parent account
+  Assets:Shares:VDHG  10  VDHG @ $75.5
+  Assets:Bank:NAB Savings  $-755.00
+2026/05/15 Dividends received VDHG ; Needs code at end or start of payee to link to share or fund
+  Assets:Broker:Schwabb  $128.40
+  Income:Investment:Distribution  $-128.40  ;Needs account to match with breakdown accounts
+2026/05/15 Transfer from Broker
+  Assets:Broker:Schwabb  $-128.40
+  Assets:Bank:NAB Savings  $128.40
+2025/05/14 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/05/20 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/05/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2025/06/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2025/06/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2025/06/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2025/06/03 Medical Insurance Fund
+  Assets:Bank:NAB Savings  $-304.53
+  Expenses:Medical:Insurance  $304.53
+2025/06/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/06/06 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/06/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/06/11 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/06/03 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/06/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2025/07/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2025/07/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2025/07/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2025/09/03 Medical Insurance Fund
+  Assets:Bank:NAB Savings  $-304.53
+  Expenses:Medical:Insurance  $304.53
+2025/07/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/06/20 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/07/09 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/07/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/06/17 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/07/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2025/08/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2025/08/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2025/08/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2025/12/03 Medical Insurance Fund
+  Assets:Bank:NAB Savings  $-304.53
+  Expenses:Medical:Insurance  $304.53
+2025/08/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/07/04 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/08/06 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/08/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/07/01 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/08/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2025/09/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2025/09/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2025/09/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/03/03 Medical Insurance Fund
+  Assets:Bank:NAB Savings  $-304.53
+  Expenses:Medical:Insurance  $304.53
+2025/09/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/07/18 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/09/03 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/09/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/07/15 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/09/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2025/10/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2025/10/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2025/10/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/06/03 Medical Insurance Fund
+  Assets:Bank:NAB Savings  $-304.53
+  Expenses:Medical:Insurance  $304.53
+2025/10/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/08/01 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/10/01 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/10/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/07/29 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/10/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2025/11/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2025/11/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2025/11/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2025/11/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/08/15 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/10/29 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/11/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/08/12 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/11/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2025/12/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2025/12/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2025/12/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2025/12/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/08/29 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/11/26 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/12/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/08/26 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/12/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2026/01/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2026/01/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2026/01/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/01/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/09/12 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/12/24 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2026/01/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/09/09 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/01/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2026/02/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2026/02/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2026/02/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/02/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/09/26 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/01/21 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2026/02/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/09/23 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/02/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2026/03/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2026/03/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2026/03/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/03/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/10/10 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/02/18 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2026/03/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/10/07 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/03/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2026/04/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2026/04/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2026/04/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/04/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/10/24 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/03/18 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2026/04/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/10/21 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/04/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2026/05/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2026/05/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2026/05/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/05/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/11/07 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/04/15 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2026/05/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/11/04 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/05/20 Amazon Prime
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2026/06/01 Netflix
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2026/06/01 Home Loan Payment
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2026/06/03 Cleaner
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/06/06 Internet + Phone Bill
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2025/11/21 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/05/13 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2026/06/08 NAB Credit Card
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
+2025/11/18 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/12/05 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/06/10 Lawn Maintenance
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2025/12/02 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/12/19 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/01/02 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/12/16 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/01/16 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/12/30 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/01/30 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/01/13 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/02/13 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/01/27 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/02/27 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/02/10 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/03/13 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/02/24 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/03/27 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/03/10 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/04/10 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/03/24 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/04/24 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/04/07 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/05/08 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/04/21 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/05/22 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/05/05 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/06/05 House Loan Offset Payment
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/05/19 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/06/02 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2025/06/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2025/07/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2025/08/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2025/09/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2025/09/29 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2025/10/11 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2025/11/12 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2025/12/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2026/01/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2026/02/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2026/03/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2026/04/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2026/05/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2026/06/19 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:NAB Visa  $-144.00
+2025/06/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2025/07/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2025/08/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2025/09/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2025/10/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2025/11/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2025/12/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2026/01/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2026/02/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2026/03/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2026/04/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2026/05/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2026/06/22 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:NAB Visa  $-43.00
+2025/07/01 Super Earnings
+  Assets:Superannuation:My Super Fund  $3333.00
+  Income:Superannuation:Returns  $-3333.00
+2026/04/22 Speakers
+  Expenses:Cash:Entertain  $6000.00
+  Liabilities:Credit Card:NAB Visa  $-6000.00
+2026/01/22 Laptop
+  Expenses:Cash:Entertain  $3400.00
+  Liabilities:Credit Card:NAB Visa  $-3400.00
+2026/05/22 Jacket
+    Expenses:Cash:Clothing  $400.00
+    Liabilities:Credit Card:NAB Visa  $-400.00

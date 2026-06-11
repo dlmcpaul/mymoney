@@ -1,0 +1,32 @@
+2026/07/14 Lawn Maintenance ; 4w
+  Assets:Bank:NAB Savings  $-30.00
+  Expenses:Cash:Household  $30.00
+2026/07/20 Salary ; 2w
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:NAB Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/07/20 Amazon Prime ; 1m
+  Liabilities:Credit Card:NAB Visa  $-2.99
+  Expenses:Cash:Household  $2.99
+2026/07/01 Netflix ; 1m
+  Liabilities:Credit Card:NAB Visa  $-20.99
+  Expenses:Cash:Entertain  $20.99
+2026/07/01 Home Loan Payment ; 1m
+  Assets:Bank:Mortgage Offset  $-1000.00
+  Liabilities:Mortgage:House Mortgage  $1000.00
+2026/07/03 Cleaner ; 1m
+  Assets:Bank:NAB Savings  $-242.00
+  Expenses:Cash:Household  $242.00
+2026/07/03 Medical Insurance Fund ; 3m
+  Assets:Bank:NAB Savings  $-304.53
+  Expenses:Medical:Insurance  $304.53
+2026/07/06 Internet + Phone Bill ; 1m
+  Assets:Bank:NAB Savings  $-183.00
+  Expenses:Cash:Phone-Internet  $183.00
+2026/07/06 House Loan Offset Payment ; 2w
+  Assets:Bank:NAB Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2026/07/08 NAB Credit Card ; 1m
+  Assets:Bank:NAB Savings  $-1206.77
+  Liabilities:Credit Card:NAB Visa  $1206.77
