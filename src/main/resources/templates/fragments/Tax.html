@@ -13,32 +13,36 @@
 <!--/*@thymesVar id="taxYear" type="com.hz.mymoney.ui.models.templates.TaxYear"*/-->
 <div th:fragment="TaxYear (taxYear, yearType)" class="ui segment">
     <div class="ui three column compact grid">
-        <div class="column">Earnings from Salary</div>
-        <div class="right aligned column">Excluding Super <span class="ui teal text" th:text="${#numbers.formatCurrency(taxYear.getSuperContribAmount())}">$1000</span></div>
-        <div th:replace="~{fragments/Tax :: BreakdownLink ('income', ${yearType}, ${taxYear.getEarnedIncome()})}"></div>
-        <div class="column">Earnings from Investments</div>
-        <div class="right aligned column">Includes Imputation <span class="ui teal text" th:text="${#numbers.formatCurrency(taxYear.getImputationCreditAmount())}">$1000</span></div>
-        <div th:replace="~{fragments/Tax :: BreakdownLink ('investment', ${yearType}, ${taxYear.getInvestmentIncomeAmount()})}"></div>
+        <div class="row">
+            <div class="five wide column">Earnings from Salary</div>
+            <div class="right aligned eight wide column">Excluding Super <span class="ui teal text" th:text="${#numbers.formatCurrency(taxYear.getSuperContribAmount())}">$1000</span></div>
+            <div th:replace="~{fragments/Tax :: BreakdownLink ('income', ${yearType}, ${taxYear.getEarnedIncome()})}"></div>
+        </div>
+        <div class="row">
+            <div class="five wide column">Earnings from Investments</div>
+            <div class="right aligned eight wide column">Including Franking Credits <span class="ui teal text" th:text="${#numbers.formatCurrency(taxYear.getImputationCreditAmount())}">$1000</span></div>
+            <div th:replace="~{fragments/Tax :: BreakdownLink ('investment', ${yearType}, ${taxYear.getInvestmentIncomeAmount()})}"></div>
+        </div>
     </div>
     <div class="ui horizontal divider">Less Deductions</div>
     <div class="ui two column compact grid">
-        <div class="column">Tax Deductible Expenses</div>
+        <div class="thirteen wide column">Tax Deductible Expenses</div>
         <div th:replace="~{fragments/Tax :: BreakdownLink ('tax_expenses', ${yearType}, ${taxYear.getTaxDeductionsAmount()})}"></div>
-        <div class="column">Charitable Donations</div>
+        <div class="thirteen wide column">Charitable Donations</div>
         <div th:replace="~{fragments/Tax :: BreakdownLink ('donations', ${yearType}, ${taxYear.getDonationsAmount()})}"></div>
     </div>
     <div class="ui horizontal divider">Less Taxes Already Paid</div>
     <div class="ui two column compact grid">
-        <div class="column">Tax Deducted from Salary</div>
+        <div class="thirteen wide column">Tax Deducted from Salary</div>
         <div th:replace="~{fragments/Tax :: BreakdownLink ('tax_salary', ${yearType}, ${taxYear.getSalaryTaxPaidAmount()})}"></div>
-        <div class="column">PAYG Prepayments</div>
+        <div class="thirteen wide column">PAYG Prepayments</div>
         <div th:replace="~{fragments/Tax :: BreakdownLink ('tax_payg', ${yearType}, ${taxYear.getPAYGPaidAmount()})}"></div>
-        <div class="column">Franking Credits</div>
+        <div class="thirteen wide column">Franking Credits</div>
         <div th:replace="~{fragments/Tax :: BreakdownLink ('franking_credits', ${yearType}, ${taxYear.getImputationCreditAmount()})}"></div>
     </div>
 </div>
 
-<div th:fragment="BreakdownLink (breakdown_code, tax_year_code, amount)" class="right aligned column"><a
+<div th:fragment="BreakdownLink (breakdown_code, tax_year_code, amount)" class="right aligned three wide column"><a
         th:href="|@{/Tax/Breakdown}?breakdown_code=${breakdown_code}&tax_year_code=${tax_year_code}|"
         th:attr="hx-get=|@{/Tax/Breakdown}?breakdown_code=${breakdown_code}&tax_year_code=${tax_year_code}|" hx-target="#TaxBreakdown"
         hx-swap="outerHTML"
