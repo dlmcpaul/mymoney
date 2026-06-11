@@ -6,6 +6,7 @@ public interface IPosting {
 
 	boolean isSameAccount(String account);
 	boolean isCommissionPosting();
+	boolean isIncomePosting();
 
 	String postLine();
 	String getAccount();

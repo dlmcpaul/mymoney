@@ -8,6 +8,7 @@ public class AccountConstants {
 	public static final String EMPLOYMENT_TAXES = "Expenses:Employment:Taxes";
 
 	// Income
+	public static final String INCOME_PREFIX = "Income:";
 	public static final String EMPLOYMENT_SALARY = "Income:Employment:Salary";
 	public static final String DIVIDEND_INCOME = "Income:Investment:Dividends";
 	public static final String DISTRIBUTION_INCOME = "Income:Investment:Distribution";

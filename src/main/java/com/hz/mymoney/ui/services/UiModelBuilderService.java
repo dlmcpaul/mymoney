@@ -72,7 +72,7 @@ public class UiModelBuilderService {
 				.map(p -> new Journal(p.getNote() == null ? schedule.ledgerEntry.getDescription() : p.getNote(), p.getAccount(), p.getAmount()))
 				.toList();
 		return new ScheduledTransaction(schedule.ledgerEntry.getDescription(),
-				schedule.ledgerEntry.getFirstPosting().getAccount().startsWith("Income:"),
+				schedule.ledgerEntry.getFirstPosting().isIncomePosting(),
 				schedule.ledgerEntry.getDate(),
 				schedule.ledgerEntry.getFirstAmount().abs(),
 				schedule.recurrenceAmount(),
@@ -407,7 +407,7 @@ public class UiModelBuilderService {
 		int yearMin = year - 10;
 
 		while (year > yearMin) {
-			yearlyIncomeExpenseList.add(new YearlyIncomeExpense("FY" + year + "/" + (year + 1),
+			yearlyIncomeExpenseList.add(new YearlyIncomeExpense("FY" + (year - 2000) + "/" + (year - 1999),
 					sumBalanceForFY(chartOfAccounts, "Income", financialYearStart),
 					sumBalanceForFY(chartOfAccounts, "Expenses", financialYearStart)
 							.subtract(sumBalanceForFY(chartOfAccounts, AccountConstants.EMPLOYMENT_TAXES, financialYearStart))

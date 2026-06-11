@@ -9,9 +9,10 @@ import java.util.List;
 public class EquityTemplateData {
 	public final List<Account> equityAccounts = new ArrayList<>();
 
-	public List<Account> filterAccounts(String filter) {
+	public List<Account> filterEquityAccounts(String filter) {
+		String equityFilter = ("Equity:" + filter).toLowerCase();
 		return equityAccounts.stream()
-				.filter(account -> account.fullName().startsWith(filter))
+				.filter(account -> account.fullName().toLowerCase().startsWith(equityFilter))
 				.toList();
 	}
 

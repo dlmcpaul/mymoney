@@ -11,7 +11,7 @@
             <div th:if="${break}" class="ui segment">
                 <a th:if="${break}" class="ui green ribbon label" th:text="${account.category()}"
                    th:href="|@{/Accounts/}${#uris.escapePathSegment(account.fullName())}|">Super Account</a>
-                <div th:replace="~{fragments/Equity :: Feed (${accounts.filterAccounts('Equity:' + account.category())}, 'Equity:' + ${account.category()})}"></div>
+                <div th:replace="~{fragments/Equity :: Feed (${accounts.filterEquityAccounts(account.category())}, 'Equity:' + ${account.category()})}"></div>
             </div>
         </th:block>
     </div>

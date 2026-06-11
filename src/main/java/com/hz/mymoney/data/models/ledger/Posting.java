@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import static com.hz.mymoney.configuration.AccountConstants.COMMISSION;
+import static com.hz.mymoney.configuration.AccountConstants.INCOME_PREFIX;
 
 public class Posting implements IPosting {
 	protected final String account;
@@ -87,5 +88,10 @@ public class Posting implements IPosting {
 	@Override
 	public boolean isCommissionPosting() {
 		return this.account.equalsIgnoreCase(COMMISSION);
+	}
+
+	@Override
+	public boolean isIncomePosting() {
+		return this.account.toLowerCase().startsWith(INCOME_PREFIX.toLowerCase());
 	}
 }

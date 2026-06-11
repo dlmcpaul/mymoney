@@ -24,6 +24,7 @@ public class LedgerParser {
 
 	private static final String DATE_FORMAT_1 = "yyyy/MM/dd";
 	private static final String DATE_FORMAT_2 = "yyyy-MM-dd";
+	private static final String MONEY_SYMBOL = "$";
 
 	public Ledger loadLedger(InputStream file) {
 		Ledger ledger = new Ledger();
@@ -117,21 +118,21 @@ public class LedgerParser {
 	}
 
 	private BigDecimal parseMoney(String amount, int scale) {
-		if (amount.contains("$-") || amount.contains("-$")) {
+		if (amount.contains(MONEY_SYMBOL + "-") || amount.contains("-" + MONEY_SYMBOL)) {
 			// special case 1
-			return parseMoney("$" + amount.substring(2), scale).multiply(BigDecimal.valueOf(-1));
-		} else if (amount.contains("$ -")) {
+			return parseMoney(MONEY_SYMBOL + amount.substring(2), scale).multiply(BigDecimal.valueOf(-1));
+		} else if (amount.contains(MONEY_SYMBOL + " -")) {
 			// special case 2
-			return parseMoney("$" + amount.substring(3), scale).multiply(BigDecimal.valueOf(-1));
+			return parseMoney(MONEY_SYMBOL + amount.substring(3), scale).multiply(BigDecimal.valueOf(-1));
 		} else if (amount.contains(".") == false) {
 			// special case 3
 			return parseMoney(amount + ".00", scale);
-		} else if (amount.startsWith("$ ")) {
+		} else if (amount.startsWith(MONEY_SYMBOL + " ")) {
 			// special case 4
-			return parseMoney("$" + amount.substring(2), scale);
-		} else if (amount.startsWith("$") == false) {
+			return parseMoney(MONEY_SYMBOL + amount.substring(2), scale);
+		} else if (amount.startsWith(MONEY_SYMBOL) == false) {
 			// special case 5
-			return parseMoney("$" + amount, scale);
+			return parseMoney(MONEY_SYMBOL + amount, scale);
 		}
 
 		try {
@@ -254,11 +255,11 @@ public class LedgerParser {
 
 		// split into entries with 2 or more spaces as delimiter
 		// remove any empty tokens
-		// remove any $ tokens
+		// remove any MONEY_SYMBOL tokens
 		return Arrays.stream(line.split(" {2}"))
 				.map(String::trim)
 				.filter(s -> s.isEmpty() == false)
-				.filter(s -> s.equals("$") == false)
+				.filter(s -> s.equals(MONEY_SYMBOL) == false)
 				.toList();
 	}
 

@@ -1,10 +1,8 @@
 package com.hz.mymoney.data.services;
 
 import com.hz.mymoney.data.models.internal.Schedule;
-import com.hz.mymoney.data.models.ledger.IPosting;
 import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;
-import com.hz.mymoney.data.models.ledger.Posting;
 import com.hz.mymoney.data.utilities.LedgerParser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +16,12 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
@@ -53,9 +52,12 @@ public class SchedulesServices implements ApplicationRunner {
 
 		if (Files.isReadable(path)) {
 			schedulesFileName = path.toString();
-			log.info("Loading schedules from file {}", path.toString());
-			Ledger scheduleLedger = ledgerParser.loadLedger(Files.newInputStream(path));
-			convertLedgerToSchedules(scheduleLedger);
+			try {
+				Ledger scheduleLedger = ledgerParser.loadLedger(Files.newInputStream(path));
+				convertLedgerToSchedules(scheduleLedger);
+			} finally {
+				log.info("Schedules loaded successfully from file {}", path.toString());
+			}
 		} else {
 			log.error("Unable to load schedules from file {}", fileName);
 		}
@@ -64,11 +66,14 @@ public class SchedulesServices implements ApplicationRunner {
 	private void loadSchedulesFromClassPath(String fileName) throws IOException {
 		LedgerParser ledgerParser = new LedgerParser();
 
-		schedulesFileName = CLASSPATH_URL_PREFIX + fileName;
-		Resource resource = resourceLoader.getResource(schedulesFileName);
-		log.info("Loading schedules from classpath:{}", fileName);
-		Ledger scheduleLedger = ledgerParser.loadLedger(resource.getInputStream());
-		convertLedgerToSchedules(scheduleLedger);
+		try {
+			schedulesFileName = CLASSPATH_URL_PREFIX + fileName;
+			Resource resource = resourceLoader.getResource(schedulesFileName);
+			Ledger scheduleLedger = ledgerParser.loadLedger(resource.getInputStream());
+			convertLedgerToSchedules(scheduleLedger);
+		} finally {
+			log.info("Schedules loaded successfully from classpath:{}", fileName);
+		}
 	}
 
 	private void convertLedgerToSchedules(Ledger scheduleLedger) {
@@ -81,21 +86,6 @@ public class SchedulesServices implements ApplicationRunner {
 	}
 
 	private Schedule createSchedule(String recurrence, LedgerEntry ledgerEntry) {
-		return new Schedule(recurrence, ledgerEntry);
-	}
-
-	private Schedule createSchedule(String recurrence, String description, LocalDate date, BigDecimal amount, String debit, String credit) {
-		Posting debitAccount = new Posting(debit, amount.multiply(BigDecimal.valueOf(-1)));
-		Posting creditAccount = new Posting(credit, amount);
-		LedgerEntry ledgerEntry = new LedgerEntry(date, description, List.of(debitAccount, creditAccount));
-		return new Schedule(recurrence, ledgerEntry);
-	}
-
-	private Schedule createSchedule(String recurrence, String description, LocalDate date, BigDecimal amount, String debit, IPosting... credits) {
-		List<IPosting> postings = new ArrayList<>();
-		postings.add(new Posting(debit, amount.multiply(BigDecimal.valueOf(-1))));
-		postings.addAll(Arrays.stream(credits).toList());
-		LedgerEntry ledgerEntry = new LedgerEntry(date, description, postings);
 		return new Schedule(recurrence, ledgerEntry);
 	}
 

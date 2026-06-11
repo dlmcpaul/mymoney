@@ -2,6 +2,7 @@ package com.hz.mymoney.data.services;
 
 import com.hz.mymoney.data.models.internal.InvestmentHistory;
 import com.hz.mymoney.data.models.internal.InvestmentHistoryEntry;
+import com.hz.mymoney.exceptions.ValidationException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -77,33 +78,45 @@ public class SharePriceServices implements ApplicationRunner {
 		Path path = Path.of(fileName);
 
 		if (Files.isReadable(path)) {
-			log.info("Loading quicken commodities from file {}", fileName);
-			try (final InputStream ledgerImportStream = Files.newInputStream(path)) {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(ledgerImportStream));
-				String line = reader.readLine();
-				while (line != null) {
-					List<String> tokens = Arrays.stream(line.split(", ")).toList();
-					addEntry(entries, tokens.get(0), parseDate(tokens.get(2), QUICKEN_DATE_FORMAT), parseBigDecimal(tokens.get(1)));
+			try {
+				try (final InputStream ledgerImportStream = Files.newInputStream(path)) {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(ledgerImportStream));
+					String line = reader.readLine();
+					while (line != null) {
+						List<String> tokens = Arrays.stream(line.split(", ")).toList();
+						addEntry(entries, tokens.get(0), parseDate(tokens.get(2), QUICKEN_DATE_FORMAT), parseBigDecimal(tokens.get(1)));
 
-					line = reader.readLine();
+						line = reader.readLine();
+					}
+					investmentHistory = new InvestmentHistory(entries);
 				}
-				investmentHistory = new InvestmentHistory(entries);
+			} finally {
+				log.info("Quicken Commodities loaded successfully from file {}", fileName);
 			}
+		} else {
+			log.error("Unable to load Quicken Commodities from file {}", fileName);
 		}
 	}
 
 	// Ledger Commodities file format
 	private void loadCommoditiesFromArgs(String fileName, Map<String, List<InvestmentHistoryEntry>> entries) throws IOException {
 		commodityFileName = fileName;
-		if (fileName.startsWith("classpath:")) {
-			loadCommodities(resourceLoader.getResource(fileName).getInputStream(), entries);
-		} else {
-			Path path = Path.of(fileName);
+		try {
+			if (fileName.startsWith("classpath:")) {
+				loadCommodities(resourceLoader.getResource(fileName).getInputStream(), entries);
+			} else {
+				Path path = Path.of(fileName);
 
-			if (Files.isReadable(path)) {
-				log.info("Loading commodities from file {}", fileName);
-				loadCommodities(Files.newInputStream(path), entries);
+				if (Files.isReadable(path)) {
+					loadCommodities(Files.newInputStream(path), entries);
+				} else {
+					throw new ValidationException("Unable to load Commodities from file " + fileName);
+				}
 			}
+		} catch (RuntimeException e) {
+			log.error(e.getMessage());
+		} finally {
+			log.info("Commodities loaded successfully from file {}", fileName);
 		}
 	}
 

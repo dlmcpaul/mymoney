@@ -135,6 +135,7 @@ public class LedgerServices implements ApplicationRunner {
 				for (LedgerEntry entry : ledger.getLedgerEntries()) {
 					out.write(entry.toString());
 				}
+				log.info("Ledger saved successfully");
 			} catch (IOException e) {
 				log.error("Failed to Save Ledger", e);
 			}
@@ -147,19 +148,27 @@ public class LedgerServices implements ApplicationRunner {
 		Path path = Path.of(fileName);
 
 		if (Files.isReadable(path)) {
-			ledgerFileName = path.toString();
-			log.info("Loading Ledger from file {}", ledgerFileName);
-			ledger = ledgerParser.loadLedger(Files.newInputStream(path));
+			try {
+				ledgerFileName = path.toString();
+				ledger = ledgerParser.loadLedger(Files.newInputStream(path));
+			} finally {
+				log.info("Ledger loaded successfully from file {}", ledgerFileName);
+			}
+		} else {
+			log.error("Unable to load Ledger from file {}", fileName);
 		}
 	}
 
 	private void loadLedgerFromClassPath(String fileName) throws IOException {
 		LedgerParser ledgerParser = new LedgerParser();
 
-		ledgerFileName = CLASSPATH_URL_PREFIX + fileName;
-		Resource resource = resourceLoader.getResource(ledgerFileName);
-		log.info("Loading Ledger from classpath:{}", fileName);
-		ledger = ledgerParser.loadLedger(resource.getInputStream());
+		try {
+			ledgerFileName = CLASSPATH_URL_PREFIX + fileName;
+			Resource resource = resourceLoader.getResource(ledgerFileName);
+			ledger = ledgerParser.loadLedger(resource.getInputStream());
+		} finally {
+			log.info("Ledger loaded successfully from classpath:{}", fileName);
+		}
 	}
 
 	public void reloadLedger() throws IOException {
