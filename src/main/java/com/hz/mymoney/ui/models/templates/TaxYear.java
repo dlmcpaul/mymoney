@@ -87,6 +87,7 @@ public class TaxYear {
 		result.addAll(this.filter(incomeTransactions, CAPITAL_GAINS_INCOME));
 		result.addAll(this.filter(incomeTransactions, CAPITAL_RETURN_INCOME));
 		result.addAll(this.filter(incomeTransactions, INTEREST_INCOME));
+		result.addAll(this.filter(incomeTransactions, DISTRIBUTION_INCOME));
 
 		return result;
 	}
