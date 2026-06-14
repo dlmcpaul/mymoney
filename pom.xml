@@ -125,6 +125,10 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<image>
+						<name>dlmcpaul/${project.artifactId}:${revision}</name>
+						<createdDate>now</createdDate>
+					</image>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

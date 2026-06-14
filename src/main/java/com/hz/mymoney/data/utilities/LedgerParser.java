@@ -18,6 +18,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 @Log4j2
 public class LedgerParser {
@@ -136,7 +137,7 @@ public class LedgerParser {
 		}
 
 		try {
-			NumberFormat currency = NumberFormat.getCurrencyInstance();
+			NumberFormat currency = NumberFormat.getCurrencyInstance(Locale.of("en", "au"));
 
 			if (currency instanceof DecimalFormat decimal) {
 				decimal.setParseBigDecimal(true);
