@@ -64,24 +64,6 @@ This is the same format as a ledger file but the entry comment specifies the sch
 
 Only the ledger file is mandatory.  For the other files if they are not supplied then some test data may be used.
 
-If the ledger file is read ok then a web page at http://localhost:8081 will be available with 9 pages
-
-- DashBoard : Shows Balance Sheet (Assets & Liabilities), Scheduled Transactions, Monthly Profit & Loss along with Forms for ledger entry creation
-- Accounts : Shows all open accounts (non zero balance) as at the financial year specified
-- Equity : Focuses on Equity accounts only
-- Investments : A view of investment accounts
-- Net Worth : A basic graph showing your net worth over the last 20 years
-- Superannuation : A view of all superannuation accounts (open and closed)
-- Recurring : List of schedules from the schedules file
-- Taxation : A view based on australian taxation
-- Trends : Drill down into accounts over time to see trends
-
-For these pages the **Dashboard, Accounts, Equity, Recurring, Trends** should work for most ledgers but the **Investments, Superannuation and Taxation** pages likely relies on hardcoded values specific to my ledger.
-
-I may look to document these or try to make them configurable.
-
-There are mechanisms to update the ledger file (accepting a schedule, posting a new journal) but you can primarily use it for visualisation.
-
 This is a Java Application built using Java 21 so download the jar and using a java 21 runtime
 ```
 java -jar mymoney.jar --ledger=myledger.ledger
@@ -92,3 +74,23 @@ The other files can be loaded with additional params
 ```
 java -jar mymoney.jar --ledger=myledger.ledger --schedules=schedules.ledger --commodities=commodities.txt
 ```
+
+If the ledger file is read ok then a web page at http://localhost:8081/mymoney will be available with 9 pages
+
+- DashBoard : Shows Balance Sheet (Assets & Liabilities), Scheduled Transactions, Monthly Profit & Loss along with Forms for ledger entry creation
+- Accounts : Shows all open accounts (non-zero balance) as at the financial year specified
+- Equity : Focuses on Equity accounts only
+- Investments : A view of investment accounts
+- Net Worth : A basic graph showing your net worth over the last 20 years
+- Superannuation : A view of all superannuation accounts (open and closed)
+- Recurring : List of schedules from the schedules file
+- Taxation : A view based on Australian taxation
+- Trends : Drill down into accounts over time to see trends
+
+For these pages the **Dashboard, Accounts, Equity, Recurring, Trends** should work for most ledgers but the **Investments, Superannuation and Taxation** pages likely relies on hardcoded values specific to my ledger.
+
+I may look to document these or try to make them configurable.
+
+There are mechanisms to update the ledger file (accepting a schedule, posting a new journal) but you can primarily use it for visualisation.
+
+There is also a docker image available as a demo using ```docker run dlmcpaul/mymoney:demo```
