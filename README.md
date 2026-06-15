@@ -75,6 +75,8 @@ The other files can be loaded with additional params
 java -jar mymoney.jar --ledger=myledger.ledger --schedules=schedules.ledger --commodities=commodities.txt
 ```
 
+There is also a demo docker image available using dummy data just ```docker run -p 8081:8081 dlmcpaul/mymoney:demo```
+
 If the ledger file is read ok then a web page at http://localhost:8081/mymoney will be available with 9 pages
 
 - DashBoard : Shows Balance Sheet (Assets & Liabilities), Scheduled Transactions, Monthly Profit & Loss along with Forms for ledger entry creation
@@ -92,5 +94,3 @@ For these pages the **Dashboard, Accounts, Equity, Recurring, Trends** should wo
 I may look to document these or try to make them configurable.
 
 There are mechanisms to update the ledger file (accepting a schedule, posting a new journal) but you can primarily use it for visualisation.
-
-There is also a docker image available as a demo using ```docker run dlmcpaul/mymoney:demo```
