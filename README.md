@@ -94,3 +94,7 @@ For these pages the **Dashboard, Accounts, Equity, Recurring, Trends** should wo
 I may look to document these or try to make them configurable.
 
 There are mechanisms to update the ledger file (accepting a schedule, posting a new journal) but you can primarily use it for visualisation.
+
+![Screenshot](/docs/images/MyMoney-Dashboard.png)
+
+![Screenshot](/docs/images/MyMoney-Accounts.png)
