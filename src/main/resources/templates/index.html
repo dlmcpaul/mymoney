@@ -4,8 +4,8 @@
       lang="en">
 <body>
 <main>
-    <div class="ui three column divided grid">
-        <div class="row">
+    <div class="ui stackable three column divided grid">
+        <div class="row big-screen">
             <div class="five wide column">
                 <h3 class="ui header">Balance Sheet</h3>
             </div>
@@ -72,7 +72,7 @@
         console.log("Setting up event listeners for Dashboard Page");
         // Placing inside onPageLoad ensures these event listeners are registered only once
 
-        document.body.addEventListener("showScheduleModal", function (event) {
+        document.body.addEventListener("showScheduleModal", function () {
             $('#scheduleModal')
                 .modal('show');
         });
@@ -87,7 +87,7 @@
             });
         });
 
-        document.body.addEventListener('htmx:timeout', function (event) {
+        document.body.addEventListener('htmx:timeout', function () {
             $.toast({
                 class: 'error',
                 title: 'Network',
@@ -97,7 +97,7 @@
             });
         });
 
-        document.body.addEventListener('htmx:sendError', function (event) {
+        document.body.addEventListener('htmx:sendError', function () {
             $.toast({
                 class: 'error',
                 title: 'Network',

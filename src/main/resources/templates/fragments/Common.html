@@ -3,13 +3,13 @@
 <body>
 
 <div th:fragment="Banner" class="ui inverted segment">
-    <div class="ui two column grid middle aligned">
-        <div class="column">
+    <div class="ui grid middle aligned">
+        <div class="eleven wide column">
             <h1 class="ui inverted header">My Money Visualiser<span class="ui small text"
                                                                     data-th-text="' (' + ${releaseVersion} + ')'"></span>
             </h1>
         </div>
-        <div class="right aligned column">
+        <div class="right aligned five wide column">
             <div class="ui small text">
                 <i class="copyright icon"></i> David McPaul 2026
             </div>
@@ -34,8 +34,7 @@
             </div>
         </div>
         <div class="fifteen wide column">
-            <div class="ui center aligned huge header">Dashboard for <span
-                    th:text="${#temporals.format(today, 'EEEE dd MMM yyyy')}"></span></div>
+            <div class="ui center aligned huge header"><span class="big-screen" th:text="|Dashboard for ${#temporals.format(today, 'EEEE dd MMM yyyy')}|"></span><span class="small-screen" th:text="|Dashboard for ${#temporals.format(today, 'EEE dd MMM yyyy')}|"></span></div>
         </div>
     </div>
 </div>
@@ -74,7 +73,7 @@
     </div>
 </div>
 
-<div th:fragment="SaveButton" data-tooltip="Save" class="ui large icon button" id="SaveButton"
+<div th:fragment="SaveButton" data-tooltip="Save" class="ui large icon" id="SaveButton" th:classappend="${readOnlyLedger} ? ' disabled button' : ' button'"
      th:attr="hx-post=|@{/save}|" hx-swap="outerHTML" hx-select="#SaveButton"
 ><i class="fitted inverted black save icon"></i>
 </div>
@@ -99,9 +98,10 @@
     </div>
 </div>
 
-<div id="primary-tabs" th:fragment="PrimaryTabs (active, menuList)" class="ui nine item menu">
+<div id="primary-tabs" th:fragment="PrimaryTabs (active, menuList)" class="ui wrapped centered fluid wrapping menu">
     <a th:each="menu : ${menuList}" th:text="${menu.getText()}" th:href="|@{/}${menu.getUri()}|" class="item"
        th:attrprepend="class = ${active} eq ${menu.getCode()} ? 'active ' : _"></a>
 </div>
+
 </body>
 </html>

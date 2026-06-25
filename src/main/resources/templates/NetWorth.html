@@ -4,13 +4,62 @@
       lang="en">
 <body>
 <main>
-    <div class="ui basic segment">
+    <div class="ui basic segment small-screen">
+        <div class="ui four column compact celled grid">
+            <div class="row">
+                <div class="four wide column"></div>
+                <div class="center aligned four wide column">Current</div>
+                <div class="center aligned four wide column">Last Year</div>
+                <div class="center aligned four wide column">Difference</div>
+            </div>
+            <div class="row">
+                <div class="four wide column">Assets</div>
+                <div class="right aligned four wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentAssetBalance())}"></div>
+                <div class="right aligned four wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearAssetBalance())}"></div>
+                <div class="right aligned four wide column" th:if="${netWorth.assetDifference()} lt 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.assetDifference())}">$0</span><span> <i
+                        class="fitted arrow down icon"></i></span></div>
+                <div class="right aligned four wide column" th:if="${netWorth.assetDifference()} ge 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.assetDifference())}">$0</span><span> <i
+                        class="fitted arrow up icon"></i></span></div>
+            </div>
+            <div class="row">
+                <div class="four wide column">Liabilities</div>
+                <div class="right aligned four wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentLiabilityBalance())}"></div>
+                <div class="right aligned four wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearLiabilityBalance())}"></div>
+                <div class="right aligned four wide column" th:if="${netWorth.liabilityDifference()} lt 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.liabilityDifference())}">$0</span><span> <i
+                        class="fitted arrow down icon"></i></span></div>
+                <div class="right aligned four wide column" th:if="${netWorth.liabilityDifference()} ge 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.liabilityDifference())}">$0</span><span> <i
+                        class="fitted arrow up icon"></i></span></div>
+            </div>
+            <div class="row">
+                <div class="four wide column">Net Worth</div>
+                <div class="right aligned four wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentNetPosition())}"></div>
+                <div class="right aligned four wide column"
+                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearNetPosition())}"></div>
+                <div class="right aligned four wide column" th:if="${netWorth.netWorthDifference()} lt 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.netWorthDifference())}">$0</span><span> <i
+                        class="fitted arrow down icon"></i></span></div>
+                <div class="right aligned four wide column" th:if="${netWorth.netWorthDifference()} ge 0"><span
+                        data-th-text="${#numbers.formatCurrency(netWorth.netWorthDifference())}">$0</span><span> <i
+                        class="fitted arrow up icon"></i></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="ui basic segment big-screen">
         <div class="ui four column celled grid">
             <div class="row">
                 <div class="ten wide column"></div>
-                <div class="right aligned two wide column">Current</div>
-                <div class="right aligned two wide column">Last Year</div>
-                <div class="right aligned two wide column">Difference</div>
+                <div class="center aligned two wide column">Current</div>
+                <div class="center aligned two wide column">Last Year</div>
+                <div class="center aligned two wide column">Difference</div>
             </div>
             <div class="row">
                 <div class="ten wide column">Assets</div>

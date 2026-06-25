@@ -1,11 +1,29 @@
-@media screen and (width <= 1900px) {
+@media screen and (max-width: 1900px) {
     #primary-menu {
         display: none;
     }
 }
 
-@media screen and (width > 1900px) {
+@media screen and (min-width: 1900px) {
     #primary-tabs {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .big-screen {
+        display: none;
+    }
+    .small-screen {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .big-screen {
+        display: block;
+    }
+    .small-screen {
         display: none;
     }
 }
