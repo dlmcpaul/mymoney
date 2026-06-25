@@ -11,6 +11,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Ledger {
+	private int loadErrorCount = 0;
+	private List<String> preamble = new ArrayList<>();
 	private List<LedgerEntry> ledgerEntries = new ArrayList<>();
 
 	private void addAll(List<LedgerEntry> ledgerEntries) {
@@ -46,5 +48,17 @@ public class Ledger {
 
 	public boolean hasLedgerEntry(LedgerEntry ledgerEntry) {
 		return ledgerEntries.stream().anyMatch(t -> t.isEquivalent(ledgerEntry));
+	}
+
+	public void addPreamble(String preamble) {
+		this.preamble.add(preamble);
+	}
+
+	public void addErrorCount() {
+		this.loadErrorCount++;
+	}
+
+	public boolean isReadOnly() {
+		return loadErrorCount != 0;
 	}
 }

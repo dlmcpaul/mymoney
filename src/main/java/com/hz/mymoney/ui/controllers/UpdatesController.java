@@ -228,9 +228,14 @@ public class UpdatesController {
 			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
 			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
 			model.addAttribute("scheduledTransactions", uiModelBuilderService.getScheduledTransactions());
+			model.addAttribute("readOnlyLedger", uiModelBuilderService.isLedgerReadOnly());
 			model.addAttribute("today", LocalDate.now());
 
-			htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "Files Reloaded Successfully"));
+			if (uiModelBuilderService.isLedgerReadOnly()) {
+				htmxResponse.addTrigger("showMessage", new Toast("error", "Error", "Failed to load Ledger.  See log for errors"));
+			} else {
+				htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "Files Reloaded Successfully"));
+			}
 		} catch (Exception e) {
 			log.error("Reload All Files Exception {}", e.getMessage(), e);
 			htmxResponse.addTrigger("showMessage", new Toast("error", "Error", "Reload All Files failed"));

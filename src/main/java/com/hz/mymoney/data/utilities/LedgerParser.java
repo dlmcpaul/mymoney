@@ -44,32 +44,41 @@ public class LedgerParser {
 					continue;
 				}
 
-				if (isNewLedgerEntry(line)) {
-					if (ledgerEntry != null) {
-						if (ledgerEntry.isBalanced()) {
-							ledger.getLedgerEntries().add(ledgerEntry);
-						} else {
-							log.error("Ledger Entry is not balanced {}", ledgerEntry);
+				try {
+					if (isNewLedgerEntry(line) || (ledgerEntry != null && ledgerEntry.isBalanced())) {
+						if (ledgerEntry != null) {
+							if (ledgerEntry.isBalanced()) {
+								ledger.getLedgerEntries().add(ledgerEntry);
+							} else {
+								ledger.addErrorCount();
+								log.error("Ledger Entry is not balanced {}", ledgerEntry);
+							}
+							ledgerEntry = null;
 						}
-					}
-					ledgerEntry = makeLedgerEntryFromLine(line);
-				} else if (ledgerEntry != null) {
-					// Posting (cash or share)
-					if (isFundPosting(line)) {
-						ledgerEntry.getPostings().add(parseFundPosting(line));
-					} else if (isCashPosting(line)) {
-						ledgerEntry.getPostings().add(parseCashPosting(line));
-					} else if (isSharePosting(line)) {
-						ledgerEntry.getPostings().add(parseSharePosting(line));
-					} else if (isRemainderPosting(line)) {
-						ledgerEntry.getPostings().add(parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
-					} else if (isShareResetPosting(line)) {
-						ledgerEntry.getPostings().add(parseShareResetPosting(line));
+						ledgerEntry = makeLedgerEntryFromLine(line);
+					} else if (ledgerEntry != null) {
+						// Posting (cash or share)
+						if (isFundPosting(line)) {
+							ledgerEntry.getPostings().add(parseFundPosting(line));
+						} else if (isCashPosting(line)) {
+							ledgerEntry.getPostings().add(parseCashPosting(line));
+						} else if (isSharePosting(line)) {
+							ledgerEntry.getPostings().add(parseSharePosting(line));
+						} else if (isRemainderPosting(line)) {
+							ledgerEntry.getPostings().add(parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
+						} else if (isShareResetPosting(line)) {
+							ledgerEntry.getPostings().add(parseShareResetPosting(line));
+						} else {
+							ledger.addErrorCount();
+							log.warn("Could not parse line '{}' {}", line, countTokens(line));
+						}
 					} else {
-						log.warn("Could not parse line '{}' {}", line, countTokens(line));
+						ledger.addErrorCount();
+						log.error("Not supported {}", line);
 					}
-				} else {
-					log.error("Not supported {}", line);
+				} catch (RuntimeException e) {
+					log.error(e.getMessage());
+					ledger.addErrorCount();
 				}
 				line = ledgerReader.readLine();
 			}
@@ -77,6 +86,7 @@ public class LedgerParser {
 				if (ledgerEntry.isBalanced()) {
 					ledger.getLedgerEntries().add(ledgerEntry);
 				} else {
+					ledger.addErrorCount();
 					log.error("Final Ledger Entry is not balanced {}", ledgerEntry);
 				}
 			}
@@ -141,10 +151,10 @@ public class LedgerParser {
 
 			if (currency instanceof DecimalFormat decimal) {
 				decimal.setParseBigDecimal(true);
-				return ((BigDecimal)decimal.parse(amount)).setScale(scale, RoundingMode.HALF_UP);
+				return ((BigDecimal) decimal.parse(amount)).setScale(scale, RoundingMode.HALF_UP);
 			}
 		} catch (ParseException e) {
-			log.error("{} {}", e.getMessage(), amount);
+			throw new RuntimeException("Could not parse money: " + amount, e);
 		}
 		return BigDecimal.ZERO;
 	}
@@ -213,7 +223,7 @@ public class LedgerParser {
 			}
 			return LocalDate.parse(datePart, DateTimeFormatter.ofPattern(DATE_FORMAT_2));
 		} catch (DateTimeParseException e) {
-			return null;
+			throw new RuntimeException("Could not parse date " + datePart + " as either " + DATE_FORMAT_1 + " or " + DATE_FORMAT_2, e);
 		}
 	}
 

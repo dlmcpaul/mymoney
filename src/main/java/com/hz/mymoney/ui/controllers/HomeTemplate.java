@@ -45,6 +45,7 @@ public class HomeTemplate {
 	                   HtmxResponse htmxResponse) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
+			model.addAttribute("readOnlyLedger", uiModelBuilderService.isLedgerReadOnly());
 			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
 			model.addAttribute("scheduledTransactions", uiModelBuilderService.getScheduledTransactions());
 			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));

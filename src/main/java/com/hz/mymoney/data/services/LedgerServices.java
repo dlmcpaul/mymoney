@@ -126,7 +126,7 @@ public class LedgerServices implements ApplicationRunner {
 	}
 
 	public void saveLedger() {
-		if (ledgerFileName == null || ledgerFileName.startsWith(CLASSPATH_URL_PREFIX)) {
+		if (ledgerFileName == null || ledgerFileName.startsWith(CLASSPATH_URL_PREFIX) || ledger.isReadOnly()) {
 			log.error("Cannot Save Ledger");
 		} else {
 			Path path = Path.of(ledgerFileName);
@@ -152,7 +152,7 @@ public class LedgerServices implements ApplicationRunner {
 				ledgerFileName = path.toString();
 				ledger = ledgerParser.loadLedger(Files.newInputStream(path));
 			} finally {
-				log.info("Ledger loaded successfully from file {}", ledgerFileName);
+				log.info("Ledger loaded {}from file {} with {} errors", ledger.isReadOnly() ? "" : "successfully ", ledgerFileName, ledger.getLoadErrorCount());
 			}
 		} else {
 			log.error("Unable to load Ledger from file {}", fileName);
@@ -167,7 +167,7 @@ public class LedgerServices implements ApplicationRunner {
 			Resource resource = resourceLoader.getResource(ledgerFileName);
 			ledger = ledgerParser.loadLedger(resource.getInputStream());
 		} finally {
-			log.info("Ledger loaded successfully from classpath:{}", fileName);
+			log.info("Demo Ledger loaded successfully from classpath:{}", fileName);
 		}
 	}
 

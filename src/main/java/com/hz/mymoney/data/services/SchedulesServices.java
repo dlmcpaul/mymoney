@@ -18,10 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
@@ -35,6 +32,8 @@ public class SchedulesServices implements ApplicationRunner {
 
 	@Getter
 	private List<Schedule> scheduledTransactions;
+
+	private Ledger scheduleLedger;
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
@@ -53,10 +52,11 @@ public class SchedulesServices implements ApplicationRunner {
 		if (Files.isReadable(path)) {
 			schedulesFileName = path.toString();
 			try {
-				Ledger scheduleLedger = ledgerParser.loadLedger(Files.newInputStream(path));
+				scheduleLedger = ledgerParser.loadLedger(Files.newInputStream(path));
 				convertLedgerToSchedules(scheduleLedger);
 			} finally {
-				log.info("Schedules loaded successfully from file {}", path.toString());
+				assert scheduleLedger != null;
+				log.info("Schedules loaded {}from file {} with {} errors", scheduleLedger.isReadOnly() ? "" : "successfully ", path.toString(), scheduleLedger.getLoadErrorCount());
 			}
 		} else {
 			log.error("Unable to load schedules from file {}", fileName);
@@ -69,10 +69,10 @@ public class SchedulesServices implements ApplicationRunner {
 		try {
 			schedulesFileName = CLASSPATH_URL_PREFIX + fileName;
 			Resource resource = resourceLoader.getResource(schedulesFileName);
-			Ledger scheduleLedger = ledgerParser.loadLedger(resource.getInputStream());
+			scheduleLedger = ledgerParser.loadLedger(resource.getInputStream());
 			convertLedgerToSchedules(scheduleLedger);
 		} finally {
-			log.info("Schedules loaded successfully from classpath:{}", fileName);
+			log.info("Demo schedules loaded successfully from classpath:{}", fileName);
 		}
 	}
 
@@ -95,13 +95,11 @@ public class SchedulesServices implements ApplicationRunner {
 
 	public void scheduleRollForward(Schedule schedule) {
 		schedule.rollForward();
-		// Replace in sorted position
-		scheduledTransactions.remove(schedule);
-		scheduledTransactions.add(schedule);
+		scheduledTransactions.sort(Comparator.comparing(o -> o.ledgerEntry.getDate()));
 	}
 
 	public void saveSchedules() {
-		if (schedulesFileName == null || schedulesFileName.startsWith(CLASSPATH_URL_PREFIX)) {
+		if (schedulesFileName == null || schedulesFileName.startsWith(CLASSPATH_URL_PREFIX) || scheduleLedger.isReadOnly()) {
 			log.error("Cannot Save Schedules");
 		} else {
 			Path path = Path.of(schedulesFileName);

@@ -45,6 +45,9 @@ public class LedgerEntry {
 
 	// Basic check for balanced transaction (debits == credits)
 	public boolean isBalanced() {
+		if (postings.size() < 2) {
+			return false;
+		}
 		BigDecimal total = postings.stream()
 				.map(IPosting::getValue)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);

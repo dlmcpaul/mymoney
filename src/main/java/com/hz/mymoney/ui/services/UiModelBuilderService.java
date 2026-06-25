@@ -37,6 +37,10 @@ public class UiModelBuilderService {
 	private final SharePriceServices shareValueService;
 	private final SchedulesServices schedulesLoaderService;
 
+	public boolean isLedgerReadOnly() {
+		return dataLoaderService.getLedger().isReadOnly();
+	}
+
 	public TrendsTemplateData createTrendsTemplateData(String accountName, String trendType) {
 		ChartOfAccounts coa = dataLoaderService.getCoa();
 
