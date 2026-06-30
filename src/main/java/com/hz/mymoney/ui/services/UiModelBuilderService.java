@@ -247,7 +247,10 @@ public class UiModelBuilderService {
 
 	public TaxTemplateData createTaxTemplateData() {
 		ChartOfAccounts coa = dataLoaderService.getCoa();
-		return new TaxTemplateData(createTaxYear(coa, coa), createTaxYear(new ChartOfAccounts(calculateStartOfFinancialYear(LocalDate.now()).minusDays(1), coa), coa));
+		LocalDate currentFY = calculateStartOfFinancialYear(LocalDate.now());
+
+		return new TaxTemplateData( createTaxYear(currentFY, coa),
+									createTaxYear(currentFY.minusYears(1), coa));
 	}
 
 	private Account buildFilteredAccount(com.hz.mymoney.data.models.internal.Account account, LocalDate startDate, LocalDate endDate) {
@@ -256,31 +259,31 @@ public class UiModelBuilderService {
 		return new Account(filteredAccount.getSimpleName(), filteredAccount.getName(), filteredAccount.getCategory(), filteredAccount.getBalance(endDate, shareValueService.getInvestmentHistory()).abs(), account.isShareAccount(), null);
 	}
 
-	private TaxYear createTaxYear(ChartOfAccounts coa, ChartOfAccounts fullCoa) {
-		LocalDate financialYearStartDate = calculateStartOfFinancialYear(coa.getAsAt());
+	private TaxYear createTaxYear(LocalDate financialYearStartDate, ChartOfAccounts coa) {
+		LocalDate financialYearEndDate = financialYearStartDate.plusYears(1).minusDays(1);
 
 		List<Transaction> incomeTransactions = coa.getAccountsOfType("Income:", true).stream()
-				.filter(account -> account.hasMovementBetween(financialYearStartDate, coa.getAsAt()))
-				.map(account -> getFilteredTransactions(account, financialYearStartDate, coa.getAsAt()))
+				.filter(account -> account.hasMovementBetween(financialYearStartDate, financialYearEndDate))
+				.map(account -> getFilteredTransactions(account, financialYearStartDate, financialYearEndDate))
 				.flatMap(List::stream)
 				.toList();
 
 		List<Transaction> expenseTransactions = coa.getAccountsOfType("Expenses:", true).stream()
-				.filter(account -> account.hasMovementBetween(financialYearStartDate, coa.getAsAt()))
-				.map(account -> getFilteredTransactions(account, financialYearStartDate, coa.getAsAt()))
+				.filter(account -> account.hasMovementBetween(financialYearStartDate, financialYearEndDate))
+				.map(account -> getFilteredTransactions(account, financialYearStartDate, financialYearEndDate))
 				.flatMap(List::stream)
 				.toList();
 
 		List<Transaction> imputationTransactions = coa.getAccountsOfType(AccountConstants.IMPUTATION_ACCOUNT, false).stream()
-				.filter(account -> account.hasMovementBetween(financialYearStartDate, coa.getAsAt()))
-				.map(account -> getFilteredTransactions(account, financialYearStartDate, coa.getAsAt()))
+				.filter(account -> account.hasMovementBetween(financialYearStartDate, financialYearEndDate))
+				.map(account -> getFilteredTransactions(account, financialYearStartDate, financialYearEndDate))
 				.flatMap(List::stream)
 				.filter(transaction -> transaction.amount().compareTo(BigDecimal.ZERO) >= 0)
 				.toList();
 
 		List<Transaction> supercontribTransactions = coa.getAccountsOfType(AccountConstants.SUPER_ACCOUNT, false).stream()
-				.filter(account -> account.hasMovementBetween(financialYearStartDate, coa.getAsAt()))
-				.map(account -> getFilteredTransactions(account, financialYearStartDate, coa.getAsAt()))
+				.filter(account -> account.hasMovementBetween(financialYearStartDate, financialYearEndDate))
+				.map(account -> getFilteredTransactions(account, financialYearStartDate, financialYearEndDate))
 				.flatMap(List::stream)
 				.filter(transaction -> transaction.amount().compareTo(BigDecimal.ZERO) >= 0)
 				.filter(transaction -> transaction.description().equalsIgnoreCase(SUPER_CONTRIBUTION_NOTE))
@@ -288,9 +291,9 @@ public class UiModelBuilderService {
 
 		// PAYG Payments for the Tax Year are offset by 3 months
 		LocalDate paygStartDate = financialYearStartDate.plusMonths(3);
-		LocalDate paygEndDate = coa.getAsAt().plusMonths(3);
+		LocalDate paygEndDate = financialYearEndDate.plusMonths(3);
 
-		List<Transaction> paygTransactions = fullCoa.getAccountsOfType(AccountConstants.PAYG_DEDUCTIONS, false).stream()
+		List<Transaction> paygTransactions = coa.getAccountsOfType(AccountConstants.PAYG_DEDUCTIONS, false).stream()
 				.filter(account -> account.hasMovementBetween(paygStartDate, paygEndDate))
 				.map(account -> getFilteredTransactions(account, paygStartDate, paygEndDate))
 				.flatMap(List::stream)
