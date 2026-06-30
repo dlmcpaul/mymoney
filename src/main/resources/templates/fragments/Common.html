@@ -25,7 +25,7 @@
     </div>
 </div>
 
-<div th:fragment="DashboardHeader (today)" class="ui two column middle aligned grid">
+<div id="#DashboardHeader" th:fragment="DashboardHeader (today)" class="ui two column middle aligned grid">
     <div class="row">
         <div class="one wide column">
             <div class="ui icon buttons">
@@ -80,7 +80,7 @@
 
 <div th:fragment="RefreshButton" data-tooltip="Reload Files" class="ui large icon button" id="RefreshButton"
      th:attr="hx-post=|@{/reload}|" hx-swap="none"
-     hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody,#DashboardHeader,#ScheduleList"
+     hx-select-oob="#DashboardHeader,#BalanceSheet,#ScheduleList,#IncomeExpenseHeader,#IncomeExpenseBody"
 ><i class="fitted inverted black sync icon"></i>
 </div>
 
