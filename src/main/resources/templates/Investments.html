@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: InvestmentHeader (${nextDisplayMode}, ${header})}, content=~{::main}, menucode='Investments', scripts=~{::script})}" lang="en">
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: InvestmentHeader (${nextDisplayMode}, ${header})}, content=~{::main}, menucode='Investments', scripts=~{::script})}"
+      lang="en">
 <body>
 <main>
-        <div th:replace="~{fragments/Investment :: InvestmentTable (${investmentsData})}"></div>
-        <div class="ui horizontal divider">Investment Details</div>
-        <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${header})}"></div>
+    <div th:replace="~{fragments/Investment :: InvestmentTable (${investmentsData})}"></div>
+    <div class="ui horizontal divider">Investment Details</div>
+    <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${header})}"></div>
 </main>
 <script th:inline="javascript">
     htmx.onLoad(function updateInvestmentsTotalChart(target) {

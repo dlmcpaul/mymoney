@@ -3,11 +3,9 @@
       th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: AccountsHeader(${accounts})}, content=~{::main}, menucode='Accounts', scripts=~{::script})}" lang="en">
 <body>
 <main>
-    <div class="ui basic segment">
-        <div th:replace="~{fragments/Account :: AccountsBody(${accounts})}"></div>
-    </div>
+    <div th:replace="~{fragments/Account :: AccountsBody(${accounts})}"></div>
     <div class="ui raised segment">
-        <div id="yearlyIncomeExpenseChart" th:attr="data-chart-data=${incomeExpenseHistory}" style="height: 400px;width: 100%"></div>
+        <div id="yearlyIncomeExpenseChart" th:attr="data-chart-data=${incomeExpenseHistory}" style="height: 450px;width: 100%"></div>
     </div>
 </main>
 <script th:inline="javascript" type="text/javascript">

@@ -109,7 +109,8 @@
     <div class="fields">
         <div th:replace="~{fragments/Journal :: AccountInputField ('to-account', 'To Account', '', null, false)}"></div>
     </div>
-    <button type="submit" class="ui right floated submit button">Post</button>
+    <button type="submit" class="ui right floated compact submit button"><i class="comment dollar icon"></i>Post
+    </button>
 </form>
 
 <form th:fragment="NewDividendIncome (defaultDate)" class="ui form" th:attr="hx-post=|@{/newDividend}|" hx-swap="none"
@@ -131,10 +132,12 @@
         <div th:replace="~{fragments/Journal :: AccountInputField ('dividend-disb', 'Disbursement Account', '', null, false)}"></div>
         <div th:replace="~{fragments/Journal :: AmountInputField ('Imputation Credit', true)}"></div>
     </div>
-    <button type="submit" class="ui right floated submit button">Post</button>
+    <button type="submit" class="ui right floated compact submit button"><i class="comment dollar icon"></i>Post
+    </button>
 </form>
 
-<form th:fragment="NewDistributionIncome (defaultDate, activeButton)" class="ui form" th:attr="hx-post=|@{/newDistribution}|"
+<form th:fragment="NewDistributionIncome (defaultDate, activeButton)" class="ui form"
+      th:attr="hx-post=|@{/newDistribution}|"
       hx-swap="outerHTML"
       hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
       id="NewFundIncomeForm">
@@ -148,7 +151,33 @@
         <div th:replace="~{fragments/Journal :: AccountInputField ('fund-income-disb', 'Disbursement Account', '', null, false)}"></div>
         <div class="field"></div>
     </div>
-    <button type="submit" class="ui right floated submit button" id="fund-income-button">Post</button>
+    <button type="submit" class="ui right floated compact submit button"><i class="comment dollar icon"></i>Post
+    </button>
 </form>
+
+<div id="JournalForms" th:fragment="JournalForms (entryDate)" class="ui basic fitted segment">
+    <div class="ui top attached tabular menu" id="journal-tabs">
+        <div class="active item" data-tab="one" id="journal-tab-item-1">Journal Entry
+        </div>
+        <div class="center item" data-tab="two" id="journal-tab-item-2">Dividend Income</div>
+        <div class="item" data-tab="three" id="journal-tab-item-3">Fund Income</div>
+    </div>
+    <div class="ui bottom attached active tab segment" data-tab="one">
+        <div class="ui padded basic segment">
+            <div th:replace="~{fragments/Journal :: NewJournal (${entryDate})}"></div>
+        </div>
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="two">
+        <div class="ui padded basic segment">
+            <div th:replace="~{fragments/Journal :: NewDividendIncome (${entryDate})}"></div>
+        </div>
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="three">
+        <div class="ui padded basic segment">
+            <div th:replace="~{fragments/Journal :: NewDistributionIncome (${entryDate}, 'distribution')}"></div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
