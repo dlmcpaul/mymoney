@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,7 +170,7 @@ public class UIDataUpdateService {
 				if (schedule.isValid()) {
 					Ledger ledger = ledgerServices.getLedger();
 					// Need to clone the ledger entry
-					ledger.add(new LedgerEntry(schedule.ledgerEntry.getDate(), schedule.ledgerEntry.getDescription(), schedule.ledgerEntry.getPostings()));
+					ledger.add(new LedgerEntry(LocalDate.now(), schedule.ledgerEntry.getDescription(), schedule.ledgerEntry.getPostings()));
 					schedulesServices.scheduleRollForward(schedule);
 
 					ledgerServices.makeChartOfAccounts(ledger);
