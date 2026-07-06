@@ -245,6 +245,7 @@ public class UpdatesController {
 				.fragment("fragments/Common :: DashboardHeader")
 				.fragment("fragments/Account :: BalanceSheet")
 				.fragment("fragments/Schedules :: ScheduleList (schedules=${scheduledTransactions})")
+				.fragment("fragments/Journal :: JournalForms (entryDate=${today})")
 				.fragment("fragments/IncomeExpense :: IncomeExpenseHeader")
 				.fragment("fragments/IncomeExpense :: IncomeExpenseBody")
 				.build();
