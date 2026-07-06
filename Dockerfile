@@ -44,8 +44,9 @@ ARG VERSION
 WORKDIR /build
 
 # unpack the uber jar into it's components and set release properties
-RUN java -Djarmode=layertools -jar target/app.jar extract --destination target/extracted && \
-    echo "release.version=${VERSION}" > ./target/extracted/application/BOOT-INF/classes/release.properties
+RUN mkdir -p BOOT-INF/classes && echo "release.version=${VERSION}" > ./BOOT-INF/classes/release.properties && \
+    jar uf target/app.jar BOOT-INF/classes/release.properties && \
+    java -Djarmode=tools -jar target/app.jar extract --layers --destination target/extracted
 
 #Choose prod or dev layer
 FROM extract-${RELEASE} AS pre-final
@@ -53,13 +54,14 @@ FROM extract-${RELEASE} AS pre-final
 # Create the runtime image using a minimal base image
 # and copy only necessary files from the builder image
 FROM azul-zulu:21-jre-headless AS final
+WORKDIR /application
 
 # Copy the executable from the "pre-final" stage.
+COPY --from=pre-final build/target/extracted/application/ ./
 COPY --from=pre-final build/target/extracted/dependencies/ ./
 COPY --from=pre-final build/target/extracted/spring-boot-loader/ ./
 COPY --from=pre-final build/target/extracted/snapshot-dependencies/ ./
-COPY --from=pre-final build/target/extracted/application/ ./
 
 EXPOSE 8081
 
-ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
+ENTRYPOINT [ "java",  "-jar", "app.jar" ]
