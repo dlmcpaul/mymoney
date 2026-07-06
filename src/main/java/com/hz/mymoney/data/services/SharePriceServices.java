@@ -105,13 +105,13 @@ public class SharePriceServices implements ApplicationRunner {
 				if (Files.isReadable(path)) {
 					loadCommodities(Files.newInputStream(path), entries);
 				} else {
-					throw new ValidationException("Unable to load Commodities from file " + fileName);
+					throw new ValidationException("Unable to load Commodities from " + fileName);
 				}
 			}
 		} catch (RuntimeException e) {
 			log.error(e.getMessage());
 		} finally {
-			log.info("Commodities loaded successfully from file {}", fileName);
+			log.info("Commodities loaded successfully from {}", fileName);
 		}
 	}
 
