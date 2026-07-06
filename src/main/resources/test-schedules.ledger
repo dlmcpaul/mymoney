@@ -1,7 +1,7 @@
 2026/07/14 Lawn Maintenance ; 4w
   Assets:Bank:My Bank Savings  $-30.00
   Expenses:Cash:Household  $30.00
-2026/07/20 Salary ; 2w
+2026/08/03 Salary ; 2w
   Income:Employment:Salary  $-3451.37
   Assets:Bank:My Bank Savings  $2031.24  ;Salary Paid
   Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
@@ -9,24 +9,24 @@
 2026/07/20 Amazon Prime ; 1m
   Liabilities:Credit Card:My Bank Visa  $-2.99
   Expenses:Cash:Household  $2.99
-2026/07/01 Netflix ; 1m
+2026/08/01 Netflix ; 1m
   Liabilities:Credit Card:My Bank Visa  $-20.99
   Expenses:Cash:Entertain  $20.99
-2026/07/01 Home Loan Payment ; 1m
+2026/08/01 Home Loan Payment ; 1m
   Assets:Bank:Mortgage Offset  $-1000.00
   Liabilities:Mortgage:House Mortgage  $1000.00
-2026/07/03 Cleaner ; 1m
+2026/08/03 Cleaner ; 1m
   Assets:Bank:My Bank Savings  $-242.00
   Expenses:Cash:Household  $242.00
-2026/07/03 Medical Insurance Fund ; 3m
+2026/08/03 Medical Insurance Fund ; 3m
   Assets:Bank:My Bank Savings  $-304.53
   Expenses:Medical:Insurance  $304.53
-2026/07/06 Internet + Phone Bill ; 1m
+2026/08/06 Internet + Phone Bill ; 1m
   Assets:Bank:My Bank Savings  $-183.00
   Expenses:Cash:Phone-Internet  $183.00
-2026/07/06 House Loan Offset Payment ; 2w
+2026/08/06 Offset Payment ; 2w
   Assets:Bank:My Bank Savings  $-1200.00
   Assets:Bank:Mortgage Offset  $1200.00
-2026/07/08 NAB Credit Card ; 1m
+2026/08/08 My Bank Visa Payment ; 1m
   Assets:Bank:My Bank Savings  $-1206.77
   Liabilities:Credit Card:My Bank Visa  $1206.77

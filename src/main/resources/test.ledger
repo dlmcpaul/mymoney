@@ -5,10 +5,13 @@
   Assets:Bank:My Bank Savings  $10000.00
   Equity:Opening Balances:Bank  $-10000.00
 2025/06/01 Mortgage Opening balance
-  Equity:Opening Balances:Mortgage  $100000.00
+  Equity:Property:Mortgage:1 Cross Street  $100000.00
   Liabilities:Mortgage:House Mortgage  $-100000.00
+2025/06/01 Property Opening Balance
+  Assets:Property:1 Cross Street  $160000.00
+  Equity:Property:Purchased:1 Cross Street  $-160000.00
 2025/06/01 Credit Card Opening balance
-  Equity:Opening Balances:Credit Card  $3376.99
+  Equity:Opening Liability:Credit Card  $3376.99
   Liabilities:Credit Card:My Bank Visa  $-3376.99
 2025/06/01 My Super Opening balance
   Assets:Superannuation:My Super Fund  $10000.00
@@ -634,5 +637,58 @@
   Expenses:Cash:Entertain  $3400.00
   Liabilities:Credit Card:My Bank Visa  $-3400.00
 2026/05/22 Jacket
-    Expenses:Cash:Clothing  $400.00
-    Liabilities:Credit Card:My Bank Visa  $-400.00
+  Expenses:Cash:Clothing  $400.00
+  Liabilities:Credit Card:My Bank Visa  $-400.00
+2026/07/01 Super Earnings
+  Assets:Superannuation:My Super Fund  $4444.00
+  Income:Superannuation:Returns  $-4444.00
+2026/07/01 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:My Bank Visa  $-43.00
+2026/07/02 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:My Bank Visa  $-43.00
+2026/07/03 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:My Bank Visa  $-43.00
+2026/07/04 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:My Bank Visa  $-43.00
+2026/07/05 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:My Bank Visa  $-43.00
+2026/07/06 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:My Bank Visa  $-43.00
+2026/07/07 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:My Bank Visa  $-43.00
+2026/07/08 Lunch
+  Expenses:Food:Household  $43.00
+  Liabilities:Credit Card:My Bank Visa  $-43.00
+2026/07/02 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:My Bank Visa  $-144.00
+2026/07/09 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:My Bank Visa  $-144.00
+2026/07/16 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:My Bank Visa  $-144.00
+2026/06/23 Grocery Store
+  Expenses:Food:Groceries  $144.00
+  Liabilities:Credit Card:My Bank Visa  $-144.00
+2026/06/16 Salary
+  Income:Employment:Salary  $-3451.37
+  Assets:Bank:My Bank Savings  $2031.24  ;Salary Paid
+  Expenses:Employment:Taxes On Salary  $908.00  ;Tax on Salary
+  Assets:Superannuation:My Super Fund  $512.13  ;Super Contribution Transfer
+2026/06/22 House Loan Offset Payment
+  Assets:Bank:My Bank Savings  $-1200.00
+  Assets:Bank:Mortgage Offset  $1200.00
+2025/06/30 Super Admin Fees
+  Assets:Superannuation:My Super Fund  $-241.64
+  Expenses:Superannuation:Fees  $241.64
+  2025/06/30 Super Admin Fees
+    Assets:Superannuation:My Super Fund  $-221.64
+    Expenses:Superannuation:Fees  $221.64
