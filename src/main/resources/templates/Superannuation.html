@@ -21,7 +21,19 @@
                      th:text="|${account.name()} (${#temporals.format(account.openingDate(), 'MMM yyyy')} - ${#temporals.format(account.closingDate(), 'MMM yyyy')})|"></div>
             </div>
         </div>
-        <div class="ui segment">
+        <div class="ui segment small-screen">
+            <div class="ui one column very compact grid">
+                <div class="row">
+                    <div class="center aligned column"><b>Earnings</b></div>
+                </div>
+                <div class="row">
+                    <div class="center aligned column" th:text="${#numbers.formatCurrency(account.earnings())}">
+                        Earnings
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui segment big-screen">
             <div class="ui three column very compact grid">
                 <div class="row">
                     <div class="center aligned column"><b>Starting</b></div>
@@ -41,7 +53,7 @@
                 </div>
             </div>
         </div>
-        <div class="ui segment">
+        <div class="ui segment big-screen">
             <div class="ui three column very compact grid">
                 <div class="row">
                     <div class="center aligned column"><b>Losses</b></div>

@@ -1,29 +1,51 @@
 @media screen and (max-width: 1900px) {
     #primary-menu {
         display: none;
+        visibility: hidden;
     }
 }
 
 @media screen and (min-width: 1900px) {
     #primary-tabs {
         display: none;
+        visibility: hidden;
     }
 }
 
 @media (max-width: 768px) {
-    .big-screen {
-        display: none;
+    div.big-screen, .big-screen-table, span.big-screen, .big-screen {
+        display: none !important;
+        visibility: hidden;
     }
-    .small-screen {
+    div.small-screen, span.small-screen, .small-screen {
         display: block;
+        visibility: visible;
+    }
+    .small-screen-table {
+        display: table-cell;
+        visibility: visible;
+    }
+    div.chart {
+        height: 600px !important;
+        width: 100% !important;
     }
 }
 
 @media (min-width: 769px) {
-    .big-screen {
+    div.big-screen, span.big-screen, .big-screen {
         display: block;
+        visibility: visible;
     }
-    .small-screen {
-        display: none;
+    .big-screen-table {
+        display: table-cell;
+        visibility: visible;
+    }
+    div.small-screen, span.small-screen, .small-screen-table, .small-screen {
+        display: none !important;
+        visibility: hidden;
+    }
+    div.chart {
+        height: 900px !important;
+        width: 100% !important;
     }
 }

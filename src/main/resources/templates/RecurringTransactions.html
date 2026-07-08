@@ -4,15 +4,15 @@
       lang="en">
 <body>
 <main>
-    <table class="ui compact celled table">
+    <table class="ui unstackable single line compact celled table">
         <thead>
         <tr>
             <th>Description</th>
-            <th>Next Due Date</th>
+            <th>Due Date</th>
             <th>Recurrence</th>
             <th class="right aligned">Amount</th>
-            <th class="right aligned">Estimate over Year</th>
-            <th class="center aligned">Actions</th>
+            <th class="right aligned big-screen-table">Yearly Estimate</th>
+            <th class="center aligned big-screen-table">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -21,9 +21,9 @@
             <td data-label="Due Date" th:text="${#temporals.format(schedule.dueDate(),'dd MMM yyyy', #locale)}">24</td>
             <td data-label="Recurrence" th:text="${schedule.recurrenceDescription()}">Engineer</td>
             <td data-label="Amount" class="right aligned" th:text="${#numbers.formatCurrency(schedule.amount())}"></td>
-            <td data-label="Estimate over Year" class="right aligned"
+            <td data-label="Yearly Estimate" class="right aligned big-screen-table"
                 th:text="${#numbers.formatCurrency(schedule.totalForYear())}"></td>
-            <td data-label="Actions" class="center aligned">
+            <td data-label="Actions" class="center aligned big-screen-table">
                 <div class="ui small spaced buttons">
                     <button class="ui compact button">Edit</button>
                     <button class="ui compact button">Skip</button>
