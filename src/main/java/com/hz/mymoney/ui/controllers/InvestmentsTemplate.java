@@ -1,6 +1,7 @@
 package com.hz.mymoney.ui.controllers;
 
 import com.hz.mymoney.components.ReleaseInfoContributor;
+import com.hz.mymoney.ui.services.UIDataUpdateService;
 import com.hz.mymoney.ui.services.UiModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
@@ -19,10 +20,12 @@ import org.springframework.web.servlet.view.FragmentsRendering;
 public class InvestmentsTemplate {
 	private final ReleaseInfoContributor release;
 	private final UiModelBuilderService uiModelBuilderService;
+	private final UIDataUpdateService uiDataUpdateService;
 
 	@GetMapping("/Investments")
 	public String investments(Model model) {
 		try {
+			uiDataUpdateService.reloadCommodities();
 			PageSupport.populateDefaultModelData(model, release.getVersion());
 			model.addAttribute("investmentsData", uiModelBuilderService.createCurrentInvestmentsTemplateData());
 			model.addAttribute("nextDisplayMode", "historical");

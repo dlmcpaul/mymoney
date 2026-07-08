@@ -188,4 +188,8 @@ public class UIDataUpdateService {
 		schedulesServices.reloadSchedules();
 		ledgerServices.reloadLedger();
 	}
+
+	public void reloadCommodities() throws IOException {
+		sharePriceServices.reloadCommodities();
+	}
 }
