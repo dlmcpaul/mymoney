@@ -14,8 +14,13 @@ public record InvestmentSummary(
 		BigDecimal earnings,
 		BigDecimal netProfitLoss,
 		LocalDate firstPurchase,
-		LocalDate lastDate
+		LocalDate lastDate,
+		String note
 		) {
+
+	public boolean hasNote() {
+		return note != null;
+	}
 
 	public boolean isProfit() {
 		return netProfitLoss.compareTo(BigDecimal.ZERO) >= 0;

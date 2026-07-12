@@ -14,14 +14,14 @@
         <th class="right aligned big-screen-table">Earnings</th>
         <th class="right aligned big-screen-table">Sales</th>
         <th class="right aligned" th:if="${#strings.contains(header,'Current')}">Market Value</th>
-        <th class="right aligned big-screen-table">Net Profit/Loss</th>
+        <th class="right aligned big-screen-table">Profit/Loss</th>
         <th class="right aligned">Annual Return</th>
     </tr>
     </thead>
     <tbody>
     <tr th:unless="${investmentsData.investmentSummaries.isEmpty()}"
         th:each="investment : ${investmentsData.investmentSummaries}">
-        <td th:text="${investment.code}"></td>
+        <td th:text="${investment.code}" th:attr="data-tooltip = ${investment.hasNote()} ? ${investment.note} : _"></td>
         <td th:text="${#temporals.format(investment.firstPurchase, 'dd MMM yyyy')}"></td>
         <td class="right aligned" th:if="${#strings.contains(header,'Current')}" th:text="${investment.count}"></td>
         <td class="right aligned" th:if="${#strings.contains(header,'Current')}"

@@ -320,13 +320,13 @@ public class UiModelBuilderService {
 
 		PriorityQueue<Movement> movementsForCode = account.getMovementsForCode(account.getCode());
 		if (movementsForCode.isEmpty()) {
-			return new InvestmentSummary(account.getCode(), account.getTotalAmount().intValue(), shareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, LocalDate.of(2000,1,1), LocalDate.now());
+			return new InvestmentSummary(account.getCode(), account.getTotalAmount().intValue(), shareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, LocalDate.of(2000,1,1), LocalDate.now(), getNextInvestmentIncomeNote(account.getCode()));
 		}
 
 		LocalDate earliestMovementDate = movementsForCode.stream().findFirst().orElseThrow().date();
 		LocalDate lastMovementDate = movementsForCode.stream().toList().getLast().date();
 
-		return new InvestmentSummary(account.getCode(), account.getTotalAmount().intValue(), shareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, earliestMovementDate, lastMovementDate);
+		return new InvestmentSummary(account.getCode(), account.getTotalAmount().intValue(), shareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, earliestMovementDate, lastMovementDate, getNextInvestmentIncomeNote(account.getCode()));
 	}
 
 	private NetAssetLiabilityPosition createNetAssetLiabilityPosition(ChartOfAccounts chartOfAccounts, boolean includeNote) {
