@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
@@ -29,11 +30,13 @@ import java.util.*;
 @Log4j2
 @RequiredArgsConstructor
 public class SharePriceServices implements ApplicationRunner {
-	private static final String PTA_DATE_FORMAT = "yyyy/MM/dd";
+	private static final String PTA_DATE_FORMAT_1 = "yyyy/MM/dd";
+	private static final String PTA_DATE_FORMAT_2 = "yyyy-MM-dd";
 	private static final String QUICKEN_DATE_FORMAT = "d/M/yy";
 
 	private String commodityOption;
 	private String commodityFileName;
+	private boolean loadSuccess;
 
 	private final ResourceLoader resourceLoader;
 
@@ -42,26 +45,35 @@ public class SharePriceServices implements ApplicationRunner {
 
 	@Override
 	public void run(@NonNull ApplicationArguments args) throws Exception {
-		Map<String, List<InvestmentHistoryEntry>> investmentHistoryEntries = new HashMap<>();
 		if (args.containsOption("commodities")) {
 			commodityOption = "commodities";
-			loadCommoditiesFromArgs(Objects.requireNonNull(args.getOptionValues("commodities")).getFirst(), investmentHistoryEntries);
+			commodityFileName = Objects.requireNonNull(args.getOptionValues("commodities")).getFirst();
 		} else if (args.containsOption("quicken")) {
 			commodityOption = "quicken";
-			loadCommoditiesFromQuickenFile(Objects.requireNonNull(args.getOptionValues("quicken")).getFirst(), investmentHistoryEntries);
+			commodityFileName = Objects.requireNonNull(args.getOptionValues("quicken")).getFirst();
 		} else {
 			commodityOption = "internal";
-			loadCommoditiesFromArgs("classpath:test.commodities", investmentHistoryEntries);
+			commodityFileName = "classpath:test.commodities";
+		}
+
+		if (commodityOption.isEmpty()) {
+			log.error("No commodities option provided");
+		} else {
+			reloadCommodities();
 		}
 	}
 
 	public void reloadCommodities() throws IOException {
 		Map<String, List<InvestmentHistoryEntry>> investmentHistoryEntries = new HashMap<>();
+		loadSuccess = true;
 		switch (commodityOption) {
 			case "internal" -> loadCommoditiesFromArgs("classpath:test.commodities", investmentHistoryEntries);
 			case "quicken" -> loadCommoditiesFromQuickenFile(commodityFileName, investmentHistoryEntries);
 			case "commodities" -> loadCommoditiesFromArgs(commodityFileName, investmentHistoryEntries);
 			default -> throw new IllegalStateException("Unexpected value: " + commodityOption);
+		}
+		if (loadSuccess) {
+			log.info("Loaded {} commodities", investmentHistoryEntries.size());
 		}
 	}
 
@@ -79,14 +91,17 @@ public class SharePriceServices implements ApplicationRunner {
 					String line = reader.readLine();
 					while (line != null) {
 						List<String> tokens = Arrays.stream(line.split(", ")).toList();
-						addEntry(entries, tokens.get(0), parseDate(tokens.get(2), QUICKEN_DATE_FORMAT), parseBigDecimal(tokens.get(1)));
+						addEntry(entries, tokens.get(0), parseQuickenDate(tokens.get(2)), parseBigDecimal(tokens.get(1)));
 
 						line = reader.readLine();
 					}
 					investmentHistory = new InvestmentHistory(entries);
 				}
+			} catch (RuntimeException e) {
+				log.error(e.getMessage());
+				loadSuccess = false;
 			} finally {
-				log.info("Quicken Commodities loaded successfully from file {}", fileName);
+				log.info("Quicken Commodities {} from {}", loadSuccess ? "loaded successfully" : "failed to load", fileName);
 			}
 		} else {
 			log.error("Unable to load Quicken Commodities from file {}", fileName);
@@ -110,8 +125,9 @@ public class SharePriceServices implements ApplicationRunner {
 			}
 		} catch (RuntimeException e) {
 			log.error(e.getMessage());
+			loadSuccess = false;
 		} finally {
-			log.info("Commodities loaded successfully from {}", fileName);
+			log.info("Commodities {} from {}", loadSuccess ? "loaded successfully" : "failed to load", fileName);
 		}
 	}
 
@@ -124,18 +140,30 @@ public class SharePriceServices implements ApplicationRunner {
 				// P date commodity value currency
 				if (line.startsWith("P")) {
 					List<String> tokens = Arrays.stream(line.split(" ")).toList();
-					addEntry(entries, tokens.get(2), parseDate(tokens.get(1), PTA_DATE_FORMAT), parseBigDecimal(tokens.get(3)));
+					addEntry(entries, tokens.get(2), parseDate(tokens.get(1)), parseBigDecimal(tokens.get(3)));
 				}
 				line = reader.readLine();
 			}
 			investmentHistory = new InvestmentHistory(entries);
 		} catch (IOException e) {
 			log.error(e.getMessage());
+			throw new ValidationException(e.getMessage());
 		}
 	}
 
-	private LocalDate parseDate(String date, String format) {
-		return LocalDate.parse(date, DateTimeFormatter.ofPattern(format));
+	private LocalDate parseQuickenDate(String dateString) {
+		return LocalDate.parse(dateString, DateTimeFormatter.ofPattern(QUICKEN_DATE_FORMAT));
+	}
+
+	private LocalDate parseDate(String dateString) {
+		try {
+			if (dateString.contains("/")) {
+				return LocalDate.parse(dateString, DateTimeFormatter.ofPattern(PTA_DATE_FORMAT_1));
+			}
+			return LocalDate.parse(dateString, DateTimeFormatter.ofPattern(PTA_DATE_FORMAT_2));
+		} catch (DateTimeParseException e) {
+			throw new RuntimeException("Could not parse date " + dateString + " as either " + PTA_DATE_FORMAT_1 + " or " + PTA_DATE_FORMAT_2, e);
+		}
 	}
 
 	private BigDecimal parseBigDecimal(String value) {
