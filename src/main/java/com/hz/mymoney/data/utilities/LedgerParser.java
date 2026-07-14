@@ -13,8 +13,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +21,6 @@ import java.util.Locale;
 @Log4j2
 public class LedgerParser {
 
-	private static final String DATE_FORMAT_1 = "yyyy/MM/dd";
-	private static final String DATE_FORMAT_2 = "yyyy-MM-dd";
 	private static final String MONEY_SYMBOL = "$";
 
 	public Ledger loadLedger(InputStream file) {
@@ -216,15 +212,7 @@ public class LedgerParser {
 	}
 
 	private LocalDate getDate(String line) {
-		String datePart = line.substring(0, 10);
-		try {
-			if (datePart.contains("/")) {
-				return LocalDate.parse(datePart, DateTimeFormatter.ofPattern(DATE_FORMAT_1));
-			}
-			return LocalDate.parse(datePart, DateTimeFormatter.ofPattern(DATE_FORMAT_2));
-		} catch (DateTimeParseException e) {
-			throw new RuntimeException("Could not parse date " + datePart + " as either " + DATE_FORMAT_1 + " or " + DATE_FORMAT_2, e);
-		}
+		return Dates.parseDate(line.substring(0, 10));
 	}
 
 	// A post line where we have to calculate the remaining amount
