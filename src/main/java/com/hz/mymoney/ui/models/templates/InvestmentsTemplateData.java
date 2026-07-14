@@ -26,8 +26,8 @@ public class InvestmentsTemplateData {
 	public List<MarketValue> getTotalProfitLossValues() {
 		return investmentSummaries.stream()
 				.map(investmentSummary -> new MarketValue(investmentSummary.code(), investmentSummary.netProfitLoss()))
-				.filter(marketValue -> marketValue.value.compareTo(BigDecimal.ZERO) > 0)
-				.sorted((o1, o2) -> o2.value.compareTo(o1.value))
+				.filter(marketValue -> marketValue.getValue().compareTo(BigDecimal.ZERO) > 0)
+				.sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
 				.limit(20)
 				.toList();
 	}

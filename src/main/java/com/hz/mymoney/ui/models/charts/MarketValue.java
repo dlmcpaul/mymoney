@@ -11,6 +11,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @JsonPropertyOrder({"name", "value"})
 public class MarketValue {
-	public String name;
-	public BigDecimal value;
+	private String name;
+	private BigDecimal value;
 }

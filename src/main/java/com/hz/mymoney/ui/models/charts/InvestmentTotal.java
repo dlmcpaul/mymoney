@@ -9,6 +9,6 @@ import lombok.Data;
 @AllArgsConstructor
 @JsonPropertyOrder({"name", "value"})
 public class InvestmentTotal {
-	public String name;
-	public int value;
+	private String name;
+	private int value;
 }
