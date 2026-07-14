@@ -84,7 +84,7 @@
 ><i class="fitted inverted black sync icon"></i>
 </div>
 
-<button th:fragment="ScheduleButton (description)" class="mini ui compact icon button" data-tooltip="Post or Skip"
+<button th:fragment="ScheduleButton (description)" class="mini ui compact icon primary button" data-tooltip="Post or Skip"
         data-inverted=""
         th:attr="hx-get=|@{/showScheduleModal}?scheduleDescription=${#uris.escapeQueryParam(description)}|"
         hx-swap="none" hx-trigger="click" hx-select-oob="#scheduleModal">
