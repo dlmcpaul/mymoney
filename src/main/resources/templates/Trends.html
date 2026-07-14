@@ -5,42 +5,42 @@
 <body>
 <main>
     <form class="ui form" hx-include="#trend-account-input"
-          th:attr="hx-get=|@{/accountChanged}?trendType=${activeButton}|"
+          th:attr="hx-get=|@{/accountChanged}?trendPeriod=${activeButton}|"
           hx-trigger="focusout[event.target.matches('input')] from:body" hx-select-oob="#trendsGraph,#trendsTotal"
           hx-target="none">
         <div class="two fields">
             <div th:replace="~{fragments/Journal :: AccountInputField ('trend-account', 'Account to Track', '', null, false)}"></div>
-            <div class="required field" id="TrendTypeButtons">
-                <label>Trend Type</label>
+            <div class="required field" id="trendPeriodButtons">
+                <label>Trend Period</label>
                 <div class="six ui buttons">
-                    <input type="hidden" th:value="${activeButton}" name="trendType">
+                    <input type="hidden" th:value="${activeButton}" name="trendPeriod">
                     <div th:class="${activeButton} eq '30d' ? 'ui active button' : 'ui button'"
-                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=30d|" hx-target="#TrendTypeButtons"
+                         th:attr="hx-get=|@{/trendPeriodButtonClick}?button=30d|" hx-target="#trendPeriodButtons"
                          hx-select-oob="#trendsGraph,#trendsTotal">
                         30d
                     </div>
                     <div th:class="${activeButton} eq '6m' ? 'ui active button' : 'ui button'"
-                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=6m|" hx-target="#TrendTypeButtons"
+                         th:attr="hx-get=|@{/trendPeriodButtonClick}?button=6m|" hx-target="#trendPeriodButtons"
                          hx-select-oob="#trendsGraph,#trendsTotal">
                         6m
                     </div>
                     <div th:class="${activeButton} eq '1y' ? 'ui active button' : 'ui button'"
-                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=1y|" hx-target="#TrendTypeButtons"
+                         th:attr="hx-get=|@{/trendPeriodButtonClick}?button=1y|" hx-target="#trendPeriodButtons"
                          hx-select-oob="#trendsGraph,#trendsTotal">
                         1y
                     </div>
                     <div th:class="${activeButton} eq '2y' ? 'ui active button' : 'ui button'"
-                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=2y|" hx-target="#TrendTypeButtons"
+                         th:attr="hx-get=|@{/trendPeriodButtonClick}?button=2y|" hx-target="#trendPeriodButtons"
                          hx-select-oob="#trendsGraph,#trendsTotal">
                         2y
                     </div>
                     <div th:class="${activeButton} eq '5y' ? 'ui active button' : 'ui button'"
-                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=5y|" hx-target="#TrendTypeButtons"
+                         th:attr="hx-get=|@{/trendPeriodButtonClick}?button=5y|" hx-target="#trendPeriodButtons"
                          hx-select-oob="#trendsGraph,#trendsTotal">
                         5y
                     </div>
                     <div th:class="${activeButton} eq '10y' ? 'ui active button' : 'ui button'"
-                         th:attr="hx-get=|@{/trendTypeButtonClick}?button=10y|" hx-target="#TrendTypeButtons"
+                         th:attr="hx-get=|@{/trendPeriodButtonClick}?button=10y|" hx-target="#trendPeriodButtons"
                          hx-select-oob="#trendsGraph,#trendsTotal">
                         10y
                     </div>

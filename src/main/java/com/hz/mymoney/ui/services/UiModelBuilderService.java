@@ -41,17 +41,17 @@ public class UiModelBuilderService {
 		return dataLoaderService.getLedger().isReadOnly();
 	}
 
-	public TrendsTemplateData createTrendsTemplateData(String accountName, String trendType) {
+	public TrendsTemplateData createTrendsTemplateData(String accountName, String trendPeriod) {
 		ChartOfAccounts coa = dataLoaderService.getCoa();
 
 		var account = coa.findAccount(accountName);
 
 		if (account.isPresent()) {
-			return new TrendsTemplateData(accountName, trendType, account.get().getMovementsAsList());
+			return new TrendsTemplateData(accountName, trendPeriod, account.get().getMovementsAsList());
 		}
 
 		if (accountName.isEmpty()) {
-			return new TrendsTemplateData(accountName, trendType, new ArrayList<>());
+			return new TrendsTemplateData(accountName, trendPeriod, new ArrayList<>());
 		}
 
 		// Merge all the accounts found into single set of movements
@@ -61,7 +61,7 @@ public class UiModelBuilderService {
 				.flatMap(Collection::stream)
 				.toList();
 
-		return new TrendsTemplateData(accountName, trendType, allMovements);
+		return new TrendsTemplateData(accountName, trendPeriod, allMovements);
 	}
 
 	public List<ScheduledTransaction> getScheduledTransactions() {

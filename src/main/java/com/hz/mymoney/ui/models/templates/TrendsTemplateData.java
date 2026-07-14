@@ -17,44 +17,44 @@ import java.util.stream.Collectors;
 public class TrendsTemplateData {
 	@Getter
 	private final String account;
-	private final String trendType;
+	private final String trendPeriod;
 	private final List<Movement> movements;
 
 	private LocalDate startDate() {
-		return switch (trendType) {
+		return switch (trendPeriod) {
 			case "30d" -> LocalDate.now().minusDays(30);
 			case "6m" -> LocalDate.now().minusMonths(5);
 			case "1y" -> LocalDate.now().minusMonths(11);
 			case "2y" -> LocalDate.now().minusYears(1).minusMonths(11);
 			case "5y" -> LocalDate.now().minusYears(4).minusMonths(11);
 			case "10y" -> LocalDate.now().minusYears(9).minusMonths(11);
-			default -> throw new IllegalStateException("Unexpected value: " + trendType);
+			default -> throw new IllegalStateException("Unexpected value: " + trendPeriod);
 		};
 	}
 
 	private String groupBy(LocalDate date) {
-		return switch (trendType) {
+		return switch (trendPeriod) {
 			case "30d" -> date.format(DateTimeFormatter.ISO_LOCAL_DATE);
 			case "6m", "1y", "2y" -> date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
 			case "5y", "10y" -> date.format(DateTimeFormatter.ofPattern("yyyy"));
-			default -> throw new IllegalStateException("Unexpected value: " + trendType);
+			default -> throw new IllegalStateException("Unexpected value: " + trendPeriod);
 		};
 	}
 
 	private String toDisplayName(String groupedName) {
-		LocalDate date = switch (trendType) {
+		LocalDate date = switch (trendPeriod) {
 			case "30d" -> LocalDate.parse(groupedName, DateTimeFormatter.ISO_LOCAL_DATE);
 			case "6m", "1y", "2y" -> LocalDate.parse(groupedName + "-01", DateTimeFormatter.ISO_LOCAL_DATE);
 			case "5y", "10y" -> LocalDate.parse(groupedName + "-01-01", DateTimeFormatter.ISO_LOCAL_DATE);
-			default -> throw new IllegalStateException("Unexpected value: " + trendType);
+			default -> throw new IllegalStateException("Unexpected value: " + trendPeriod);
 		};
 
-		return switch (trendType) {
+		return switch (trendPeriod) {
 			case "30d" -> date.format(DateTimeFormatter.ISO_LOCAL_DATE);
 			case "6m", "1y" -> date.format(DateTimeFormatter.ofPattern("MMM"));
 			case "2y" -> date.format(DateTimeFormatter.ofPattern("MMM-yy"));
 			case "5y", "10y" -> date.format(DateTimeFormatter.ofPattern("yyyy"));
-			default -> throw new IllegalStateException("Unexpected value: " + trendType);
+			default -> throw new IllegalStateException("Unexpected value: " + trendPeriod);
 		};
 	}
 

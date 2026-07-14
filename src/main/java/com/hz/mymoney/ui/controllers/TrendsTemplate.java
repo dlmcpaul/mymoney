@@ -32,13 +32,17 @@ public class TrendsTemplate {
 		return "Trends";
 	}
 
-	@GetMapping("/trendTypeButtonClick")
+	@GetMapping("/trendPeriodButtonClick")
 	@HxRequest
 	public View distributionButtonsClick(Model model, @RequestParam String button, @RequestParam String accounts) {
-		model.addAttribute("activeButton", button);
-		model.addAttribute("trendsData", uiModelBuilderService.createTrendsTemplateData(accounts, button));
+		try {
+			model.addAttribute("activeButton", button);
+			model.addAttribute("trendsData", uiModelBuilderService.createTrendsTemplateData(accounts, button));
+		}  catch (Exception e) {
+			log.error("Trends Period Button Generation Exception {}", e.getMessage(), e);
+		}
 		return FragmentsRendering
-				.fragment("Trends :: #TrendTypeButtons")
+				.fragment("Trends :: #trendPeriodButtons")
 				.fragment("Trends :: #trendsGraph")
 				.fragment("Trends :: #trendsTotal")
 				.build();
@@ -50,7 +54,7 @@ public class TrendsTemplate {
 		try {
 			model.addAttribute("trendsData", uiModelBuilderService.createTrendsTemplateData(accountName, trendType));
 		}  catch (Exception e) {
-			log.error("Trends Page Generation Exception {}", e.getMessage(), e);
+			log.error("Trends Account Change Generation Exception {}", e.getMessage(), e);
 		}
 		return FragmentsRendering
 				.fragment("Trends :: #trendsGraph")
