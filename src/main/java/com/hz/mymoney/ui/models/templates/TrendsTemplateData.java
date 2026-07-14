@@ -34,7 +34,7 @@ public class TrendsTemplateData {
 
 	private String groupBy(LocalDate date) {
 		return switch (trendType) {
-			case "30d" -> date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			case "30d" -> date.format(DateTimeFormatter.ISO_LOCAL_DATE);
 			case "6m", "1y", "2y" -> date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
 			case "5y", "10y" -> date.format(DateTimeFormatter.ofPattern("yyyy"));
 			default -> throw new IllegalStateException("Unexpected value: " + trendType);
@@ -43,14 +43,14 @@ public class TrendsTemplateData {
 
 	private String toDisplayName(String groupedName) {
 		LocalDate date = switch (trendType) {
-			case "30d" -> LocalDate.parse(groupedName, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			case "6m", "1y", "2y" -> LocalDate.parse(groupedName + "-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			case "5y", "10y" -> LocalDate.parse(groupedName + "-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			case "30d" -> LocalDate.parse(groupedName, DateTimeFormatter.ISO_LOCAL_DATE);
+			case "6m", "1y", "2y" -> LocalDate.parse(groupedName + "-01", DateTimeFormatter.ISO_LOCAL_DATE);
+			case "5y", "10y" -> LocalDate.parse(groupedName + "-01-01", DateTimeFormatter.ISO_LOCAL_DATE);
 			default -> throw new IllegalStateException("Unexpected value: " + trendType);
 		};
 
 		return switch (trendType) {
-			case "30d" -> date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			case "30d" -> date.format(DateTimeFormatter.ISO_LOCAL_DATE);
 			case "6m", "1y" -> date.format(DateTimeFormatter.ofPattern("MMM"));
 			case "2y" -> date.format(DateTimeFormatter.ofPattern("MMM-yy"));
 			case "5y", "10y" -> date.format(DateTimeFormatter.ofPattern("yyyy"));
