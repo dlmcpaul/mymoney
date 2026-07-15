@@ -21,7 +21,7 @@
                 <div class="description">Income</div>
             </div>
             <div class="right attached right aligned column">
-                <div class="description" data-th-text="${#numbers.formatCurrency(monthlyChange.incoming())}">$0</div>
+                <div class="description"><span class="ui blue text" data-th-text="${#numbers.formatCurrency(monthlyChange.incoming())}">$0</span></div>
             </div>
         </div>
         <div class="row">
@@ -29,7 +29,7 @@
                 <div class="description">Expenses</div>
             </div>
             <div class="right attached right aligned column">
-                <div class="description" data-th-text="${#numbers.formatCurrency(monthlyChange.outgoing())}">$0</div>
+                <div class="description"><span class="ui red text" data-th-text="${#numbers.formatCurrency(monthlyChange.outgoing())}">$0</span></div>
             </div>
         </div>
         <div class="row">
@@ -37,8 +37,8 @@
                 <div class="description">Net</div>
             </div>
             <div class="right attached right aligned column">
-                <div th:if="${monthlyChange.getBalance()} lt 0" class="description"><span><i class="minus icon"></i></span><span data-th-text="${#numbers.formatCurrency(monthlyChange.getBalance())}">$0</span></div>
-                <div th:if="${monthlyChange.getBalance()} ge 0" class="description"><span><i class="plus icon"></i></span><span data-th-text="${#numbers.formatCurrency(monthlyChange.getBalance())}">$0</span></div>
+                <div th:if="${monthlyChange.getBalance()} lt 0" class="description"><span><i class="minus icon"></i></span><span class="ui red text" data-th-text="${#numbers.formatCurrency(monthlyChange.getBalance())}">$0</span></div>
+                <div th:if="${monthlyChange.getBalance()} ge 0" class="description"><span><i class="plus icon"></i></span><span class="ui green text" data-th-text="${#numbers.formatCurrency(monthlyChange.getBalance())}">$0</span></div>
             </div>
         </div>
     </div>
