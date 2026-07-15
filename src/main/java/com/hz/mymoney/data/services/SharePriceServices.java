@@ -3,6 +3,7 @@ package com.hz.mymoney.data.services;
 import com.hz.mymoney.data.models.internal.InvestmentHistory;
 import com.hz.mymoney.data.models.internal.InvestmentHistoryEntry;
 import com.hz.mymoney.data.utilities.Dates;
+import com.hz.mymoney.data.utilities.Money;
 import com.hz.mymoney.exceptions.ValidationException;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -101,7 +102,7 @@ public class SharePriceServices implements ApplicationRunner {
 					}
 				}
 			} catch (RuntimeException e) {
-				log.error(e.getMessage());
+				log.error(e.getMessage(), e);
 				loadSuccess = false;
 			}
 		} else {
@@ -126,32 +127,36 @@ public class SharePriceServices implements ApplicationRunner {
 					throw new ValidationException("Unable to load Commodities from " + commodityFileName);
 				}
 			}
-		} catch (RuntimeException e) {
-			log.error(e.getMessage());
+		} catch (ValidationException e) {
+			log.error(e.getMessage(), e);
 			loadSuccess = false;
 		}
 	}
 
 	private void loadCommodities(InputStream inputStream, Map<String, List<InvestmentHistoryEntry>> entries) {
+		String line = "";
 		try (final InputStream ledgerImportStream = inputStream) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(ledgerImportStream));
-			String line = reader.readLine();
+			line = reader.readLine();
 			while (line != null) {
 				// Parse as P 2025-01-01 NSC 150,25 USD
 				// P date commodity value currency
 				if (line.startsWith("P")) {
-					List<String> tokens = Arrays.stream(line.split(" ")).toList();
+					List<String> tokens = Arrays.stream(line.split("\\s+")).toList();
 					addEntry(entries, tokens.get(2), Dates.parseDate(tokens.get(1)), parseBigDecimal(tokens.get(3)));
 				}
 				line = reader.readLine();
 			}
-		} catch (IOException e) {
-			log.error(e.getMessage());
-			throw new ValidationException(e.getMessage());
+		} catch (RuntimeException | IOException e) {
+			log.error(e.getMessage(), e);
+			throw new ValidationException("Failed to parse line '" + line + "'");
 		}
 	}
 
 	private BigDecimal parseBigDecimal(String value) {
+		if (value.startsWith(Money.MONEY_SYMBOL)) {
+			return Money.parseMoney(value, 2);
+		}
 		return BigDecimal.valueOf(Double.parseDouble(value));
 	}
 

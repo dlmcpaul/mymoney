@@ -8,20 +8,13 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 @Log4j2
 public class LedgerParser {
-
-	private static final String MONEY_SYMBOL = "$";
 
 	public Ledger loadLedger(InputStream file) {
 		Ledger ledger = new Ledger();
@@ -56,10 +49,10 @@ public class LedgerParser {
 						// Posting (cash or share)
 						if (isFundPosting(line)) {
 							ledgerEntry.getPostings().add(parseFundPosting(line));
-						} else if (isCashPosting(line)) {
-							ledgerEntry.getPostings().add(parseCashPosting(line));
 						} else if (isSharePosting(line)) {
 							ledgerEntry.getPostings().add(parseSharePosting(line));
+						} else if (isCashPosting(line)) {
+							ledgerEntry.getPostings().add(parseCashPosting(line));
 						} else if (isRemainderPosting(line)) {
 							ledgerEntry.getPostings().add(parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
 						} else if (isShareResetPosting(line)) {
@@ -124,37 +117,6 @@ public class LedgerParser {
 				|| line.startsWith("|");
 	}
 
-	private BigDecimal parseMoney(String amount, int scale) {
-		if (amount.contains(MONEY_SYMBOL + "-") || amount.contains("-" + MONEY_SYMBOL)) {
-			// special case 1
-			return parseMoney(MONEY_SYMBOL + amount.substring(2), scale).multiply(BigDecimal.valueOf(-1));
-		} else if (amount.contains(MONEY_SYMBOL + " -")) {
-			// special case 2
-			return parseMoney(MONEY_SYMBOL + amount.substring(3), scale).multiply(BigDecimal.valueOf(-1));
-		} else if (amount.contains(".") == false) {
-			// special case 3
-			return parseMoney(amount + ".00", scale);
-		} else if (amount.startsWith(MONEY_SYMBOL + " ")) {
-			// special case 4
-			return parseMoney(MONEY_SYMBOL + amount.substring(2), scale);
-		} else if (amount.startsWith(MONEY_SYMBOL) == false) {
-			// special case 5
-			return parseMoney(MONEY_SYMBOL + amount, scale);
-		}
-
-		try {
-			NumberFormat currency = NumberFormat.getCurrencyInstance(Locale.of("en", "au"));
-
-			if (currency instanceof DecimalFormat decimal) {
-				decimal.setParseBigDecimal(true);
-				return ((BigDecimal) decimal.parse(amount)).setScale(scale, RoundingMode.HALF_UP);
-			}
-		} catch (ParseException e) {
-			throw new RuntimeException("Could not parse money: " + amount, e);
-		}
-		return BigDecimal.ZERO;
-	}
-
 	private Posting parseRemainderPosting(String line, BigDecimal remainder) {
 		String account = tokenize(line).getFirst().trim();
 
@@ -162,15 +124,25 @@ public class LedgerParser {
 	}
 
 	private SharePosting parseSharePosting(String line) {
-		// Account  Amount  Share Name @ Share Price
-		String account = tokenize(line).get(0).trim();
-		String amount = tokenize(line).get(1).trim();
-		String shares = tokenize(line).get(2).trim();
+		String account = tokenize(line).getFirst().trim();
+		String amount = "";
+		String shares = "";
+
+		if (tokenize(line).size() == 3) {
+			// Follows the defined convention of 2 spaces between Account, Amount and Share Name
+			// Account  Amount  Share Name @ Share Price
+			amount = tokenize(line).get(1).trim();
+			shares = tokenize(line).get(2).trim();
+		} else {
+			String misformed = tokenize(line).get(1).trim();
+			amount = misformed.split(" ")[0];
+			shares = misformed.substring(amount.length()).trim();
+		}
 
 		if (shares.contains("@")) {
-			return new SharePosting(account, parseMoney(amount, 2), parseMoney(shares.split(" ")[2], 6), shares.split(" ")[0], getNote(line));
+			return new SharePosting(account, Money.parseMoney(amount, 2), Money.parseMoney(shares.split(" ")[2], 6), shares.split(" ")[0], getNote(line));
 		}
-		return new SharePosting(account, parseMoney(amount, 2), BigDecimal.ZERO, shares.split(" ")[0], getNote(line));
+		return new SharePosting(account, Money.parseMoney(amount, 2), BigDecimal.ZERO, shares.split(" ")[0], getNote(line));
 	}
 
 	private SharePosting parseShareResetPosting(String line) {
@@ -178,7 +150,7 @@ public class LedgerParser {
 		String amount = tokenize(line).get(2).trim();
 		String shareCode = tokenize(line).getLast().trim();
 
-		return new SharePosting(account, parseMoney(amount, 2), BigDecimal.ZERO, shareCode, true, getNote(line));
+		return new SharePosting(account, Money.parseMoney(amount, 2), BigDecimal.ZERO, shareCode, true, getNote(line));
 	}
 
 	private FundPosting parseFundPosting(String line) {
@@ -189,7 +161,7 @@ public class LedgerParser {
 			log.warn("for fund line '{}' amount needs to be calculated", line);
 		}
 
-		return new FundPosting(account, parseMoney(amount, 2), getNote(line));
+		return new FundPosting(account, Money.parseMoney(amount, 2), getNote(line));
 	}
 
 	private String getNote(String line) {
@@ -208,7 +180,7 @@ public class LedgerParser {
 			log.warn("for cash line '{}' amount needs to be calculated", line);
 		}
 
-		return new Posting(account, parseMoney(amount, 2), getNote(line));
+		return new Posting(account, Money.parseMoney(amount, 2), getNote(line));
 	}
 
 	private LocalDate getDate(String line) {
@@ -231,7 +203,7 @@ public class LedgerParser {
 
 	// A share posting
 	private boolean isSharePosting(String line) {
-		return countTokens(line) == 3;
+		return countTokens(line) == 3 || line.contains("@");
 	}
 
 	// A share reset posting
@@ -258,7 +230,7 @@ public class LedgerParser {
 		return Arrays.stream(line.split(" {2}"))
 				.map(String::trim)
 				.filter(s -> s.isEmpty() == false)
-				.filter(s -> s.equals(MONEY_SYMBOL) == false)
+				.filter(s -> s.equals(Money.MONEY_SYMBOL) == false)
 				.toList();
 	}
 
