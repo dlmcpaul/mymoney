@@ -16,7 +16,7 @@ public class InvestmentsTemplateData {
 	public final String mode;
 
 	public List<InvestmentTotal> getInvestmentTotals() {
-		return investmentSummaries.stream().map(investmentSummary -> new InvestmentTotal(investmentSummary.code(), investmentSummary.count())).toList();
+		return investmentSummaries.stream().map(investmentSummary -> new InvestmentTotal(investmentSummary.code(), investmentSummary.count().intValue())).toList();
 	}
 
 	public List<MarketValue> getMarketValues() {

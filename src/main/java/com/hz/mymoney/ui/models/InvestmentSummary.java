@@ -2,11 +2,12 @@ package com.hz.mymoney.ui.models;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 
 public record InvestmentSummary(
 		String code,
-		int count,
+		BigDecimal count,
 		BigDecimal lastPrice,
 		BigDecimal balance,
 		BigDecimal costBase,
@@ -18,6 +19,10 @@ public record InvestmentSummary(
 		String note
 		) {
 
+	public String quantity() {
+		return new DecimalFormat("#,###.##").format(count);
+	}
+
 	public boolean hasNote() {
 		return note != null;
 	}
@@ -27,7 +32,7 @@ public record InvestmentSummary(
 	}
 
 	public boolean isClosed() {
-		return count == 0;
+		return count.equals(BigDecimal.ZERO);
 	}
 
 	public BigDecimal yearlyReturn() {

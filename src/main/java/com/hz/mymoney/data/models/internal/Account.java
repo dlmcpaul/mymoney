@@ -7,6 +7,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -93,9 +94,9 @@ public class Account implements Comparable<Account> {
 	private BigDecimal addMovementAmount(Movement movement) {
 		if (isShareAccount) {
 			if (movement.split()) {
-				return movement.amount().setScale(0, RoundingMode.HALF_UP);
+				return movement.amount().setScale(2, RoundingMode.HALF_UP);
 			}
-			return cachedAmount.add(movement.amount()).setScale(0, RoundingMode.HALF_UP);
+			return cachedAmount.add(movement.amount()).setScale(2, RoundingMode.HALF_UP);
 		}
 		return cachedAmount.add(movement.amount());
 	}
@@ -108,7 +109,7 @@ public class Account implements Comparable<Account> {
 			for (Movement movement : movements) {
 				sum = movement.split() ? movement.amount() : sum.add(movement.amount());
 			}
-			return sum.setScale(0, RoundingMode.HALF_UP);
+			return sum.setScale(2, RoundingMode.HALF_UP);
 		}
 		return sumBigDecimals(movements.stream()
 				.map(Movement::amount));
@@ -202,7 +203,8 @@ public class Account implements Comparable<Account> {
 				// Option not share?
 				return getTotalAmount() + " options (" + getCode() + ") for " + getCode().substring(0,3);
 			}
-			return getTotalAmount() + " shares in " + simpleName;
+			;
+			return new DecimalFormat("#.##").format(getTotalAmount()) + " shares in " + simpleName;
 		} else if (isManagedFund()) {
 			return simpleName + " Fund";
 		}
