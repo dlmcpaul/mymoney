@@ -80,7 +80,7 @@ public class LedgerParser {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			log.error(e.getMessage());
+			log.error(e.getMessage(), e);
 		} catch (Exception e) {
 			log.error("({}) {}", lastLine, e.getMessage());
 		}

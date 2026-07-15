@@ -56,7 +56,7 @@ public class SchedulesServices implements ApplicationRunner {
 				convertLedgerToSchedules(scheduleLedger);
 			} finally {
 				assert scheduleLedger != null;
-				log.info("Schedules loaded {}from file {} with {} errors", scheduleLedger.isReadOnly() ? "" : "successfully ", path.toString(), scheduleLedger.getLoadErrorCount());
+				log.info("Successfully loaded {} Schedules from file {} with {} errors", scheduleLedger.getLedgerEntries().size(), path.toString(), scheduleLedger.getLoadErrorCount());
 			}
 		} else {
 			log.error("Unable to load schedules from file {}", fileName);
