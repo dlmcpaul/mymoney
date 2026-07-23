@@ -58,7 +58,7 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 				return description.substring(0, 3);
 			}
 
-			log.warn("Could not find code in {} using {}", sourceAccount, description);
+			log.debug("Could not find code in {} using {}", sourceAccount, description);
 		}
 		return code;
 	}
