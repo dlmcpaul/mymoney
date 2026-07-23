@@ -19,23 +19,23 @@
                     <div class="right aligned six wide column">
                         <div class="description" th:if="${txn.isNotYetDue()}">
                             <span th:text="|due ${#temporals.format(txn.dueDate(),'dd MMM yyyy', #locale)}|">dd MMM yyyy</span>
-                            <span>&nbsp;<button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                            <span>&nbsp;<button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, '')}"></button></span>
                         </div>
                         <div class="description" th:if="${txn.isDueSoon()}">
                             <span class="ui warn text"><b>due soon&nbsp;</b>
-                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'warn')}"></button></span>
                         </div>
                         <div class="description" th:if="${txn.isDueTomorrow()}">
                             <span class="ui info text"><b>due tomorrow&nbsp;</b>
-                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'info')}"></button></span>
                         </div>
                         <div class="description" th:if="${txn.isDueToday()}">
                             <span class="ui success text"><b>due today&nbsp;</b>
-                                <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                                <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'success')}"></button></span>
                         </div>
                         <div class="description" th:if="${txn.isInPast()}">
                             <span class="ui error text"><b>overdue&nbsp;</b>
-                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()})}"></button></span>
+                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'error')}"></button></span>
                         </div>
                     </div>
                 </div>
