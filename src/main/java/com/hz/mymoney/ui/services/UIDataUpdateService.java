@@ -90,16 +90,16 @@ public class UIDataUpdateService {
 		log.info("New Dividend Journal Request {}", dividendInputJournal);
 		Ledger ledger = ledgerServices.getLedger();
 		String shareAccount = dividendInputJournal.getAccounts().getFirst();
-		String brokerAccount = dividendInputJournal.getAccounts().get(1);
 		String destinationAccount = dividendInputJournal.getAccounts().getLast();
 
 		BigDecimal frankedAmount = dividendInputJournal.getAmounts().getFirst();
 		BigDecimal unfrankedAmount = dividendInputJournal.getAmounts().get(1);
 		BigDecimal imputationAmount = dividendInputJournal.getAmounts().getLast();
-		BigDecimal totalAmount = frankedAmount.add(unfrankedAmount).add(imputationAmount);
+		BigDecimal cashAmount = frankedAmount.add(unfrankedAmount);
 
 		String code = shareAccount.substring(shareAccount.lastIndexOf(":") + 1);
 		String description = "Dividend from " + code;
+		String imputationNote = "Imputation Credit from " + code;
 
 		// If there is a franked amount then there must be an imputation amount
 		if (imputationAmount.compareTo(BigDecimal.ZERO) == 0 && frankedAmount.compareTo(BigDecimal.ZERO) != 0) {
@@ -113,26 +113,16 @@ public class UIDataUpdateService {
 
 		// Post the income
 		List<IPosting> postings = new ArrayList<>();
-		postings.add(new Posting(brokerAccount, totalAmount));
+
+		postings.add(new Posting(destinationAccount, cashAmount));
+		if (imputationAmount.compareTo(BigDecimal.ZERO) > 0) {
+			postings.add(new Posting(IMPUTATION_ACCOUNT, imputationAmount, imputationNote));
+		}
 		if (frankedAmount.compareTo(BigDecimal.ZERO) > 0) {
-			postings.add(new Posting(FRANKED_DIVIDEND, frankedAmount.multiply(BigDecimal.valueOf(-1))));
+			postings.add(new Posting(FRANKED_DIVIDEND, frankedAmount.add(imputationAmount).multiply(BigDecimal.valueOf(-1))));
 		}
 		if (unfrankedAmount.compareTo(BigDecimal.ZERO) > 0) {
 			postings.add(new Posting(UNFRANKED_DIVIDEND, unfrankedAmount.multiply(BigDecimal.valueOf(-1))));
-		}
-		if (imputationAmount.compareTo(BigDecimal.ZERO) > 0) {
-			postings.add(new Posting(IMPUTATION_INCOME, imputationAmount.multiply(BigDecimal.valueOf(-1)), "Imputation Credit from " + code));
-		}
-		ledger.add(dividendInputJournal.getJournalDate(),
-				description,
-				postings);
-
-		// Then disburse to the accounts
-		postings = new ArrayList<>();
-		postings.add(new Posting(brokerAccount, totalAmount.multiply(BigDecimal.valueOf(-1))));
-		postings.add(new Posting(destinationAccount, frankedAmount.add(unfrankedAmount)));
-		if (imputationAmount.compareTo(BigDecimal.ZERO) > 0) {
-			postings.add(new Posting(IMPUTATION_ACCOUNT, imputationAmount, code));
 		}
 		ledger.add(dividendInputJournal.getJournalDate(),
 				description,
