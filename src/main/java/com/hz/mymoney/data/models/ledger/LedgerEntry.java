@@ -75,6 +75,13 @@ public class LedgerEntry {
 		return BigDecimal.ZERO;
 	}
 
+	public SharePosting getSharePosting() {
+		return (SharePosting) postings.stream()
+				.filter(p -> p instanceof SharePosting)
+				.findFirst()
+				.orElse(null);
+	}
+
 	public boolean isEquivalent(LedgerEntry transaction) {
 		return this.date.isEqual(transaction.getDate())
 				&& this.getFirstPosting().isSameAccount(transaction.getLastPosting().getAccount())

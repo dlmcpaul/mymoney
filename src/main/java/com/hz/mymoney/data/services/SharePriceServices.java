@@ -62,12 +62,23 @@ public class SharePriceServices implements ApplicationRunner {
 		}
 	}
 
-	public void reloadCommodities() throws IOException {
+	// If internal commodity map then allow updates from journal load
+	public void updateFromJournal(LocalDate effective, String code, BigDecimal price) {
+		if (commodityOption.equals("internal")) {
+			log.info("Adding investment history entry {} {} {}", effective, code, price);
+			addEntry(investmentHistory.commodityMap(), code, effective, price);
+		}
+	}
 
+	public void reloadCommodities() throws IOException {
 		loadSuccess = true;
 
 		switch (commodityOption) {
-			case "internal", "commodities" -> loadCommoditiesFromArgs();
+			case "internal" -> {
+				// Don't reload test data
+				if (investmentHistory == null || investmentHistory.commodityMap().isEmpty()) loadCommoditiesFromArgs();
+			}
+			case "commodities" -> loadCommoditiesFromArgs();
 			case "quicken" -> loadCommoditiesFromQuickenFile();
 			default -> throw new IllegalStateException("Unexpected value: " + commodityOption);
 		}

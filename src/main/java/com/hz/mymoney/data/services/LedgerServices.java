@@ -6,6 +6,7 @@ import com.hz.mymoney.data.models.internal.Movement;
 import com.hz.mymoney.data.models.ledger.IPosting;
 import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;
+import com.hz.mymoney.data.models.ledger.SharePosting;
 import com.hz.mymoney.data.utilities.LedgerParser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -54,6 +56,9 @@ public class LedgerServices implements ApplicationRunner {
 			this.loadLedgerFromClassPath("test.ledger");
 		}
 
+		ledger.getLedgerEntries()
+			.forEach(this::updateShareValues);
+
 		makeChartOfAccounts(ledger);
 
 		if (args.containsOption("testing")) {
@@ -70,6 +75,13 @@ public class LedgerServices implements ApplicationRunner {
 			logEmptyCodeMovements("Income:Investment:Capital Gains");
 			logEmptyCodeMovements("Income:Investment:Capital Return");
 			logEmptyCodeMovements("Expenses:Investment:Capital Losses");
+		}
+	}
+
+	private void updateShareValues(LedgerEntry entry) {
+		SharePosting posting = entry.getSharePosting();
+		if (posting != null) {
+			shareValueService.updateFromJournal(entry.getDate(), posting.getCode(), posting.getPrice());
 		}
 	}
 
@@ -156,6 +168,7 @@ public class LedgerServices implements ApplicationRunner {
 			}
 		} else {
 			log.error("Unable to load Ledger from file {}", fileName);
+			throw new FileNotFoundException("Unable to load Ledger from file " + fileName);
 		}
 	}
 
