@@ -83,11 +83,13 @@ public class TaxYear {
 	List<Transaction> getInvestmentIncomeTransactions() {
 		List<Transaction> result = new ArrayList<>();
 
-		result.addAll(this.filter(incomeTransactions, DIVIDEND_INCOME));
-		result.addAll(this.filter(incomeTransactions, CAPITAL_GAINS_INCOME));
-		result.addAll(this.filter(incomeTransactions, CAPITAL_RETURN_INCOME));
 		result.addAll(this.filter(incomeTransactions, INTEREST_INCOME));
-		result.addAll(this.filter(incomeTransactions, DISTRIBUTION_INCOME));
+		result.addAll(this.filter(incomeTransactions, INVESTMENT_INCOME));
+
+//		result.addAll(this.filter(incomeTransactions, DIVIDEND_INCOME));
+//		result.addAll(this.filter(incomeTransactions, CAPITAL_GAINS_INCOME));
+//		result.addAll(this.filter(incomeTransactions, CAPITAL_RETURN_INCOME));
+//		result.addAll(this.filter(incomeTransactions, DISTRIBUTION_INCOME));
 
 		return result;
 	}

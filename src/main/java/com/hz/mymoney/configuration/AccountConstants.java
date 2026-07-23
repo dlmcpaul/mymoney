@@ -10,16 +10,18 @@ public class AccountConstants {
 	// Income
 	public static final String INCOME_PREFIX = "Income:";
 	public static final String EMPLOYMENT_SALARY = "Income:Employment:Salary";
+	public static final String INTEREST_INCOME = "Income:Cash:Int Paid";
+	public static final String INVESTMENT_INCOME = "Income:Investment:";
+	public static final String IMPUTATION_INCOME = "Income:Investment:Imputation:Tax Credit";
+
 	public static final String DIVIDEND_INCOME = "Income:Investment:Dividends";
+	public static final String FRANKED_DIVIDEND = "Income:Investment:Dividends:Franked";
+	public static final String UNFRANKED_DIVIDEND ="Income:Investment:Dividends:Unfranked";
 	public static final String DISTRIBUTION_INCOME = "Income:Investment:Distribution";
 	public static final String REINVESTMENT_INCOME = "Income:Investment:Reinvestment";
 	public static final String CAPITAL_GAINS_INCOME = "Income:Investment:Capital Gains";
 	public static final String CAPITAL_LOSSES_INCOME = "Income:Investment:Capital Losses";
 	public static final String CAPITAL_RETURN_INCOME = "Income:Investment:Capital Return";
-	public static final String INTEREST_INCOME = "Income:Cash:Int Paid";
-	public static final String FRANKED_DIVIDEND = "Income:Investment:Dividends:Franked";
-	public static final String UNFRANKED_DIVIDEND ="Income:Investment:Dividends:Unfranked";
-	public static final String IMPUTATION_INCOME = "Income:Investment:Imputation:Tax Credit";
 	public static final String INCOME_OTHER = "Income:Investment:Miscellaneous Income";
 
 	// Expenses
@@ -39,7 +41,7 @@ public class AccountConstants {
 
 	public static final String SUPER_CONTRIBUTION_NOTE = "Super Contribution Transfer";  // To identify Super Contributions
 
-	// Investments
+	// Investment Assets
 	public static final String SHARES = "Assets:Shares:";       // Where shares are tracked
 	public static final String STOCKBROKER = "Assets:Broker:";   // Where stockbroker accounts are tracked
 	public static final String FUNDS = "Assets:Fund:";          // Where Fund accounts are tracked

@@ -120,49 +120,26 @@ public class ChartOfAccounts {
 				.collect(Collectors.toCollection(PriorityQueue::new)));
 	}
 
-	public BigDecimal getTotalFrankedDividendsForCode(String code) {
-		return this.sumAmountForAccountWithCode(FRANKED_DIVIDEND, code);
-	}
-
-	public BigDecimal getTotalUnFrankedDividendsForCode(String code) {
-		return this.sumAmountForAccountWithCode(UNFRANKED_DIVIDEND, code);
-	}
-
-	public BigDecimal getTotalMiscIncomeForCode(String code) {
-		return this.sumAmountForAccountWithCode(INCOME_OTHER, code);
-	}
-
-	public BigDecimal getTotalCapitalGainsForCode(String code) {
-		return this.sumAmountForAccountWithCode(CAPITAL_GAINS_INCOME, code);
-	}
-
-	// None in conversion
-	public BigDecimal getTotalCapitalLossesForCode(String code) {
-		return this.sumAmountForAccountWithCode(CAPITAL_LOSSES_INCOME, code);
-	}
-
-	public BigDecimal getTotalCapitalReturnsForCode(String code) {
-		return this.sumAmountForAccountWithCode(CAPITAL_RETURN_INCOME, code);
-	}
-
-	// Fund type distribution or reinvestment
-	public BigDecimal getTotalDistributionsForCode(String code) {
-		return this.sumAmountForAccountWithCode(DISTRIBUTION_INCOME, code)
-				.add(this.sumAmountForAccountWithCode(REINVESTMENT_INCOME, code));
-	}
-
 	public BigDecimal getTotalInvestmentIncomeForCode(String code) {
-		return this.getTotalFrankedDividendsForCode(code)
-				.add(this.getTotalUnFrankedDividendsForCode(code))
-				.add(this.getTotalMiscIncomeForCode(code))
-				.add(this.getTotalCapitalGainsForCode(code))
-				.add(this.getTotalCapitalReturnsForCode(code))
-				.add(this.getTotalDistributionsForCode(code));
+		return Arrays.stream(INVESTMENT_INCOME
+				.split(","))
+				.map(x -> this.sumAmountForAccountsWithCode(x, code))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
-	private BigDecimal sumAmountForAccountWithCode(String accountType, String code) {
+	private BigDecimal sumAmountForAccountExactWithCode(String accountType, String code) {
 		return accounts.stream()
 				.filter(account -> account.getName().equalsIgnoreCase(accountType))
+				.map(account -> account.getMovementsForCode(code))
+				.map(this::sum)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.abs()
+				.setScale(2, RoundingMode.HALF_UP);
+	}
+
+	private BigDecimal sumAmountForAccountsWithCode(String accountType, String code) {
+		return accounts.stream()
+				.filter(account -> account.getName().toLowerCase().startsWith(accountType.toLowerCase()))
 				.map(account -> account.getMovementsForCode(code))
 				.map(this::sum)
 				.reduce(BigDecimal.ZERO, BigDecimal::add)
