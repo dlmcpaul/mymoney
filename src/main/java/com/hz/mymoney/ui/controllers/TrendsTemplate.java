@@ -43,7 +43,7 @@ public class TrendsTemplate {
 		}
 		return FragmentsRendering
 				.fragment("Trends :: #trendPeriodButtons")
-				.fragment("Trends :: #trendsGraph")
+				.fragment("Trends :: #TrendsGraph")
 				.fragment("Trends :: #trendsTotal")
 				.build();
 	}

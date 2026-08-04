@@ -11,10 +11,10 @@
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/_static/fomantic-ui-css/2.9.4/semantic.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.js}"></script>
-    <script type="text/javascript" th:src="@{/webjars/echarts/dist/echarts.min.js}"></script>
-    <script src="https://unpkg.com/idiomorph@0.7.4/dist/idiomorph-ext.min.js"
-            integrity="sha384-SsScJKzATF/w6suEEdLbgYGsYFLzeKfOA6PY+/C5ZPxOSuA+ARquqtz/BZz9JWU8"
-            crossorigin="anonymous"></script>
+    <script type="text/javascript" th:src="@{/webjars/chart.js/dist/chart.umd.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/idiomorph/dist/idiomorph-ext.min.js}"></script>
 </head>
 <body hx-ext="morph" th:attr="onload=${scripts != null} ? 'onPageLoad()' : _">
 <div class="ui wide container">

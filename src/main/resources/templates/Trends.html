@@ -16,42 +16,42 @@
                     <input type="hidden" th:value="${activeButton}" name="trendPeriod">
                     <div th:class="${activeButton} eq '30d' ? 'ui active button' : 'ui button'"
                          th:attr="hx-get=|@{/trendPeriodButtonClick}?button=30d|" hx-target="#trendPeriodButtons"
-                         hx-select-oob="#trendsGraph,#trendsTotal">
+                         hx-select-oob="#TrendsGraph,#trendsTotal">
                         30d
                     </div>
                     <div th:class="${activeButton} eq '6m' ? 'ui active button' : 'ui button'"
                          th:attr="hx-get=|@{/trendPeriodButtonClick}?button=6m|" hx-target="#trendPeriodButtons"
-                         hx-select-oob="#trendsGraph,#trendsTotal">
+                         hx-select-oob="#TrendsGraph,#trendsTotal">
                         6m
                     </div>
                     <div th:class="${activeButton} eq '1y' ? 'ui active button' : 'ui button'"
                          th:attr="hx-get=|@{/trendPeriodButtonClick}?button=1y|" hx-target="#trendPeriodButtons"
-                         hx-select-oob="#trendsGraph,#trendsTotal">
+                         hx-select-oob="#TrendsGraph,#trendsTotal">
                         1y
                     </div>
                     <div th:class="${activeButton} eq '2y' ? 'ui active button' : 'ui button'"
                          th:attr="hx-get=|@{/trendPeriodButtonClick}?button=2y|" hx-target="#trendPeriodButtons"
-                         hx-select-oob="#trendsGraph,#trendsTotal">
+                         hx-select-oob="#TrendsGraph,#trendsTotal">
                         2y
                     </div>
                     <div th:class="${activeButton} eq '5y' ? 'ui active button' : 'ui button'"
                          th:attr="hx-get=|@{/trendPeriodButtonClick}?button=5y|" hx-target="#trendPeriodButtons"
-                         hx-select-oob="#trendsGraph,#trendsTotal">
+                         hx-select-oob="#TrendsGraph,#trendsTotal">
                         5y
                     </div>
                     <div th:class="${activeButton} eq '10y' ? 'ui active button' : 'ui button'"
                          th:attr="hx-get=|@{/trendPeriodButtonClick}?button=10y|" hx-target="#trendPeriodButtons"
-                         hx-select-oob="#trendsGraph,#trendsTotal">
+                         hx-select-oob="#TrendsGraph,#trendsTotal">
                         10y
                     </div>
                 </div>
             </div>
         </div>
     </form>
-    <div class="ui raised segment">
-        <div id="trendsGraph" style="height: 400px;width: 100%"
+    <div id="TrendsGraph" class="ui raised segment">
+        <canvas id="trendsGraphCanvas" style="height: 100px;width: 100%"
              th:attr="data-trend-chart=${trendsData.dataSetAsJson()}">
-        </div>
+        </canvas>
     </div>
     <div class="ui raised segment">
         <div class="ui center aligned header" id="trendsTotal"
@@ -70,41 +70,29 @@
     });
 
     document.body.addEventListener('htmx:afterSwap', function (event) {
-        // Initialize the echarts instance based on the prepared dom
-        let trendsChart = echarts.init(document.getElementById('trendsGraph'));
-        let trendsChartDataSet = JSON.parse(document.getElementById('trendsGraph').dataset.trendChart);
 
-        // Specify the configuration items and data for the chart
-        let trendsOption = {
-            title: {
-                text: 'Account Trend'
-            },
-            tooltip: {
-                valueFormatter: (value) => moneyFmt.format(value.toFixed(2))
-            },
+        let chartStatus = Chart.getChart("trendsGraphCanvas"); // <canvas> id
+        if (chartStatus != undefined) {
+            chartStatus.destroy();
+        }
 
-            legend: {
-                orient: 'vertical',
-                right: 10,
-                top: 'center',
-            },
-            dataset: {
-                source: trendsChartDataSet
-            },
-            xAxis: {type: 'category'},
-            yAxis: {},
-            series: [
-                {
-                    type: 'bar',
-                    itemStyle: {
-                        color: '#00FF00'
-                    }
-                }
-            ]
-        };
-
-        // Display the chart using the configuration items and data just specified.
-        trendsChart.setOption(trendsOption);
+        const ctx = document.getElementById('trendsGraphCanvas');
+        const data = JSON.parse(ctx.dataset.trendChart);
+        const account = document.getElementById('trend-account-input').value;
+        if (ctx != undefined) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(row => row.name),
+                    datasets: [
+                        {
+                            label: account,
+                            backgroundColor: '#00FF00',
+                            data: data.map(row => row.value)
+                        }]
+                },
+            });
+        }
     })
 </script>
 </body>

@@ -33,10 +33,12 @@
 		<build.source>SNAPSHOT</build.source>
 		<revision>${build.number}-${build.source}</revision>
 		<fomantic-ui.version>2.9.4</fomantic-ui.version>
-		<echarts.version>6.1.0</echarts.version>
+		<chart.js.version>4.5.1</chart.js.version>
+		<chart.js.annotation.version>3.1.0</chart.js.annotation.version>
+		<chart.js.datalabels.version>2.2.0</chart.js.datalabels.version>
 		<jquery.version>4.0.0</jquery.version>
 		<htmx.version>2.0.10</htmx.version>
-		<htmx-spring-boot.version>5.1.0</htmx-spring-boot.version>
+		<htmx.idiomorph.version>0.7.4</htmx.idiomorph.version>
 		<htmx-spring-boot-thymeleaf.version>5.1.0</htmx-spring-boot-thymeleaf.version>
 	</properties>
 	<dependencies>
@@ -68,6 +70,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>io.github.wimdeblauwe</groupId>
+			<artifactId>htmx-spring-boot-thymeleaf</artifactId>
+			<version>${htmx-spring-boot-thymeleaf.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
@@ -79,6 +87,12 @@
 			<artifactId>webjars-locator-lite</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.mvnpm</groupId>
+			<artifactId>fomantic-ui-css</artifactId>
+			<version>${fomantic-ui.version}</version>
+		</dependency>
+		<!-- htmx Jars -->
+		<dependency>
 			<groupId>org.webjars.npm</groupId>
 			<artifactId>htmx.org</artifactId>
 			<version>${htmx.version}</version>
@@ -88,23 +102,29 @@
 			<artifactId>jquery</artifactId>
 			<version>${jquery.version}</version>
 		</dependency>
-		<!-- Source: https://mvnrepository.com/artifact/org.mvnpm/fomantic-ui-css -->
 		<dependency>
-			<groupId>org.mvnpm</groupId>
-			<artifactId>fomantic-ui-css</artifactId>
-			<version>${fomantic-ui.version}</version>
-			<scope>compile</scope>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>idiomorph</artifactId>
+			<version>${htmx.idiomorph.version}</version>
+		</dependency>
+		<!-- End htmx jars -->
+		<!-- chart.js jars -->
+		<dependency>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>chart.js</artifactId>
+			<version>${chart.js.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars.npm</groupId>
-			<artifactId>echarts</artifactId>
-			<version>${echarts.version}</version>
+			<artifactId>chartjs-plugin-annotation</artifactId>
+			<version>${chart.js.annotation.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.github.wimdeblauwe</groupId>
-			<artifactId>htmx-spring-boot-thymeleaf</artifactId>
-			<version>5.1.0</version>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>chartjs-plugin-datalabels</artifactId>
+			<version>${chart.js.datalabels.version}</version>
 		</dependency>
+		<!-- End chart.js jars -->
 	</dependencies>
 
 	<build>

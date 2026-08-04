@@ -8,9 +8,10 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-@JsonPropertyOrder({"financialYear", "income", "expense"})
+@JsonPropertyOrder({"financialYear", "income", "expense", "taxes"})
 public class YearlyIncomeExpense {
 	public final String financialYear;
 	public final BigDecimal income;
 	public final BigDecimal expense;
+	public final BigDecimal taxes;
 }

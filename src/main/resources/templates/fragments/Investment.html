@@ -65,13 +65,13 @@
 <div id="InvestmentChart" th:fragment="InvestmentChart(investmentsData, header)"
      th:class="${#strings.contains(header,'Current')} ? 'ui two column grid' : 'ui two column grid container'">
     <div th:if="${#strings.contains(header,'Current')}" class="column">
-        <div id="investmentsTotalChart" class="chart"></div>
+        <canvas id="investmentsTotalChart" class="chart"></canvas>
     </div>
     <div th:unless="${#strings.contains(header,'Current')}" class="three wide column"></div>
     <div class="column">
-        <div id="marketValueChart" class="chart"
+        <canvas id="marketValueChart" class="chart"
              th:attr="data-chart-data=${investmentsData.getMarketValuesJson()}, data-chart-title=${#strings.contains(header,'Current')?'Market Value':'Net Profit/Loss'}">
-        </div>
+        </canvas>
     </div>
 </div>
 </body>

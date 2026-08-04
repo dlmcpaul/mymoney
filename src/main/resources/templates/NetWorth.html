@@ -107,12 +107,11 @@
         Graph
     </div>
     <div class="ui basic segment">
-        <div id="netWorthGraph" style="height: 400px;width: 100%"></div>
+        <canvas id="netWorthGraph" style="height: 400px;width: 100%"></canvas>
     </div>
 </main>
 <script th:inline="javascript" type="text/javascript">
     function onPageLoad() {
-
         const moneyFmt = new Intl.NumberFormat(undefined, {
             style: 'currency',
             currency: 'AUD',
@@ -122,63 +121,91 @@
             maximumFractionDigits: 2, // Causes 2500.99 to be printed as $2,501
         });
 
-        // Initialize the echarts instance based on the prepared dom
-        let netWorthChart = echarts.init(document.getElementById('netWorthGraph'));
+        const ctx = document.getElementById('netWorthGraph');
 
-        var xData = /*[[${netWorth.xAxisLabels()}]]*/ [''];
+        var categories = /*[[${netWorth.xAxisLabels()}]]*/ [''];
         var yNetData = /*[[${netWorth.yAxisNetValues()}]]*/ [''];
         var yAssetData = /*[[${netWorth.yAxisAssetValues()}]]*/ [''];
         var yLiabilityData = /*[[${netWorth.yAxisLiabValues()}]]*/ [''];
 
-        // Specify the configuration items and data for the chart
-        let netWorthOption = {
-            title: {
-                text: 'Net Worth Chart'
-            },
-            tooltip: {
-                valueFormatter: (value) => moneyFmt.format(value.toFixed(2))
-            },
-            legend: {
-                orient: 'vertical',
-                right: 10,
-                top: 'center',
-            },
-            xAxis: {
-                data: xData
-            },
-            yAxis: {},
-            series: [
-                {
-                    name: 'asset',
-                    type: 'line',
-                    itemStyle: {
-                        color: '#00FF00'
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: categories,
+                datasets:[
+                    {
+                        label: 'Net Worth',
+                        data: yNetData,
+                        pointRadius: 0.5,
+                        pointHoverRadius:4,
+                        borderColor: '#000000',
+                        backgroundColor: '#000000',
+                        borderWidth: 1
                     },
-                    areaStyle: {},
-                    data: yAssetData
+                    {
+                        label: 'Assets',
+                        data: yAssetData,
+                        pointRadius: 1,
+                        pointHoverRadius:4,
+                        borderColor: '#00AA00',
+                        backgroundColor: '#00FF00',
+                        borderWidth: 1,
+                        fill: 'origin'
+                    },
+                    {
+                        label: 'Liabilities',
+                        data: yLiabilityData,
+                        pointRadius: 1,
+                        pointHoverRadius:4,
+                        borderColor: '#AA0000',
+                        backgroundColor: '#FF0000',
+                        borderWidth: 1,
+                        fill: 'origin'
+                    }]
+            },
+            options: {
+                scales:{
+                    x: {
+                        grid: {display: false},
+                        ticks:{ color:'#999999', font:{size:12}, maxTicksLimit:20, maxRotation:0 }
+                    },
+                    y: {
+                        ticks: {
+                            color:'#999999', font:{size:12},
+                            callback: function(value, index, ticks) {
+                                return moneyFmt.format(value);
+                            }
+                        }
+                    }
                 },
-                {
-                    name: 'liability',
-                    type: 'line',
-                    itemStyle: {
-                        color: '#FF0000'
+                interaction:{ mode:'index', intersect:false },
+                plugins: {
+                    title: {
+                        display: true,
+                        text:'Net Worth Chart',
+                        color:'#000000',
+                        font: {size:18}
                     },
-                    areaStyle: {},
-                    data: yLiabilityData
+                    legend: {
+                        position:'right'
+                    },
+                    tooltip:{
+                        backgroundColor:'#000000',
+                        titleColor:'#FFFFFF',
+                        bodyColor:'#BBBBBB',
+                        displayColors:true,
+                        padding:10,
+                        cornerRadius:8,
+                        callbacks:{ label:context=> context.dataset.label + ' : ' + moneyFmt.format(context.parsed.y) }
+                    }
                 },
-                {
-                    name: 'net worth',
-                    type: 'line',
-                    itemStyle: {
-                        color: '#000000'
+                elements: {
+                    line: {
+                        tension : 0.4  // smooth lines
                     },
-                    data: yNetData
-                }
-            ]
-        };
-
-        // Display the chart using the configuration items and data just specified.
-        netWorthChart.setOption(netWorthOption);
+                },
+            },
+        });
     }
 </script>
 <link rel="stylesheet" data-th-href="@{/css/default.css}"/>
