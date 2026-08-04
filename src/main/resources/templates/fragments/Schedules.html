@@ -26,16 +26,16 @@
                             <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'warn')}"></button></span>
                         </div>
                         <div class="description" th:if="${txn.isDueTomorrow()}">
-                            <span class="ui info text"><b>due tomorrow&nbsp;</b>
-                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'info')}"></button></span>
+                            <span class="ui teal text"><b>due tomorrow&nbsp;</b>
+                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'teal')}"></button></span>
                         </div>
                         <div class="description" th:if="${txn.isDueToday()}">
                             <span class="ui success text"><b>due today&nbsp;</b>
-                                <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'success')}"></button></span>
+                                <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'green')}"></button></span>
                         </div>
                         <div class="description" th:if="${txn.isInPast()}">
                             <span class="ui error text"><b>overdue&nbsp;</b>
-                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'error')}"></button></span>
+                            <button th:replace="~{fragments/Common :: ScheduleButton (${txn.description()}, 'red')}"></button></span>
                         </div>
                     </div>
                 </div>
