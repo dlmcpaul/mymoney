@@ -46,7 +46,7 @@ public class UiModelBuilderService {
 
 		var account = coa.findAccount(accountName);
 
-		if (account.isPresent()) {
+		if (account.isPresent() && accountName.endsWith(":") == false) {
 			return new TrendsTemplateData(accountName, trendPeriod, account.get().getMovementsAsList());
 		}
 
@@ -418,7 +418,9 @@ public class UiModelBuilderService {
 					sumBalanceForFY(chartOfAccounts, "Income", financialYearStart),
 					sumBalanceForFY(chartOfAccounts, "Expenses", financialYearStart)
 							.subtract(sumBalanceForFY(chartOfAccounts, AccountConstants.EMPLOYMENT_TAXES, financialYearStart))
-							.multiply(BigDecimal.valueOf(-1))));
+							.multiply(BigDecimal.valueOf(-1)),
+					sumBalanceForFY(chartOfAccounts, AccountConstants.EMPLOYMENT_TAXES, financialYearStart).multiply(BigDecimal.valueOf(-1)
+			)));
 			year--;
 			chartOfAccounts = new ChartOfAccounts(financialYearStart.minusDays(1), chartOfAccounts);
 			financialYearStart = financialYearStart.minusYears(1);
