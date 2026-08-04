@@ -171,8 +171,8 @@ public class LedgerParser {
 
 	private IPosting parseSharePosting(String line) {
 		String account = tokenize(line).getFirst().trim();
-		String amount = "";
-		String shares = "";
+		String amount;
+		String shares;
 
 		if (tokenize(line).size() == 3) {
 			// Follows the defined convention of 2 spaces between Account, Amount and Share Name

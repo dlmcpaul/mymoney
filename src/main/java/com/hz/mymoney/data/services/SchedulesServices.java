@@ -44,7 +44,7 @@ public class SchedulesServices implements ApplicationRunner {
 		}
 	}
 
-	private void loadSchedulesFromArgs(String fileName) throws IOException {
+	private void loadSchedulesFromArgs(String fileName) {
 		LedgerParser ledgerParser = new LedgerParser();
 
 		Path path = Path.of(fileName);
