@@ -4,7 +4,7 @@ This is a project to visualise Plain Text Accounting (PTA) Files.  See https://p
 
 Realistically this project works with my PTA files.  I make no guarantees about any others.
 
-It reads a subset of the PTA file format and may also be compatible with a subset of other variations (hledger or Beancount)
+It reads a subset of the PTA file format and may also be compatible with a subset of other variations (hledger)
 
 It will make use of 3 files
 
