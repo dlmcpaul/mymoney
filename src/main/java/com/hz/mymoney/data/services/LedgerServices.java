@@ -144,6 +144,9 @@ public class LedgerServices implements ApplicationRunner {
 			Path path = Path.of(ledgerFileName);
 			log.info("Saving Ledger to file {}", path);
 			try (var out = new BufferedWriter(new FileWriter(path.toFile()))) {
+				for (String metaLine : ledger.getMetaData()) {
+					out.write(metaLine);
+				}
 				for (LedgerEntry entry : ledger.getLedgerEntries()) {
 					out.write(entry.toString());
 				}
@@ -160,12 +163,9 @@ public class LedgerServices implements ApplicationRunner {
 		Path path = Path.of(fileName);
 
 		if (Files.isReadable(path)) {
-			try {
-				ledgerFileName = path.toString();
-				ledger = ledgerParser.loadLedger(Files.newInputStream(path));
-			} finally {
-				log.info("Ledger loaded {}from file {} with {} errors", ledger.isReadOnly() ? "" : "successfully ", ledgerFileName, ledger.getLoadErrorCount());
-			}
+			ledgerFileName = path.toString();
+			ledger = ledgerParser.loadLedger(path);
+			log.info("{}oaded {} Ledger Entries from file {} with {} errors", ledger.isReadOnly() ? "L" : "Successfully l", ledger.getLedgerEntries().size(), ledgerFileName, ledger.getLoadErrorCount());
 		} else {
 			log.error("Unable to load Ledger from file {}", fileName);
 			throw new FileNotFoundException("Unable to load Ledger from file " + fileName);

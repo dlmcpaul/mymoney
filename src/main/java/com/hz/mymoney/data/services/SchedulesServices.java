@@ -52,7 +52,7 @@ public class SchedulesServices implements ApplicationRunner {
 		if (Files.isReadable(path)) {
 			schedulesFileName = path.toString();
 			try {
-				scheduleLedger = ledgerParser.loadLedger(Files.newInputStream(path));
+				scheduleLedger = ledgerParser.loadLedger(path);
 				convertLedgerToSchedules(scheduleLedger);
 			} finally {
 				assert scheduleLedger != null;
