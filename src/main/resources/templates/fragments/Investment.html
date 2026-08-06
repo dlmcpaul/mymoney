@@ -19,13 +19,14 @@
     </tr>
     </thead>
     <tbody>
+    <!--/*@thymesVar id="investment" type="com.hz.mymoney.ui.models.InvestmentSummary"*/-->
     <tr th:unless="${investmentsData.investmentSummaries.isEmpty()}"
         th:each="investment : ${investmentsData.investmentSummaries}">
         <td th:text="${investment.code}" th:attr="data-tooltip = ${investment.hasNote()} ? ${investment.note} : _"></td>
         <td th:text="${#temporals.format(investment.firstPurchase, 'dd MMM yyyy')}"></td>
         <td class="right aligned" th:if="${#strings.contains(header,'Current')}" th:text="${investment.quantity()}"></td>
-        <td class="right aligned" th:if="${#strings.contains(header,'Current')}"
-            th:text="${#numbers.formatCurrency(investment.lastPrice)}"></td>
+        <td class="right aligned" th:if="${#strings.contains(header,'Current')}">
+        <span th:text="${#numbers.formatCurrency(investment.lastPrice)}"></span> <i th:class="${investment.isIncreaseInValue()} ? 'green arrow up icon' : 'red arrow down icon'"></i></td>
         <td class="right aligned big-screen-table" th:text="${#numbers.formatCurrency(investment.costBase)}"></td>
         <td class="right aligned big-screen-table" th:text="${#numbers.formatCurrency(investment.earnings)}"></td>
         <td class="right aligned big-screen-table" th:text="${#numbers.formatCurrency(investment.sales)}"></td>

@@ -42,6 +42,14 @@ public class SharePriceServices implements ApplicationRunner {
 		this.resourceLoader = resourceLoader;
 	}
 
+	public BigDecimal getInvestmentValue(String code, LocalDate asAt) {
+		return investmentHistory.getInvestmentValue(code, asAt);
+	}
+
+	public BigDecimal getPreviousInvestmentValue(String code, LocalDate asAt) {
+		return investmentHistory.getPreviousInvestmentValue(code, asAt);
+	}
+
 	@Override
 	public void run(@NonNull ApplicationArguments args) throws Exception {
 		if (args.containsOption("commodities")) {

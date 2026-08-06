@@ -10,6 +10,7 @@ import java.util.Map;
 @Log4j2
 public record InvestmentHistory(Map<String, List<InvestmentHistoryEntry>> commodityMap) {
 
+	// Get the first value prior to the asAt date
 	public BigDecimal getInvestmentValue(String commodityCode, LocalDate asAt) {
 		if (commodityMap.containsKey(commodityCode)) {
 			return commodityMap.get(commodityCode)
@@ -18,6 +19,23 @@ public record InvestmentHistory(Map<String, List<InvestmentHistoryEntry>> commod
 					.min((o1, o2) -> o2.asAt().compareTo(o1.asAt()))
 					.map(InvestmentHistoryEntry::value)
 					.orElse(BigDecimal.ZERO);
+		}
+		log.error("commodityCode {} not found", commodityCode);
+		return BigDecimal.ZERO;
+	}
+
+	// Get the second value prior to the asAt date
+	public BigDecimal getPreviousInvestmentValue(String commodityCode, LocalDate asAt) {
+		if (commodityMap.containsKey(commodityCode)) {
+			List<InvestmentHistoryEntry> list = commodityMap.get(commodityCode)
+					.stream()
+					.filter(investmentHistoryEntry -> investmentHistoryEntry.asAt().isBefore(asAt))
+					.sorted((o1, o2) -> o2.asAt().compareTo(o1.asAt()))
+					.toList();
+			if (list.isEmpty() || list.size() == 1) {
+				return BigDecimal.ZERO;
+			}
+			return list.get(1).value();
 		}
 		log.error("commodityCode {} not found", commodityCode);
 		return BigDecimal.ZERO;

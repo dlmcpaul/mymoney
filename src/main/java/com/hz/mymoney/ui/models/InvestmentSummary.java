@@ -9,6 +9,7 @@ public record InvestmentSummary(
 		String code,
 		BigDecimal count,
 		BigDecimal lastPrice,
+		BigDecimal priorPrice,
 		BigDecimal balance,
 		BigDecimal costBase,
 		BigDecimal sales,
@@ -36,7 +37,6 @@ public record InvestmentSummary(
 	}
 
 	public BigDecimal yearlyReturn() {
-
 		BigDecimal yearsOfOwnership = BigDecimal.valueOf((lastDate.toEpochDay() - firstPurchase.toEpochDay() + 364) / 365);
 		BigDecimal adjustedBalance = costBase;
 		BigDecimal closingBalance = isClosed() ? sales.add(earnings) : sales.add(earnings).add(balance);
@@ -49,5 +49,9 @@ public record InvestmentSummary(
 				.subtract(adjustedBalance).setScale(4, RoundingMode.HALF_EVEN)
 				.divide(adjustedBalance, RoundingMode.HALF_EVEN)
 				.divide(yearsOfOwnership, RoundingMode.HALF_EVEN);
+	}
+
+	public boolean isIncreaseInValue() {
+		return lastPrice.compareTo(priorPrice) > 0;
 	}
 }

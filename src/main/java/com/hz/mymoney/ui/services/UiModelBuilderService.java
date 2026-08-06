@@ -312,21 +312,22 @@ public class UiModelBuilderService {
 	}
 
 	private InvestmentSummary mapAccountToShareSummary(com.hz.mymoney.data.models.internal.Account account, BigDecimal earnings, LocalDate asAt) {
-		BigDecimal shareValue = account.isShareAccount() ? shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt) : BigDecimal.ZERO;
-		BigDecimal currentValue = account.getTotalAmount().multiply(shareValue).setScale(2, RoundingMode.HALF_UP);
+		BigDecimal currentShareValue = account.isShareAccount() ? shareValueService.getInvestmentValue(account.getCode(), asAt) : BigDecimal.ZERO;
+		BigDecimal yesterdayShareValue = account.isShareAccount() ? shareValueService.getPreviousInvestmentValue(account.getCode(), asAt) : BigDecimal.ZERO;
+		BigDecimal currentValue = account.getTotalAmount().multiply(currentShareValue).setScale(2, RoundingMode.HALF_UP);
 		BigDecimal netProfitLoss = currentValue.compareTo(BigDecimal.ZERO) != 0
 				? currentValue.subtract(account.getCostBase().subtract(earnings).subtract(account.getSales()))
 				: earnings.add(account.getSales()).subtract(account.getCostBase());
 
 		PriorityQueue<Movement> movementsForCode = account.getMovementsForCode(account.getCode());
 		if (movementsForCode.isEmpty()) {
-			return new InvestmentSummary(account.getCode(), account.getTotalAmount(), shareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, LocalDate.of(2000,1,1), LocalDate.now(), getNextInvestmentIncomeNote(account.getCode()));
+			return new InvestmentSummary(account.getCode(), account.getTotalAmount(), currentShareValue, yesterdayShareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, LocalDate.of(2000,1,1), LocalDate.now(), getNextInvestmentIncomeNote(account.getCode()));
 		}
 
 		LocalDate earliestMovementDate = movementsForCode.stream().findFirst().orElseThrow().date();
 		LocalDate lastMovementDate = movementsForCode.stream().toList().getLast().date();
 
-		return new InvestmentSummary(account.getCode(), account.getTotalAmount(), shareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, earliestMovementDate, lastMovementDate, getNextInvestmentIncomeNote(account.getCode()));
+		return new InvestmentSummary(account.getCode(), account.getTotalAmount(), currentShareValue, yesterdayShareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, earliestMovementDate, lastMovementDate, getNextInvestmentIncomeNote(account.getCode()));
 	}
 
 	private NetAssetLiabilityPosition createNetAssetLiabilityPosition(ChartOfAccounts chartOfAccounts, boolean includeNote) {
