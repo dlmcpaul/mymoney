@@ -22,7 +22,7 @@
     <!--/*@thymesVar id="investment" type="com.hz.mymoney.ui.models.InvestmentSummary"*/-->
     <tr th:unless="${investmentsData.investmentSummaries.isEmpty()}"
         th:each="investment : ${investmentsData.investmentSummaries}">
-        <td th:text="${investment.code}" th:attr="data-tooltip = ${investment.hasNote()} ? ${investment.note} : _"></td>
+        <td th:replace="~{this :: InvestmentLink (${investment.code}, ${investment.hasNote()}, ${investment.note})}"></td>
         <td th:text="${#temporals.format(investment.firstPurchase, 'dd MMM yyyy')}"></td>
         <td class="right aligned" th:if="${#strings.contains(header,'Current')}" th:text="${investment.quantity()}"></td>
         <td class="right aligned" th:if="${#strings.contains(header,'Current')}">
@@ -62,6 +62,39 @@
     </tr>
     </tbody>
 </table>
+
+<td th:fragment="InvestmentLink (code, hasNote, note)" th:attr="data-tooltip = ${hasNote} ? ${note} : _">
+    <a th:href="|@{/Investments/List}?code=${code}|"
+       th:attr="hx-get=|@{/Investments/List}?code=${code}|" hx-target="#InvestmentList"
+       hx-swap="outerHTML"
+       th:text="${code}"></a>
+</td>
+
+<div id="InvestmentList" th:fragment="InvestmentList (investments, code)">
+    <div class="ui horizontal center aligned divider" th:if="${not #lists.isEmpty(investments)}" th:text="|Buy/Sell for ${code}|"></div>
+    <div class="ui long scrolling container" th:if="${not #lists.isEmpty(investments)}">
+        <table class="ui compact celled head stuck table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>On</th>
+                <th>Off</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="elem, stats : ${investments}">
+                <td th:text="${#temporals.format(elem.asAt,'dd MMM yyyy', #locale)}">Date</td>
+                <td th:text="${elem.description}">Description</td>
+                <td th:text="${elem.amount() ge 0} ? ${elem.amount()} : ''">On</td>
+                <td th:text="${elem.amount() lt 0} ? ${elem.amount()} : ''">Off</td>
+                <td th:text="${#numbers.formatCurrency(elem.sharePrice())}">Price</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <div id="InvestmentChart" th:fragment="InvestmentChart(investmentsData, header)"
      th:class="${#strings.contains(header,'Current')} ? 'ui two column grid' : 'ui two column grid container'">

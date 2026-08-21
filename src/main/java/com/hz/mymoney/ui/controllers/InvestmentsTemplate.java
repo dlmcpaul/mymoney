@@ -54,4 +54,20 @@ public class InvestmentsTemplate {
 				.build();
 	}
 
-}
+	@GetMapping("/Investments/List")
+	@HxRequest
+	public View investmentList(Model model, @RequestParam("code") String code) {
+		try {
+			PageSupport.populateDefaultModelData(model, release.getVersion());
+			model.addAttribute("investments", uiModelBuilderService.getInvestmentTransactionsFor(code));
+			model.addAttribute("code", code);
+		} catch (Exception e) {
+			log.error("Investment List Fragment Generation Exception {}", e.getMessage(), e);
+		}
+		return FragmentsRendering
+				.fragment("fragments/Investment :: InvestmentList")
+				.build();
+	}
+
+
+	}

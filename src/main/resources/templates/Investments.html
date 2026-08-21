@@ -7,6 +7,7 @@
     <div th:replace="~{fragments/Investment :: InvestmentTable (${investmentsData})}"></div>
     <div class="ui horizontal divider">Investment Details</div>
     <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${header})}"></div>
+    <div th:replace="~{fragments/Investment :: InvestmentList (null, '')}"></div>
 </main>
 <script th:inline="javascript">
     htmx.onLoad(function updateInvestmentsTotalChart(target) {
@@ -44,6 +45,7 @@
                             annotations: {
                                 centerText: {
                                     type: 'label',
+                                    adjustScaleRange: false,
                                     xValue: '50%', // X position (50% = center)
                                     yValue: '50%', // Y position (50% = center)
                                     content: 'Investment Totals',
@@ -111,6 +113,7 @@
                         annotations: {
                             centerText: { // Unique annotation ID
                                 type: 'label', // Annotation type
+                                adjustScaleRange: false,
                                 xValue: '50%', // X position (50% = center)
                                 yValue: '50%', // Y position (50% = center)
                                 content: marketValueChartTitle, // Text content

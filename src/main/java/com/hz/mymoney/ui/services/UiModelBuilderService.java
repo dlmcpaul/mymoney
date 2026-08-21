@@ -155,6 +155,35 @@ public class UiModelBuilderService {
 		return new NetWorthTemplateData(netAssetLiabilityPositions);
 	}
 
+	public List<Transaction> getInvestmentTransactionsFor(String code) {
+		ChartOfAccounts coa = dataLoaderService.getCoa();
+		List<Transaction> investmentTransactions = new ArrayList<>();
+
+		investmentTransactions .addAll(coa.getAccountsOfType(AccountConstants.SHARES, false).stream()
+				.filter(account -> account.getCode().equals(code))
+				.map(account -> account.getMovementsForCode(code))
+				.map(this::mapMovementsToTransactions)
+				.flatMap(List::stream)
+				.toList());
+
+		investmentTransactions.addAll(coa.getAccountsOfType(AccountConstants.FUNDS, false).stream()
+				.filter(account -> account.getCode().equals(code))
+				.map(account -> account.getMovementsForCode(code))
+				.map(this::mapMovementsToTransactions)
+				.flatMap(List::stream)
+				.toList());
+
+		investmentTransactions.sort(Comparator.comparing(Transaction::asAt));
+
+		return investmentTransactions;
+	}
+
+	private List<Transaction> mapMovementsToTransactions(PriorityQueue<Movement> movements) {
+		return movements.stream()
+				.map(m -> new Transaction(m.date(), m.description(), m.amount(), "", "", true, m.price()))
+				.toList();
+	}
+
 	public InvestmentsTemplateData createCurrentInvestmentsTemplateData() {
 		InvestmentsTemplateData shareTemplateData = new InvestmentsTemplateData("Current");
 		ChartOfAccounts coa = dataLoaderService.getCoa();
@@ -220,6 +249,10 @@ public class UiModelBuilderService {
 		LocalDate financialYearEnd = financialYearStart.plusYears(1).minusDays(1);
 
 		ChartOfAccounts chartOfAccounts = new ChartOfAccounts(financialYearEnd, dataLoaderService.getCoa());
+
+		if (chartOfAccounts.findAccount(accountName).isEmpty()) {
+			throw new IllegalArgumentException("Account " + accountName + " does not exist");
+		}
 
 		// Get the account and all it's transactions
 		var acc = chartOfAccounts.getAccountsOfType(accountName, false).stream()

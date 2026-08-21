@@ -15,6 +15,12 @@ public class InvestmentsTemplateData {
 	public final List<InvestmentSummary> investmentSummaries = new ArrayList<>();
 	public final String mode;
 
+	public List<InvestmentSummary> getInvestmentSummaries(String code) {
+		return investmentSummaries.stream()
+				.filter(investmentSummary -> investmentSummary.code().equals(code))
+				.toList();
+	}
+
 	public List<InvestmentTotal> getInvestmentTotals() {
 		return investmentSummaries.stream().map(investmentSummary -> new InvestmentTotal(investmentSummary.code(), investmentSummary.count().intValue())).toList();
 	}
