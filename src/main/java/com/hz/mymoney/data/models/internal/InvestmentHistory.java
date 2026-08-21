@@ -6,9 +6,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 @Log4j2
-public record InvestmentHistory(Map<String, List<InvestmentHistoryEntry>> commodityMap) {
+public record InvestmentHistory(Map<String, SortedSet<InvestmentHistoryEntry>> commodityMap) {
 
 	// Get the first value prior to the asAt date
 	public BigDecimal getInvestmentValue(String commodityCode, LocalDate asAt) {
@@ -16,7 +17,7 @@ public record InvestmentHistory(Map<String, List<InvestmentHistoryEntry>> commod
 			return commodityMap.get(commodityCode)
 					.stream()
 					.filter(investmentHistoryEntry -> investmentHistoryEntry.asAt().isBefore(asAt))
-					.min((o1, o2) -> o2.asAt().compareTo(o1.asAt()))
+					.findFirst()
 					.map(InvestmentHistoryEntry::value)
 					.orElse(BigDecimal.ZERO);
 		}

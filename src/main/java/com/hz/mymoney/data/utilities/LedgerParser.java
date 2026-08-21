@@ -15,9 +15,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Log4j2
 public class LedgerParser {
+
+	private static final Pattern twospaces = Pattern.compile(" {2}");
+	private static final Pattern linestartswithdata = Pattern.compile("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}.*");
 
 	private enum LedgerEntryState {
 		COMMENT,
@@ -153,8 +157,9 @@ public class LedgerParser {
 
 	private IPosting parseCashPosting(String line) {
 		// Account  Amount [Currency]
-		String account = tokenize(line).getFirst().trim();
-		String amount = tokenize(line).getLast().trim();
+		List<String> tokens = tokenize(line);
+		String account = tokens.getFirst().trim();
+		String amount = tokens.getLast().trim();
 
 		if (amount.isEmpty()) {
 			log.warn("For cash line '{}' amount needs to be calculated", line);
@@ -238,7 +243,7 @@ public class LedgerParser {
 	}
 
 	private boolean isCommandLine(String line) {
-		return line.matches("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}.*")
+		return linestartswithdata.matcher(line).find()
 				&& (line.split(" ")[1].contains("open")
 				|| line.split(" ")[1].contains("balance")
 				|| line.split(" ")[1].contains("custom")
@@ -248,7 +253,7 @@ public class LedgerParser {
 
 	// test for date at start of line - line starts with yyyy/MM/dd or yyyy-MM-dd
 	private boolean isLedgerEntryStart(String line) {
-		return (line.matches("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}.*")) && isCommandLine(line) == false;
+		return (linestartswithdata.matcher(line).find()) && isCommandLine(line) == false;
 	}
 
 	private boolean isCommentLine(String line) {
@@ -278,7 +283,7 @@ public class LedgerParser {
 		// split into entries with 2 or more spaces as delimiter
 		// remove any empty tokens
 		// remove any MONEY_SYMBOL tokens
-		return Arrays.stream(line.split(" {2}"))
+		return Arrays.stream(twospaces.split(line))
 				.map(String::trim)
 				.filter(s -> s.isEmpty() == false)
 				.filter(s -> s.equals(Money.MONEY_SYMBOL) == false)

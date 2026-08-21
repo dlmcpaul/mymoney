@@ -21,17 +21,23 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 @Order(1)
 @Log4j2
 public class SharePriceServices implements ApplicationRunner {
 
+	private static final Pattern whitespace = Pattern.compile("\\s+");
+	private static final Pattern comma_delimited = Pattern.compile(", ");
+
 	private String commodityOption;
 	private String commodityFileName;
 	private boolean loadSuccess;
+	private FileTime lastModified;
 
 	private final ResourceLoader resourceLoader;
 
@@ -66,6 +72,7 @@ public class SharePriceServices implements ApplicationRunner {
 		if (commodityOption.isEmpty()) {
 			log.error("No commodities option provided");
 		} else {
+			lastModified = null;
 			reloadCommodities();
 		}
 	}
@@ -79,12 +86,12 @@ public class SharePriceServices implements ApplicationRunner {
 	}
 
 	public void reloadCommodities() throws IOException {
-		loadSuccess = true;
+		loadSuccess = false;
 
 		switch (commodityOption) {
 			case "internal" -> {
 				// Don't reload test data
-				if (investmentHistory == null || investmentHistory.commodityMap().isEmpty()) loadCommoditiesFromArgs();
+				if (investmentHistory == null || investmentHistory.commodityMap().isEmpty()) { loadCommoditiesFromArgs(); };
 			}
 			case "commodities" -> loadCommoditiesFromArgs();
 			case "quicken" -> loadCommoditiesFromQuickenFile();
@@ -103,56 +110,61 @@ public class SharePriceServices implements ApplicationRunner {
 	// Basic CSV with format of Code, Value, date (dd/MM/yy)
 	// VDHG, 74, 16/4/26
 	private void loadCommoditiesFromQuickenFile() throws IOException {
-		Map<String, List<InvestmentHistoryEntry>> entries = new HashMap<>();
-		investmentHistory = new InvestmentHistory(entries);
-
 		Path path = Path.of(commodityFileName);
 
 		if (Files.isReadable(path)) {
-			try {
-				try (final InputStream ledgerImportStream = Files.newInputStream(path)) {
-					BufferedReader reader = new BufferedReader(new InputStreamReader(ledgerImportStream));
-					String line = reader.readLine();
-					while (line != null) {
-						List<String> tokens = Arrays.stream(line.split(", ")).toList();
-						addEntry(entries, tokens.get(0), Dates.parseQuickenDate(tokens.get(2)), parseBigDecimal(tokens.get(1)));
+			if (lastModified == null || lastModified.compareTo(Files.getLastModifiedTime(path)) != 0) {
+				lastModified = Files.getLastModifiedTime(path);
+				Map<String, SortedSet<InvestmentHistoryEntry>> entries = new HashMap<>();
+				investmentHistory = new InvestmentHistory(entries);
+				try {
+					try (final InputStream ledgerImportStream = Files.newInputStream(path)) {
+						BufferedReader reader = new BufferedReader(new InputStreamReader(ledgerImportStream));
+						String line = reader.readLine();
+						while (line != null) {
+							List<String> tokens = Arrays.stream(comma_delimited.split(line)).toList();
+							addEntry(entries, tokens.get(0), Dates.parseQuickenDate(tokens.get(2)), parseBigDecimal(tokens.get(1)));
 
-						line = reader.readLine();
+							line = reader.readLine();
+						}
 					}
+					loadSuccess = true;
+				} catch (RuntimeException e) {
+					log.error(e.getMessage(), e);
 				}
-			} catch (RuntimeException e) {
-				log.error(e.getMessage(), e);
-				loadSuccess = false;
 			}
 		} else {
 			log.error("Unable to load Quicken Commodities from file {}", commodityFileName);
-			loadSuccess = false;
 		}
 	}
 
 	// Ledger Commodities file format
 	private void loadCommoditiesFromArgs() throws IOException {
-		Map<String, List<InvestmentHistoryEntry>> entries = new HashMap<>();
-		investmentHistory = new InvestmentHistory(entries);
+		Map<String, SortedSet<InvestmentHistoryEntry>> entries = new HashMap<>();
 		try {
 			if (commodityFileName.startsWith("classpath:")) {
+				investmentHistory = new InvestmentHistory(entries);
 				loadCommodities(resourceLoader.getResource(commodityFileName).getInputStream(), entries);
 			} else {
 				Path path = Path.of(commodityFileName);
 
 				if (Files.isReadable(path)) {
-					loadCommodities(Files.newInputStream(path), entries);
+					if (lastModified == null || lastModified.compareTo(Files.getLastModifiedTime(path)) != 0) {
+						lastModified = Files.getLastModifiedTime(path);
+
+						investmentHistory = new InvestmentHistory(entries);
+						loadCommodities(Files.newInputStream(path), entries);
+					}
 				} else {
 					throw new ValidationException("Unable to load Commodities from " + commodityFileName);
 				}
 			}
 		} catch (ValidationException e) {
 			log.error(e.getMessage(), e);
-			loadSuccess = false;
 		}
 	}
 
-	private void loadCommodities(InputStream inputStream, Map<String, List<InvestmentHistoryEntry>> entries) {
+	private void loadCommodities(InputStream inputStream, Map<String, SortedSet<InvestmentHistoryEntry>> entries) {
 		String line = "";
 		try (final InputStream ledgerImportStream = inputStream) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(ledgerImportStream));
@@ -161,8 +173,8 @@ public class SharePriceServices implements ApplicationRunner {
 				// Parse as P 2025-01-01 NSC 150,25 USD
 				// P date commodity value currency
 				if (line.startsWith("P")) {
-					List<String> tokens = Arrays.stream(line.split("\\s+")).toList();
-					addEntry(entries, tokens.get(2), Dates.parseDate(tokens.get(1)), parseBigDecimal(tokens.get(3)));
+					String[] tokens = whitespace.split(line);
+					addEntry(entries, tokens[2], Dates.parseDate(tokens[1]), parseBigDecimal(tokens[3]));
 				}
 				line = reader.readLine();
 			}
@@ -170,19 +182,19 @@ public class SharePriceServices implements ApplicationRunner {
 			log.error(e.getMessage(), e);
 			throw new ValidationException("Failed to parse line '" + line + "'");
 		}
+		loadSuccess = true;
 	}
 
 	private BigDecimal parseBigDecimal(String value) {
 		if (value.startsWith(Money.MONEY_SYMBOL)) {
 			return Money.parseMoney(value, 2);
 		}
-		return BigDecimal.valueOf(Double.parseDouble(value));
+		return new BigDecimal(value);
 	}
 
-	private void addEntry(Map<String, List<InvestmentHistoryEntry>> entries, String commodityCode, LocalDate asAt, BigDecimal value) {
-		InvestmentHistoryEntry entry = new InvestmentHistoryEntry(asAt, value);
-		entries.computeIfAbsent(commodityCode, k -> new ArrayList<>());
-		entries.get(commodityCode).add(entry);
+	private void addEntry(Map<String, SortedSet<InvestmentHistoryEntry>> entries, String commodityCode, LocalDate asAt, BigDecimal value) {
+		entries.computeIfAbsent(commodityCode, k -> new TreeSet<>());
+		entries.get(commodityCode).add(new InvestmentHistoryEntry(asAt, value));
 	}
 
 }
