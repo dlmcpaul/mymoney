@@ -53,9 +53,9 @@ public class UIDataUpdateService {
 
 		BigDecimal amount = distributionInputJournal.getAmounts().getFirst() != null ? distributionInputJournal.getAmounts().getFirst() : distributionInputJournal.getAmounts().getLast();
 		String shareAccount = distributionInputJournal.getAccounts().getFirst();
-		String description = "";
+		String description;
 		String code = shareAccount.substring(shareAccount.lastIndexOf(":") + 1);
-		String sourceAccount = "";
+		String sourceAccount;
 		String destinationAccount = distributionInputJournal.getAccounts().getLast();
 
 		switch (distributionInputJournal.getDistributionType()) {
@@ -72,7 +72,7 @@ public class UIDataUpdateService {
 				sourceAccount = CAPITAL_RETURN_INCOME;
 			}
 			default ->
-					throw new IllegalStateException("Unexpected value: " + distributionInputJournal.getDistributionType());
+				throw new IllegalStateException("Unexpected value: " + distributionInputJournal.getDistributionType());
 		}
 
 		log.info("New Distribution Journal Generated {} {} {} {}", distributionInputJournal.getJournalDate(), description, sourceAccount, destinationAccount);
@@ -151,16 +151,17 @@ public class UIDataUpdateService {
 				log.error("Override amounts counts do not match postings");
 				throw new ValidationException("Override amounts counts do not match postings");
 			} else {
-				log.info("Posting Scheduled Journal");
+				LocalDate today = LocalDate.now();
+				log.info("Posting Scheduled Journal @ {}", today);
 				schedule.ledgerEntry.getPostings().forEach(posting -> {
 					posting.setAmount(amountOverrides.get(schedule.ledgerEntry.getPostings().indexOf(posting)));
-					log.info("  {} {} {}", schedule.ledgerEntry.getDate(), posting.getAccount(), posting.getAmount());
+					log.info("  {} {}", posting.getAccount(), posting.getAmount());
 				});
 
 				if (schedule.isValid()) {
 					Ledger ledger = ledgerServices.getLedger();
 					// Need to clone the ledger entry
-					ledger.add(new LedgerEntry(LocalDate.now(), schedule.ledgerEntry.getDescription(), schedule.ledgerEntry.getPostings()));
+					ledger.add(new LedgerEntry(today, schedule.ledgerEntry.getDescription(), schedule.ledgerEntry.getPostings()));
 					schedulesServices.scheduleRollForward(schedule);
 
 					ledgerServices.makeChartOfAccounts(ledger);
