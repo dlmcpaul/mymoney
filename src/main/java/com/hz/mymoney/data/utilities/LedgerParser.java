@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 @Log4j2
 public class LedgerParser {
 
-	private static final Pattern twospaces = Pattern.compile(" {2}");
-	private static final Pattern linestartswithdata = Pattern.compile("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}.*");
+	private static final Pattern TWO_SPACES = Pattern.compile(" {2}");
+	private static final Pattern LINE_STARTS_WITH_DATE = Pattern.compile("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\s.*");
 
 	private enum LedgerEntryState {
 		COMMENT,
@@ -134,8 +134,8 @@ public class LedgerParser {
 	}
 
 	private LedgerEntry newLedgerEntry(String line) {
-		LocalDate date = Dates.parseDate(line.substring(0, 10)); // First 10 chars is date
-		String remaining = line.substring(10).trim();
+		LocalDate date = Dates.parseDate(line.substring(0, line.indexOf(' ')));  // Everything up to first space should be a date
+		String remaining = line.substring(line.indexOf(' ')).trim();
 		String status = null;
 		String description;
 		String note = null;
@@ -243,7 +243,7 @@ public class LedgerParser {
 	}
 
 	private boolean isCommandLine(String line) {
-		return linestartswithdata.matcher(line).find()
+		return LINE_STARTS_WITH_DATE.matcher(line).find()
 				&& (line.split(" ")[1].contains("open")
 				|| line.split(" ")[1].contains("balance")
 				|| line.split(" ")[1].contains("custom")
@@ -253,7 +253,7 @@ public class LedgerParser {
 
 	// test for date at start of line - line starts with yyyy/MM/dd or yyyy-MM-dd
 	private boolean isLedgerEntryStart(String line) {
-		return (linestartswithdata.matcher(line).find()) && isCommandLine(line) == false;
+		return (LINE_STARTS_WITH_DATE.matcher(line).find()) && isCommandLine(line) == false;
 	}
 
 	private boolean isCommentLine(String line) {
@@ -283,7 +283,7 @@ public class LedgerParser {
 		// split into entries with 2 or more spaces as delimiter
 		// remove any empty tokens
 		// remove any MONEY_SYMBOL tokens
-		return Arrays.stream(twospaces.split(line))
+		return Arrays.stream(TWO_SPACES.split(line))
 				.map(String::trim)
 				.filter(s -> s.isEmpty() == false)
 				.filter(s -> s.equals(Money.MONEY_SYMBOL) == false)

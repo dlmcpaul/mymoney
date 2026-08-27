@@ -30,7 +30,7 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 	public String code() {
 		if (code.isEmpty()) {
 			// Guessing game
-			if (sourceAccount.toLowerCase().startsWith(AccountConstants.FUNDS.toLowerCase())) {
+			if (sourceAccount.toLowerCase().startsWith(AccountConstants.FUND_ACCOUNTS.toLowerCase())) {
 				return sourceAccount.substring(sourceAccount.lastIndexOf(":") + 1);
 			}
 
@@ -88,12 +88,12 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 	}
 
 	public boolean isSuperOpeningBalance() {
-		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_OPENING_BALANCE.toLowerCase());
+		return sourceAccount.toLowerCase().startsWith(AccountConstants.EQUITY_SUPER_OPENING_BALANCE.toLowerCase());
 	}
 
 	// Should be a transfer in from another super account
 	public boolean isSuperTransferIn() {
-		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_ACCOUNT.toLowerCase())
+		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_ACCOUNTS.toLowerCase())
 				&& amount.compareTo(BigDecimal.ZERO) > 0;
 	}
 
@@ -118,7 +118,7 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 	}
 
 	public boolean isSuperTransferOut() {
-		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_ACCOUNT.toLowerCase())
+		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_ACCOUNTS.toLowerCase())
 				&& amount.compareTo(BigDecimal.ZERO) < 0;
 	}
 

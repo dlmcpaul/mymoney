@@ -77,7 +77,7 @@ public class TaxYear {
 	}
 
 	List<Transaction> getEarnedIncomeTransactions() {
-		return new ArrayList<>(this.filter(incomeTransactions, EMPLOYMENT_SALARY));
+		return new ArrayList<>(this.filter(incomeTransactions, SALARY_INCOME));
 	}
 
 	List<Transaction> getInvestmentIncomeTransactions() {

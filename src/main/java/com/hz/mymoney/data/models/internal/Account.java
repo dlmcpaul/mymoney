@@ -177,7 +177,7 @@ public class Account implements Comparable<Account> {
 	}
 
 	private boolean isManagedFund() {
-		return name.toLowerCase().startsWith(AccountConstants.FUNDS.toLowerCase());
+		return name.toLowerCase().startsWith(AccountConstants.FUND_ACCOUNTS.toLowerCase());
 	}
 
 	public String getCategory() {

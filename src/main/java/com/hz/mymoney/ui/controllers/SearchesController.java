@@ -73,7 +73,7 @@ public class SearchesController {
 	@HxRequest
 	public View investmentSearch(Model model, @RequestParam(name = "accounts") String searchValue, @RequestParam String id, @RequestParam String label) {
 		try {
-			List<String> investmentAccounts = uiModelBuilderService.searchAccounts(AccountConstants.SHARES + searchValue);
+			List<String> investmentAccounts = uiModelBuilderService.searchAccounts(AccountConstants.SHARE_ACCOUNTS + searchValue);
 
 			if (investmentAccounts.size() == 1) {
 				searchValue = investmentAccounts.getFirst();

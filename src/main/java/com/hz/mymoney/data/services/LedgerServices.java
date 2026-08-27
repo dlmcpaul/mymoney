@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.hz.mymoney.configuration.AccountConstants.FUNDS;
+import static com.hz.mymoney.configuration.AccountConstants.FUND_ACCOUNTS;
 import static com.hz.mymoney.configuration.AccountConstants.IMPUTATION_ACCOUNT;
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
@@ -66,7 +66,7 @@ public class LedgerServices implements ApplicationRunner {
 			log.info("Assets:Cash:NAB Savings = {}", coa.getBalanceForAccount("Assets:Cash:NAB Savings", shareValueService.getInvestmentHistory()));
 			log.info("Assets:Stock:IAG Shares = {}", coa.getBalanceForAccount("Assets:Stock:IAG Shares", shareValueService.getInvestmentHistory()));
 			log.info("Imputation Account Source {}", coa.getAccountsOfType(IMPUTATION_ACCOUNT, false).getFirst().getFirstMovement().sourceAccount());
-			log.info("Total Fund Accounts {}", coa.getZeroBalanceAccountsOfType(FUNDS).size());
+			log.info("Total Fund Accounts {}", coa.getZeroBalanceAccountsOfType(FUND_ACCOUNTS).size());
 			log.info("Expenses:Cash:Household = {}", coa.getBalanceForAccount("Expenses:Cash:Household", shareValueService.getInvestmentHistory()));
 
 			logEmptyCodeMovements("Income:Investment:Dividends:Franked");

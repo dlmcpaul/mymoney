@@ -127,6 +127,24 @@ public class ChartOfAccounts {
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
+	public List<Movement> getInvestmentMovementsForCode(String code) {
+		List<Movement> movements = new ArrayList<>();
+
+		 Arrays.stream(INVESTMENT_INCOME
+				.split(","))
+				.forEach(accountType -> movements.addAll(getInvestmentMovementsForAccountAndCode(accountType, code)));
+
+		 return movements;
+	}
+
+	private List<Movement> getInvestmentMovementsForAccountAndCode(String accountType, String code) {
+		return accounts.stream()
+				.filter(account -> account.getName().toLowerCase().startsWith(accountType.toLowerCase()))
+				.map(account -> account.getMovementsForCode(code))
+				.flatMap(Collection::stream)
+				.toList();
+	}
+
 	private BigDecimal sumAmountForAccountExactWithCode(String accountType, String code) {
 		return accounts.stream()
 				.filter(account -> account.getName().equalsIgnoreCase(accountType))

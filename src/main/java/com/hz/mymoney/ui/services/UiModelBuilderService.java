@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static com.hz.mymoney.configuration.AccountConstants.SUPER_CONTRIBUTION_NOTE;
+import static com.hz.mymoney.configuration.AccountConstants.*;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
@@ -159,19 +159,23 @@ public class UiModelBuilderService {
 		ChartOfAccounts coa = dataLoaderService.getCoa();
 		List<Transaction> investmentTransactions = new ArrayList<>();
 
-		investmentTransactions .addAll(coa.getAccountsOfType(AccountConstants.SHARES, false).stream()
+		investmentTransactions .addAll(coa.getAccountsOfType(AccountConstants.SHARE_ACCOUNTS, false).stream()
 				.filter(account -> account.getCode().equals(code))
 				.map(account -> account.getMovementsForCode(code))
 				.map(this::mapMovementsToTransactions)
 				.flatMap(List::stream)
 				.toList());
 
-		investmentTransactions.addAll(coa.getAccountsOfType(AccountConstants.FUNDS, false).stream()
+		investmentTransactions.addAll(coa.getAccountsOfType(AccountConstants.FUND_ACCOUNTS, false).stream()
 				.filter(account -> account.getCode().equals(code))
 				.map(account -> account.getMovementsForCode(code))
 				.map(this::mapMovementsToTransactions)
 				.flatMap(List::stream)
 				.toList());
+
+		investmentTransactions.addAll(coa.getInvestmentMovementsForCode(code).stream()
+				.map(m -> new Transaction(m.date(), m.description(), m.amount().multiply(BigDecimal.valueOf(-1)), "", "", false, BigDecimal.ZERO))
+						.toList());
 
 		investmentTransactions.sort(Comparator.comparing(Transaction::asAt));
 
@@ -187,11 +191,11 @@ public class UiModelBuilderService {
 	public InvestmentsTemplateData createCurrentInvestmentsTemplateData() {
 		InvestmentsTemplateData shareTemplateData = new InvestmentsTemplateData("Current");
 		ChartOfAccounts coa = dataLoaderService.getCoa();
-		shareTemplateData.investmentSummaries.addAll(coa.getAccountsOfType(AccountConstants.SHARES, true).stream()
+		shareTemplateData.investmentSummaries.addAll(coa.getAccountsOfType(AccountConstants.SHARE_ACCOUNTS, true).stream()
 				.map(account -> mapAccountToShareSummary(account, coa.getTotalInvestmentIncomeForCode(account.getCode()), coa.getAsAt()))
 				.toList());
 
-		shareTemplateData.investmentSummaries.addAll(coa.getAccountsOfType(AccountConstants.FUNDS, true).stream()
+		shareTemplateData.investmentSummaries.addAll(coa.getAccountsOfType(AccountConstants.FUND_ACCOUNTS, true).stream()
 				.map(account -> mapAccountToShareSummary(account, coa.getTotalInvestmentIncomeForCode(account.getCode()), coa.getAsAt()))
 				.toList());
 
@@ -201,11 +205,11 @@ public class UiModelBuilderService {
 	public InvestmentsTemplateData createPriorInvestmentsTemplateData() {
 		InvestmentsTemplateData shareTemplateData = new InvestmentsTemplateData("Historical");
 		ChartOfAccounts coa = dataLoaderService.getCoa();
-		shareTemplateData.investmentSummaries.addAll(coa.getZeroBalanceAccountsOfType(AccountConstants.SHARES).stream()
+		shareTemplateData.investmentSummaries.addAll(coa.getZeroBalanceAccountsOfType(AccountConstants.SHARE_ACCOUNTS).stream()
 				.map(account -> mapAccountToShareSummary(account, coa.getTotalInvestmentIncomeForCode(account.getCode()), coa.getAsAt()))
 				.toList());
 
-		shareTemplateData.investmentSummaries.addAll(coa.getZeroBalanceAccountsOfType(AccountConstants.FUNDS).stream()
+		shareTemplateData.investmentSummaries.addAll(coa.getZeroBalanceAccountsOfType(AccountConstants.FUND_ACCOUNTS).stream()
 				.map(account -> mapAccountToShareSummary(account, coa.getTotalInvestmentIncomeForCode(account.getCode()), coa.getAsAt()))
 				.toList());
 
@@ -314,7 +318,7 @@ public class UiModelBuilderService {
 				.filter(transaction -> transaction.amount().compareTo(BigDecimal.ZERO) >= 0)
 				.toList();
 
-		List<Transaction> supercontribTransactions = coa.getAccountsOfType(AccountConstants.SUPER_ACCOUNT, false).stream()
+		List<Transaction> supercontribTransactions = coa.getAccountsOfType(AccountConstants.SUPER_ACCOUNTS, false).stream()
 				.filter(account -> account.hasMovementBetween(financialYearStartDate, financialYearEndDate))
 				.map(account -> getFilteredTransactions(account, financialYearStartDate, financialYearEndDate))
 				.flatMap(List::stream)
@@ -448,12 +452,14 @@ public class UiModelBuilderService {
 		int yearMin = year - 10;
 
 		while (year > yearMin) {
+			BigDecimal taxes = sumBalanceForFY(chartOfAccounts, EMPLOYMENT_TAXES, financialYearStart)
+					.add(sumBalanceForFY(chartOfAccounts, SUPER_TAXES, financialYearStart));
 			yearlyIncomeExpenseList.add(new YearlyIncomeExpense("FY" + (year - 2000) + "/" + (year - 1999),
-					sumBalanceForFY(chartOfAccounts, "Income", financialYearStart),
+					sumBalanceForFY(chartOfAccounts, INCOME_PREFIX, financialYearStart),
 					sumBalanceForFY(chartOfAccounts, "Expenses", financialYearStart)
-							.subtract(sumBalanceForFY(chartOfAccounts, AccountConstants.EMPLOYMENT_TAXES, financialYearStart))
-							.multiply(BigDecimal.valueOf(-1)),
-					sumBalanceForFY(chartOfAccounts, AccountConstants.EMPLOYMENT_TAXES, financialYearStart).multiply(BigDecimal.valueOf(-1)
+						.subtract(taxes)
+						.multiply(BigDecimal.valueOf(-1)),
+					taxes.multiply(BigDecimal.valueOf(-1)
 			)));
 			year--;
 			chartOfAccounts = new ChartOfAccounts(financialYearStart.minusDays(1), chartOfAccounts);
@@ -491,7 +497,7 @@ public class UiModelBuilderService {
 		ChartOfAccounts chartOfAccounts = dataLoaderService.getCoa();
 
 		// These are as at the current date
-		chartOfAccounts.getAccountsOfType(AccountConstants.SUPER_ACCOUNT, false)
+		chartOfAccounts.getAccountsOfType(AccountConstants.SUPER_ACCOUNTS, false)
 				.forEach(account -> superTemplateData.superAccounts.add(mapSuperannuationAccount(account, chartOfAccounts.getAsAt())));
 
 		return superTemplateData;
