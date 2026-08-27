@@ -9,6 +9,7 @@ import java.util.Locale;
 
 public class Money {
 	public static final String MONEY_SYMBOL = "$";
+	private static final NumberFormat currency = NumberFormat.getCurrencyInstance(Locale.of("en", "au"));
 
 	private Money() {}
 
@@ -31,8 +32,6 @@ public class Money {
 		}
 
 		try {
-			NumberFormat currency = NumberFormat.getCurrencyInstance(Locale.of("en", "au"));
-
 			if (currency instanceof DecimalFormat decimal) {
 				decimal.setParseBigDecimal(true);
 				return ((BigDecimal) decimal.parse(amount)).setScale(scale, RoundingMode.HALF_UP);

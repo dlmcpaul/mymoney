@@ -8,18 +8,31 @@ public class Dates {
 	private static final String DATE_FORMAT_1 = "yyyy/MM/dd";
 	private static final String DATE_FORMAT_2 = "yyyy-MM-dd";
 	private static final String QUICKEN_DATE_FORMAT = "d/M/yy";
+	private static final char ZERO = '0';
 
 	private static final DateTimeFormatter DATE_FORMATTER_1 = DateTimeFormatter.ofPattern(DATE_FORMAT_1);
 	private static final DateTimeFormatter DATE_FORMATTER_2 = DateTimeFormatter.ofPattern(DATE_FORMAT_2);
 
 	private Dates() {}
 
-	private static LocalDate fastParseDate(String date) {
-		String year = date.substring(0, 4);
-		String month = date.substring(5, 7);
-		String day = date.substring(8, 10);
+	private static int fastParseInt2(String value) {
+		return (value.charAt(0) - ZERO) * 10
+				+ (value.charAt(1) - ZERO);
+	}
 
-		return LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
+	private static int fastParseInt4(String value) {
+		return (value.charAt(0) - ZERO) * 1000
+				+ (value.charAt(1) - ZERO) * 100
+				+ (value.charAt(2) - ZERO) * 10
+				+ (value.charAt(3) - ZERO);
+	}
+
+	private static LocalDate fastParseDate(String date) {
+		int year = fastParseInt4(date.substring(0, 4));
+		int month = fastParseInt2(date.substring(5, 7));
+		int day = fastParseInt2(date.substring(8, 10));
+
+		return LocalDate.of(year, month, day);
 	}
 
 	public static LocalDate parseDate(String dateString) {

@@ -14,10 +14,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +29,7 @@ import java.util.regex.Pattern;
 public class SharePriceServices implements ApplicationRunner {
 
 	private static final Pattern whitespace = Pattern.compile("\\s+");
+	private static final Pattern single_space = Pattern.compile("\\s");
 	private static final Pattern comma_delimited = Pattern.compile(", ");
 
 	private String commodityOption;
@@ -166,14 +164,15 @@ public class SharePriceServices implements ApplicationRunner {
 
 	private void loadCommodities(InputStream inputStream, Map<String, SortedSet<InvestmentHistoryEntry>> entries) {
 		String line = "";
-		try (final InputStream ledgerImportStream = inputStream) {
+		String[] tokens;
+		try (final BufferedInputStream ledgerImportStream = new BufferedInputStream(inputStream)) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(ledgerImportStream));
 			line = reader.readLine();
 			while (line != null) {
 				// Parse as P 2025-01-01 NSC 150,25 USD
 				// P date commodity value currency
 				if (line.startsWith("P")) {
-					String[] tokens = whitespace.split(line);
+					tokens = line.split(" ");
 					addEntry(entries, tokens[2], Dates.parseDate(tokens[1]), parseBigDecimal(tokens[3]));
 				}
 				line = reader.readLine();
