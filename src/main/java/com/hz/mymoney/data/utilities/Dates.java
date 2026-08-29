@@ -1,10 +1,12 @@
 package com.hz.mymoney.data.utilities;
 
+import com.hz.mymoney.exceptions.UnexpectedDataException;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public class Dates {
+public final class Dates {
 	private static final String DATE_FORMAT_1 = "yyyy/MM/dd";
 	private static final String DATE_FORMAT_2 = "yyyy-MM-dd";
 	private static final String QUICKEN_DATE_FORMAT = "d/M/yy";
@@ -46,7 +48,7 @@ public class Dates {
 			}
 			return LocalDate.parse(dateString, DATE_FORMATTER_2);
 		} catch (DateTimeParseException e) {
-			throw new RuntimeException("Could not parse date " + dateString + " as either " + DATE_FORMAT_1 + " or " + DATE_FORMAT_2, e);
+			throw new UnexpectedDataException("Could not parse date " + dateString + " as either " + DATE_FORMAT_1 + " or " + DATE_FORMAT_2, e);
 		}
 	}
 

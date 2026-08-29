@@ -1,8 +1,8 @@
 package com.hz.mymoney.data.services;
 
-import com.hz.mymoney.data.models.internal.Account;
-import com.hz.mymoney.data.models.internal.ChartOfAccounts;
-import com.hz.mymoney.data.models.internal.Movement;
+import com.hz.mymoney.data.models.coa.Account;
+import com.hz.mymoney.data.models.coa.ChartOfAccounts;
+import com.hz.mymoney.data.models.coa.Movement;
 import com.hz.mymoney.data.models.ledger.IPosting;
 import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;

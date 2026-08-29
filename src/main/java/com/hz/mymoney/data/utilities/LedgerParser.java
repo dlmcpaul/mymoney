@@ -89,23 +89,23 @@ public class LedgerParser {
 				}
 				case EMPTY -> {}
 				case CASH_POSTING -> {
-					assert ledgerEntry != null;
+					assert ledgerEntry != null : "ledgerEntry is null";
 					addPosting(ledgerEntry, parseCashPosting(line));
 				}
 				case FUND_POSTING -> {
-					assert ledgerEntry != null;
+					assert ledgerEntry != null : "ledgerEntry is null";
 					addPosting(ledgerEntry, parseFundPosting(line));
 				}
 				case SHARE_POSTING -> {
-					assert ledgerEntry != null;
+					assert ledgerEntry != null : "ledgerEntry is null";
 					addPosting(ledgerEntry, parseSharePosting(line));
 				}
 				case SHARE_RESET_POSTING -> {
-					assert ledgerEntry != null;
+					assert ledgerEntry != null : "ledgerEntry is null";
 					addPosting(ledgerEntry, parseShareResetPosting(line));
 				}
 				case REMAINDER_POSTING -> {
-					assert ledgerEntry != null;
+					assert ledgerEntry != null : "ledgerEntry is null";
 					addPosting(ledgerEntry, parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
 				}
 				default -> {

@@ -1,8 +1,8 @@
-package com.hz.mymoney.ui.models.internal;
+package com.hz.mymoney.ui.models.support;
 
 import java.util.List;
 
-public class Recurrence {
+public final class Recurrence {
 	private Recurrence() {}
 
 	private static final List<Alias> plural = List.of(

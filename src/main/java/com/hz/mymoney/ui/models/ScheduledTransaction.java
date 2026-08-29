@@ -1,6 +1,6 @@
 package com.hz.mymoney.ui.models;
 
-import com.hz.mymoney.ui.models.internal.Recurrence;
+import com.hz.mymoney.ui.models.support.Recurrence;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

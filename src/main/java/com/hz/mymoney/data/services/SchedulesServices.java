@@ -1,6 +1,6 @@
 package com.hz.mymoney.data.services;
 
-import com.hz.mymoney.data.models.internal.Schedule;
+import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;
 import com.hz.mymoney.data.utilities.LedgerParser;
@@ -55,7 +55,7 @@ public class SchedulesServices implements ApplicationRunner {
 				scheduleLedger = ledgerParser.loadLedger(path);
 				convertLedgerToSchedules(scheduleLedger);
 			} finally {
-				assert scheduleLedger != null;
+				assert scheduleLedger != null : "scheduleLedger is null";
 				log.info("Successfully loaded {} Schedules from file {} with {} errors", scheduleLedger.getLedgerEntries().size(), path.toString(), scheduleLedger.getLoadErrorCount());
 			}
 		} else {

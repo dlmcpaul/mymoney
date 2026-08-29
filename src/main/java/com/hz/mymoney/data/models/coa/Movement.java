@@ -1,4 +1,4 @@
-package com.hz.mymoney.data.models.internal;
+package com.hz.mymoney.data.models.coa;
 
 import com.hz.mymoney.configuration.AccountConstants;
 import lombok.extern.log4j.Log4j2;

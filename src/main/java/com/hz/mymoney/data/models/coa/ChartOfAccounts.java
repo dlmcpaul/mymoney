@@ -1,4 +1,4 @@
-package com.hz.mymoney.data.models.internal;
+package com.hz.mymoney.data.models.coa;
 
 import com.hz.mymoney.data.models.ledger.IPosting;
 import com.hz.mymoney.data.models.ledger.SharePosting;

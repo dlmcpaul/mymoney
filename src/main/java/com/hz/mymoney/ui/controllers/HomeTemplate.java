@@ -1,7 +1,7 @@
 package com.hz.mymoney.ui.controllers;
 
 import com.hz.mymoney.components.ReleaseInfoContributor;
-import com.hz.mymoney.data.models.internal.Schedule;
+import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.ui.models.Toast;
 import com.hz.mymoney.ui.services.UiModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;

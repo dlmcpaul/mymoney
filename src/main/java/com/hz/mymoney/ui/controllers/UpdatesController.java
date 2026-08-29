@@ -2,7 +2,7 @@ package com.hz.mymoney.ui.controllers;
 
 // Handles all post requests
 
-import com.hz.mymoney.data.models.internal.Schedule;
+import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.ui.models.Toast;
 import com.hz.mymoney.ui.models.inputs.BasicJournalInput;
 import com.hz.mymoney.ui.models.inputs.DistributionTypeInput;

@@ -1,4 +1,4 @@
-package com.hz.mymoney.data.models.internal;
+package com.hz.mymoney.data.models.coa;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

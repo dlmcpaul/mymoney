@@ -1,9 +1,9 @@
 package com.hz.mymoney.ui.services;
 
 import com.hz.mymoney.configuration.AccountConstants;
-import com.hz.mymoney.data.models.internal.ChartOfAccounts;
-import com.hz.mymoney.data.models.internal.Movement;
-import com.hz.mymoney.data.models.internal.Schedule;
+import com.hz.mymoney.data.models.coa.ChartOfAccounts;
+import com.hz.mymoney.data.models.coa.Movement;
+import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.data.services.LedgerServices;
 import com.hz.mymoney.data.services.SchedulesServices;
 import com.hz.mymoney.data.services.SharePriceServices;
@@ -57,7 +57,7 @@ public class UiModelBuilderService {
 		// Merge all the accounts found into single set of movements
 		List<Movement> allMovements = coa.getAccountsOfType(accountName, true)
 				.stream()
-				.map(com.hz.mymoney.data.models.internal.Account::getMovementsAsList)
+				.map(com.hz.mymoney.data.models.coa.Account::getMovementsAsList)
 				.flatMap(Collection::stream)
 				.toList();
 
@@ -93,7 +93,7 @@ public class UiModelBuilderService {
 
 		return coa.getAccountsOfType(searchText, false)
 				.stream()
-				.map(com.hz.mymoney.data.models.internal.Account::getName)
+				.map(com.hz.mymoney.data.models.coa.Account::getName)
 				.toList();
 	}
 
@@ -275,7 +275,7 @@ public class UiModelBuilderService {
 		};
 	}
 
-	public List<Transaction> mapMovementsToTransactions(PriorityQueue<Movement> movements, com.hz.mymoney.data.models.internal.Account account) {
+	public List<Transaction> mapMovementsToTransactions(PriorityQueue<Movement> movements, com.hz.mymoney.data.models.coa.Account account) {
 		return movements.stream()
 				.map(movement -> mapTransaction(movement, account.getName(), account.isShareAccount()))
 				.sorted(Comparator.comparing(Transaction::asAt))
@@ -290,8 +290,8 @@ public class UiModelBuilderService {
 									createTaxYear(currentFY.minusYears(1), coa));
 	}
 
-	private Account buildFilteredAccount(com.hz.mymoney.data.models.internal.Account account, LocalDate startDate, LocalDate endDate) {
-		com.hz.mymoney.data.models.internal.Account filteredAccount = new com.hz.mymoney.data.models.internal.Account(account, startDate, endDate);
+	private Account buildFilteredAccount(com.hz.mymoney.data.models.coa.Account account, LocalDate startDate, LocalDate endDate) {
+		com.hz.mymoney.data.models.coa.Account filteredAccount = new com.hz.mymoney.data.models.coa.Account(account, startDate, endDate);
 
 		return new Account(filteredAccount.getSimpleName(), filteredAccount.getName(), filteredAccount.getCategory(), filteredAccount.getBalance(endDate, shareValueService.getInvestmentHistory()).abs(), account.isShareAccount(), null);
 	}
@@ -348,7 +348,7 @@ public class UiModelBuilderService {
 		return financialYearStartDate;
 	}
 
-	private InvestmentSummary mapAccountToShareSummary(com.hz.mymoney.data.models.internal.Account account, BigDecimal earnings, LocalDate asAt) {
+	private InvestmentSummary mapAccountToShareSummary(com.hz.mymoney.data.models.coa.Account account, BigDecimal earnings, LocalDate asAt) {
 		BigDecimal currentShareValue = account.isShareAccount() ? shareValueService.getInvestmentValue(account.getCode(), asAt) : BigDecimal.ZERO;
 		BigDecimal yesterdayShareValue = account.isShareAccount() ? shareValueService.getPreviousInvestmentValue(account.getCode(), asAt) : BigDecimal.ZERO;
 		BigDecimal currentValue = account.getTotalAmount().multiply(currentShareValue).setScale(2, RoundingMode.HALF_UP);
@@ -379,14 +379,14 @@ public class UiModelBuilderService {
 		return nalPosition;
 	}
 
-	private SuperannuationAccount mapSuperannuationAccount(com.hz.mymoney.data.models.internal.Account account, LocalDate asAt) {
+	private SuperannuationAccount mapSuperannuationAccount(com.hz.mymoney.data.models.coa.Account account, LocalDate asAt) {
 		LocalDate earliestDate = account.getFirstMovement().date();
 		LocalDate lastDate = account.getLastMovement().date();
 
 		return new SuperannuationAccount(account.getSimpleName(), account.getName(), account.getBalance(asAt, shareValueService.getInvestmentHistory()), earliestDate, lastDate, account.getMovements());
 	}
 
-	private Account mapEquityAccount(com.hz.mymoney.data.models.internal.Account account, LocalDate asAt) {
+	private Account mapEquityAccount(com.hz.mymoney.data.models.coa.Account account, LocalDate asAt) {
 		if (account.isShareAccount()) {
 			BigDecimal shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
 			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getTotalAmount().multiply(shareValue).setScale(2, RoundingMode.HALF_UP), account.isShareAccount(), null);
@@ -395,7 +395,7 @@ public class UiModelBuilderService {
 		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getBalance(asAt, shareValueService.getInvestmentHistory()).multiply(BigDecimal.valueOf(-1)), false, null);
 	}
 
-	private Account mapAccount(com.hz.mymoney.data.models.internal.Account account, LocalDate asAt, boolean includeNote) {
+	private Account mapAccount(com.hz.mymoney.data.models.coa.Account account, LocalDate asAt, boolean includeNote) {
 		if (account.isShareAccount()) {
 			BigDecimal shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
 			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getTotalAmount().multiply(shareValue).setScale(2, RoundingMode.HALF_UP), account.isShareAccount(), includeNote ? getNextInvestmentIncomeNote(account.getCode()) : null);
@@ -404,7 +404,7 @@ public class UiModelBuilderService {
 		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getBalance(asAt, shareValueService.getInvestmentHistory()), false, null);
 	}
 
-	private Account mapAccount(com.hz.mymoney.data.models.internal.Account account, List<Transaction> transactions, LocalDate asAt) {
+	private Account mapAccount(com.hz.mymoney.data.models.coa.Account account, List<Transaction> transactions, LocalDate asAt) {
 		BigDecimal total = transactions.stream()
 				.map(Transaction::amount)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -433,7 +433,7 @@ public class UiModelBuilderService {
 		return "";
 	}
 
-	private List<Transaction> getFilteredTransactions(com.hz.mymoney.data.models.internal.Account account, LocalDate startDate, LocalDate endDate) {
+	private List<Transaction> getFilteredTransactions(com.hz.mymoney.data.models.coa.Account account, LocalDate startDate, LocalDate endDate) {
 		return mapMovementsToTransactions(account.getMovementsBetween(startDate, endDate), account);
 	}
 

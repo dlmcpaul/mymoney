@@ -1,7 +1,7 @@
 package com.hz.mymoney.data.services;
 
-import com.hz.mymoney.data.models.internal.InvestmentHistory;
-import com.hz.mymoney.data.models.internal.InvestmentHistoryEntry;
+import com.hz.mymoney.data.models.coa.InvestmentHistory;
+import com.hz.mymoney.data.models.coa.InvestmentHistoryEntry;
 import com.hz.mymoney.data.utilities.Dates;
 import com.hz.mymoney.data.utilities.Money;
 import com.hz.mymoney.exceptions.ValidationException;

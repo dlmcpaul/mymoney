@@ -1,6 +1,6 @@
 package com.hz.mymoney.ui.models;
 
-import com.hz.mymoney.data.models.internal.Movement;
+import com.hz.mymoney.data.models.coa.Movement;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

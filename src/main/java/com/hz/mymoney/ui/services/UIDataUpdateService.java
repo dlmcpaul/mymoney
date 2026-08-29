@@ -1,6 +1,6 @@
 package com.hz.mymoney.ui.services;
 
-import com.hz.mymoney.data.models.internal.Schedule;
+import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.data.models.ledger.IPosting;
 import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;

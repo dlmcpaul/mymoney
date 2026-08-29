@@ -20,7 +20,7 @@
 <div class="ui wide container">
     <div th:replace="~{fragments/Common :: Banner}"></div>
     <th:block th:replace="${header}"/>
-    <!--/*@thymesVar id="menuList" type="java.util.List<com.hz.mymoney.ui.models.internal.Menu>"*/-->
+    <!--/*@thymesVar id="menuList" type="java.util.List<com.hz.mymoney.ui.models.support.Menu>"*/-->
     <div th:replace="~{fragments/Common :: PrimaryTabs(${menucode}, ${menuList})}"></div>
     <div class="ui raised padded segment">
         <div th:replace="~{fragments/Common :: PrimaryMenu(${menucode}, ${menuList})}"></div>

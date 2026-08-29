@@ -1,12 +1,12 @@
 package com.hz.mymoney.ui.utilities;
 
-import com.hz.mymoney.ui.models.internal.Menu;
+import com.hz.mymoney.ui.models.support.Menu;
 import org.springframework.ui.Model;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public class PageSupport {
+public final class PageSupport {
 	static List<Menu> menuList = List.of(new Menu("Home","","Dashboard"),
 			new Menu("Accounts","Accounts","Accounts"),
 			new Menu("Equity","Equity","Equity"),

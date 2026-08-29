@@ -1,6 +1,6 @@
 package com.hz.mymoney.ui.models.templates;
 
-import com.hz.mymoney.data.models.internal.Movement;
+import com.hz.mymoney.data.models.coa.Movement;
 import com.hz.mymoney.ui.models.charts.TrendData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

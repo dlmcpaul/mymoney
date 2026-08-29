@@ -1,5 +1,7 @@
 package com.hz.mymoney.data.utilities;
 
+import com.hz.mymoney.exceptions.ValidationException;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -7,7 +9,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-public class Money {
+public final class Money {
 	public static final String MONEY_SYMBOL = "$";
 	private static final NumberFormat currency = NumberFormat.getCurrencyInstance(Locale.of("en", "au"));
 
@@ -37,7 +39,7 @@ public class Money {
 				return ((BigDecimal) decimal.parse(amount)).setScale(scale, RoundingMode.HALF_UP);
 			}
 		} catch (ParseException e) {
-			throw new RuntimeException("Could not parse money: " + amount, e);
+			throw new ValidationException("Could not parse money: " + amount, e);
 		}
 		return BigDecimal.ZERO;
 	}
