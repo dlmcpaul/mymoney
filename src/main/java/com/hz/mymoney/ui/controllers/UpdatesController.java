@@ -19,7 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.FragmentsRendering;
 
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-@SessionAttributes("profitLossMonth")
 @RequiredArgsConstructor
 @Log4j2
 public class UpdatesController {
