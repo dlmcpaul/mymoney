@@ -13,6 +13,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.FragmentsRendering;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@RequestMapping("/Tax")
 @RequiredArgsConstructor
 @Log4j2
 public class TaxTemplate {
@@ -29,7 +31,7 @@ public class TaxTemplate {
 
 	private TaxTemplateData taxTemplateData;
 
-	@GetMapping("/Tax")
+	@GetMapping
 	public String tax(Model model) {
 		try {
 			taxTemplateData = uiModelBuilderService.createTaxTemplateData();
@@ -43,7 +45,7 @@ public class TaxTemplate {
 		return "TaxEstimate";
 	}
 
-	@GetMapping("/Tax/Breakdown")
+	@GetMapping("/Breakdown")
 	@HxRequest
 	public View breakdown(Model model, @RequestParam("tax_year_code") String taxYearCode, @RequestParam("breakdown_code") String breakdownType) {
 		try {

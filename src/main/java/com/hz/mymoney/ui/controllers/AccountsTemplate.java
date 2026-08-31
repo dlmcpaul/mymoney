@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.FragmentsRendering;
@@ -19,13 +20,14 @@ import org.springframework.web.servlet.view.FragmentsRendering;
 import java.time.LocalDate;
 
 @Controller
+@RequestMapping("/Accounts")
 @RequiredArgsConstructor
 @Log4j2
 public class AccountsTemplate {
 	private final ReleaseInfoContributor release;
 	private final UiModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/Accounts")
+	@GetMapping
 	public String accounts(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
@@ -37,7 +39,7 @@ public class AccountsTemplate {
 		return "Accounts";
 	}
 
-	@GetMapping("/Accounts/{accountName}")
+	@GetMapping("/{accountName}")
 	public String account(@PathVariable String accountName, Model model, @RequestParam(value = "fy", required = false) LocalDate financialYearStart) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
@@ -50,7 +52,7 @@ public class AccountsTemplate {
 		return "SingleAccount";
 	}
 
-	@GetMapping("/Accounts/changeFY")
+	@GetMapping("/changeFY")
 	@HxRequest
 	public View changeFinancialYear(Model model, @RequestParam LocalDate currentFY, @RequestParam String direction) {
 		try {

@@ -10,11 +10,13 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.FragmentsRendering;
 
 @Controller
+@RequestMapping("/Investments")
 @RequiredArgsConstructor
 @Log4j2
 public class InvestmentsTemplate {
@@ -22,7 +24,7 @@ public class InvestmentsTemplate {
 	private final UiModelBuilderService uiModelBuilderService;
 	private final UIDataUpdateService uiDataUpdateService;
 
-	@GetMapping("/Investments")
+	@GetMapping
 	public String investments(Model model) {
 		try {
 			uiDataUpdateService.reloadCommodities();
@@ -36,7 +38,7 @@ public class InvestmentsTemplate {
 		return "Investments";
 	}
 
-	@GetMapping("/Investments")
+	@GetMapping
 	@HxRequest
 	public View switchInvestments(Model model, @RequestParam("nextDisplayMode") String nextDisplayMode) {
 		try {
@@ -54,7 +56,7 @@ public class InvestmentsTemplate {
 				.build();
 	}
 
-	@GetMapping("/Investments/List")
+	@GetMapping("/List")
 	@HxRequest
 	public View investmentList(Model model, @RequestParam("code") String code) {
 		try {
@@ -69,5 +71,4 @@ public class InvestmentsTemplate {
 				.build();
 	}
 
-
-	}
+}
