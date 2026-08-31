@@ -28,14 +28,14 @@
                 </div>
             </div>
             <div class="five wide column">
-                <div th:replace="~{fragments/IncomeExpense :: IncomeExpenseHeader (${monthlyChange})}"></div>
+                <div th:replace="~{fragments/IncomeExpense :: IncomeExpenseHeader (${monthlyChange}, ${pnlDate})}"></div>
                 <div th:replace="~{fragments/IncomeExpense :: IncomeExpenseBody (${monthlyChange})}"></div>
             </div>
         </div>
     </div>
     <div th:replace="~{fragments/Modals :: ScheduleModal (null)}"></div>
 </main>
-<script th:inline="javascript" type="text/javascript">
+<script>
     // These Listeners need to be re-registered each page load
     document.getElementById('journal-tabs').addEventListener('click', function (event) {
         if (event.target.id.includes('journal-tab-item')) {

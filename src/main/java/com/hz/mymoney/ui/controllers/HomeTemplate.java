@@ -26,29 +26,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log4j2
 public class HomeTemplate {
-	protected static final String PROFIT_LOSS_MONTH = "profitLossMonth";
-	protected static final String MONTHLY_INCOME_EXPENSE_FIELD = "monthlyChange";
-
 	private final ReleaseInfoContributor release;
 	private final UiModelBuilderService uiModelBuilderService;
-
-	@ModelAttribute(PROFIT_LOSS_MONTH)
-	public LocalDate profitLossMonth() {
-		return LocalDate.now().withDayOfMonth(1);
-	}
 
 	// Load initial page
 	@GetMapping("/")
 	public String home(Model model,
-	                   @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth,
 	                   @ModelAttribute(value = "message", binding = false) Toast message,
 	                   HtmxResponse htmxResponse) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
-			model.addAttribute("readOnlyLedger", uiModelBuilderService.isLedgerReadOnly());
-			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
-			model.addAttribute("scheduledTransactions", uiModelBuilderService.getScheduledTransactions());
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
+			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
 			if (message != null) {
 				htmxResponse.addTriggerAfterSettle("showMessage", message);
 			}
@@ -77,31 +65,13 @@ public class HomeTemplate {
 				.build();
 	}
 
-	@GetMapping("/nextMonth")
+	@GetMapping("/income-expenses")
 	@HxRequest
-	public View nextMonth(Model model, @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth) {
+	public View loadIncomeAndExpenses(Model model, @RequestParam LocalDate pnlDate) {
 		try {
-			profitLossMonth = profitLossMonth.withDayOfMonth(1).plusMonths(1);
-			model.addAttribute(PROFIT_LOSS_MONTH, profitLossMonth);
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
+			PageSupport.populateMonthlyIncomeExpense(model, uiModelBuilderService, pnlDate);
 		} catch (Exception e) {
 			log.error("Next Month Generation Exception {}", e.getMessage(), e);
-		}
-		return FragmentsRendering
-				.fragment("fragments/IncomeExpense :: IncomeExpenseHeader")
-				.fragment("fragments/IncomeExpense :: IncomeExpenseBody")
-				.build();
-	}
-
-	@GetMapping("/prevMonth")
-	@HxRequest
-	public View prevMonth(Model model, @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth) {
-		try {
-			profitLossMonth = profitLossMonth.withDayOfMonth(1).minusMonths(1);
-			model.addAttribute(PROFIT_LOSS_MONTH, profitLossMonth);
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
-		} catch (Exception e) {
-			log.error("Prev Month Generation Exception {}", e.getMessage(), e);
 		}
 		return FragmentsRendering
 				.fragment("fragments/IncomeExpense :: IncomeExpenseHeader")

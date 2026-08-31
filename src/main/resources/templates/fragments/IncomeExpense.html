@@ -2,14 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <body>
 <!--/*@thymesVar id="monthlyChange" type="com.hz.mymoney.ui.models.MonthlyIncomeExpense"*/-->
-<div id="IncomeExpenseHeader" th:fragment="IncomeExpenseHeader (monthlyChange)" class="ui four column compact grid">
+<!--/*@thymesVar id="pnlDate" type="java.time.LocalDate"*/-->
+<div id="IncomeExpenseHeader" th:fragment="IncomeExpenseHeader (monthlyChange, pnlDate)" class="ui four column compact grid">
     <div class="seven wide column"><h3 class="ui header">Profit & Loss For</h3></div>
     <div class="one wide column">
-        <a class="header" data-tooltip="Previous Month" th:href="@{/prevMonth}" th:attr="hx-get=@{/prevMonth}" hx-select-oob="#IncomeExpenseHeader,#IncomeExpenseBody" hx-swap="outerHTML"><i class="angle left icon"></i></a>
+        <a class="header" th:with="prevMonth=${pnlDate.withDayOfMonth(1).minusMonths(1)}" th:href="@{/income-expenses(pnlDate=${prevMonth})}"
+           th:attr="hx-get=@{/income-expenses(pnlDate=${prevMonth})}, data-tooltip=${#temporals.monthName(prevMonth)} + ' ' + ${#temporals.year(prevMonth)}"
+           hx-select-oob="#IncomeExpenseHeader,#IncomeExpenseBody" hx-swap="outerHTML"><i class="angle left icon"></i></a>
     </div>
     <div class="six wide center aligned column"><span class="ui subheader" data-th-text="${#temporals.monthName(monthlyChange.asAt())} + ' ' + ${#temporals.year(monthlyChange.asAt())}"></span></div>
     <div class="one wide column">
-        <a class="header" data-tooltip="Next Month" th:href="@{/nextMonth}" th:attr="hx-get=@{/nextMonth}" hx-select-oob="#IncomeExpenseHeader,#IncomeExpenseBody" hx-swap="outerHTML"><i class="angle right icon"></i></a>
+        <a class="header" th:with="nextMonth=${pnlDate.withDayOfMonth(1).plusMonths(1)}" th:href="@{/income-expenses(pnlDate=${nextMonth})}"
+           th:attr="hx-get=@{/income-expenses(pnlDate=${nextMonth})}, data-tooltip=${#temporals.monthName(nextMonth)} + ' ' + ${#temporals.year(nextMonth)}"
+           hx-select-oob="#IncomeExpenseHeader,#IncomeExpenseBody" hx-swap="outerHTML"><i class="angle right icon"></i></a>
     </div>
 </div>
 

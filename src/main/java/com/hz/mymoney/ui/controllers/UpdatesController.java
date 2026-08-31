@@ -9,6 +9,7 @@ import com.hz.mymoney.ui.models.inputs.DistributionTypeInput;
 import com.hz.mymoney.ui.models.inputs.DividendJournalInput;
 import com.hz.mymoney.ui.services.UIDataUpdateService;
 import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.utilities.PageSupport;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +28,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.hz.mymoney.ui.controllers.HomeTemplate.MONTHLY_INCOME_EXPENSE_FIELD;
-import static com.hz.mymoney.ui.controllers.HomeTemplate.PROFIT_LOSS_MONTH;
-
 @Controller
 @SessionAttributes("profitLossMonth")
 @RequiredArgsConstructor
@@ -38,15 +36,9 @@ public class UpdatesController {
 	private final UiModelBuilderService uiModelBuilderService;
 	private final UIDataUpdateService uiDataUpdateService;
 
-	@ModelAttribute(PROFIT_LOSS_MONTH)
-	public LocalDate profitLossMonth() {
-		return LocalDate.now().withDayOfMonth(1);
-	}
-
 	@PostMapping("/scheduleSkip")
 	@HxRequest
 	public View scheduleSkip(Model model,
-	                         @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth,
 	                         @RequestParam String scheduleDescription,
 	                         HtmxResponse htmxResponse
 	) {
@@ -54,10 +46,7 @@ public class UpdatesController {
 			Optional<Schedule> schedule = uiModelBuilderService.getSchedule(scheduleDescription);
 			schedule.ifPresent(uiDataUpdateService::skipSchedule);
 
-			model.addAttribute(PROFIT_LOSS_MONTH, profitLossMonth);
-			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
-			model.addAttribute("scheduledTransactions", uiModelBuilderService.getScheduledTransactions());
+			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
 
 			htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "Schedule " + scheduleDescription + " Skipped" ));
 		} catch (Exception e) {
@@ -75,7 +64,6 @@ public class UpdatesController {
 	@PostMapping("/schedulePost")
 	@HxRequest
 	public View schedulePost(Model model,
-	                         @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth,
 	                         @RequestParam String scheduleDescription,
 	                         @RequestParam List<BigDecimal> amounts,
 	                         HtmxResponse htmxResponse
@@ -84,10 +72,7 @@ public class UpdatesController {
 			Optional<Schedule> schedule = uiModelBuilderService.getSchedule(scheduleDescription);
 			schedule.ifPresent(s -> uiDataUpdateService.postSchedule(s, amounts));
 
-			model.addAttribute(PROFIT_LOSS_MONTH, profitLossMonth);
-			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
-			model.addAttribute("scheduledTransactions", uiModelBuilderService.getScheduledTransactions());
+			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
 
 			htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "Schedule " + scheduleDescription + " Posted" ));
 		} catch (Exception e) {
@@ -105,7 +90,6 @@ public class UpdatesController {
 	@PostMapping("/newJournal")
 	@HxRequest
 	public View newJournal(Model model,
-	                       @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth,
 	                       @ModelAttribute BasicJournalInput basicJournalInput,
 	                       HtmxResponse htmxResponse
 	) {
@@ -118,10 +102,7 @@ public class UpdatesController {
 				htmxResponse.addTrigger("showMessage", new Toast("error", "Failed", "Invalid Journal Entry" ));
 			}
 
-			model.addAttribute(PROFIT_LOSS_MONTH, profitLossMonth);
-			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
-			model.addAttribute("defaultDate", basicJournalInput.getJournalDate());
+			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
 		} catch (Exception e) {
 			log.error("newJournal Exception {}", e.getMessage(), e);
 		}
@@ -137,7 +118,6 @@ public class UpdatesController {
 	@PostMapping("/newDividend")
 	@HxRequest
 	public View newDividend(Model model,
-	                       @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth,
 	                       @ModelAttribute DividendJournalInput dividendInputJournal,
 	                       HtmxResponse htmxResponse
 	) {
@@ -150,10 +130,7 @@ public class UpdatesController {
 				htmxResponse.addTrigger("showMessage", new Toast("error", "Failed", "Invalid Dividend Entry" ));
 			}
 
-			model.addAttribute(PROFIT_LOSS_MONTH, profitLossMonth);
-			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
-			model.addAttribute("defaultDate", dividendInputJournal.getJournalDate());
+			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
 		} catch (Exception e) {
 			log.error("newDividend Exception {}", e.getMessage(), e);
 		}
@@ -169,7 +146,6 @@ public class UpdatesController {
 	@PostMapping("/newDistribution")
 	@HxRequest
 	public View newDistribution(Model model,
-	                            @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth,
 	                            @ModelAttribute DistributionTypeInput distributionInputTransaction,
 	                            HtmxResponse htmxResponse
 	) {
@@ -182,11 +158,7 @@ public class UpdatesController {
 				htmxResponse.addTrigger("showMessage", new Toast("error", "Failed", "Invalid Fund Distribution Entry" ));
 			}
 
-			model.addAttribute(PROFIT_LOSS_MONTH, profitLossMonth);
-			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
-			model.addAttribute("defaultDate", distributionInputTransaction.getJournalDate());
-			model.addAttribute("activeButton", distributionInputTransaction.getDistributionType());
+			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
 		} catch (Exception e) {
 			log.error("newDistribution Exception {}", e.getMessage(), e);
 		}
@@ -218,17 +190,12 @@ public class UpdatesController {
 	@PostMapping("/reload")
 	@HxRequest
 	public View reload(Model model,
-	                   @ModelAttribute(PROFIT_LOSS_MONTH) LocalDate profitLossMonth,
 	                   HtmxResponse htmxResponse) {
 
 		try {
 			uiDataUpdateService.reloadFiles();
 
-			model.addAttribute(PROFIT_LOSS_MONTH, profitLossMonth);
-			model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
-			model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(profitLossMonth));
-			model.addAttribute("scheduledTransactions", uiModelBuilderService.getScheduledTransactions());
-			model.addAttribute("readOnlyLedger", uiModelBuilderService.isLedgerReadOnly());
+			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
 			model.addAttribute("today", LocalDate.now());
 
 			if (uiModelBuilderService.isLedgerReadOnly()) {
