@@ -8,7 +8,7 @@
         <canvas id="yearlyIncomeExpenseChart" th:attr="data-chart-data=${incomeExpenseHistory}" style="height: 450px;width: 100%"></canvas>
     </div>
 </main>
-<script th:inline="javascript" type="text/javascript">
+<script>
     function onPageLoad() {
 
         const moneyFmt = new Intl.NumberFormat(undefined, {

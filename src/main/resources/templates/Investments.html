@@ -9,7 +9,7 @@
     <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${header})}"></div>
     <div th:replace="~{fragments/Investment :: InvestmentList (null, '')}"></div>
 </main>
-<script th:inline="javascript">
+<script>
     htmx.onLoad(function updateInvestmentsTotalChart(target) {
 
         let chartStatus = Chart.getChart("investmentsTotalChart"); // <canvas> id
@@ -68,7 +68,7 @@
         }
     });
 </script>
-<script th:inline="javascript">
+<script>
     const moneyFmt = new Intl.NumberFormat(undefined, {
         style: 'currency',
         currency: 'AUD',
