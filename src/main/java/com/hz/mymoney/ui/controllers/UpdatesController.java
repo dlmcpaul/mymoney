@@ -101,6 +101,7 @@ public class UpdatesController {
 			}
 
 			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
+			model.addAttribute("defaultDate", basicJournalInput.getJournalDate());
 		} catch (Exception e) {
 			log.error("newJournal Exception {}", e.getMessage(), e);
 		}
@@ -129,6 +130,7 @@ public class UpdatesController {
 			}
 
 			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
+			model.addAttribute("defaultDate", dividendInputJournal.getJournalDate());
 		} catch (Exception e) {
 			log.error("newDividend Exception {}", e.getMessage(), e);
 		}
@@ -157,6 +159,8 @@ public class UpdatesController {
 			}
 
 			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
+			model.addAttribute("defaultDate", distributionInputTransaction.getJournalDate());
+			model.addAttribute("activeButton", distributionInputTransaction.getDistributionType());
 		} catch (Exception e) {
 			log.error("newDistribution Exception {}", e.getMessage(), e);
 		}
