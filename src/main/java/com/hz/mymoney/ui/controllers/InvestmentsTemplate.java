@@ -29,9 +29,10 @@ public class InvestmentsTemplate {
 		try {
 			uiDataUpdateService.reloadCommodities();
 			PageSupport.populateDefaultModelData(model, release.getVersion());
-			model.addAttribute("investmentsData", uiModelBuilderService.createCurrentInvestmentsTemplateData());
 			model.addAttribute("nextDisplayMode", "historical");
 			model.addAttribute("header", "Current Investments");
+			model.addAttribute("investmentsData", uiModelBuilderService.createCurrentInvestmentsTemplateData());
+			model.addAttribute("investments", null);
 		} catch (Exception e) {
 			log.error("Investments Page Generation Exception {}", e.getMessage(), e);
 		}
@@ -46,6 +47,7 @@ public class InvestmentsTemplate {
 			model.addAttribute("nextDisplayMode", nextDisplayMode.equals("current") ? "historical" : "current");
 			model.addAttribute("header", nextDisplayMode.equals("current") ? "Current Investments" : "Historical Investments");
 			model.addAttribute("investmentsData", nextDisplayMode.equals("current") ? uiModelBuilderService.createCurrentInvestmentsTemplateData() : uiModelBuilderService.createPriorInvestmentsTemplateData());
+			model.addAttribute("investments", null);
 		} catch (Exception e) {
 			log.error("Switch Investments Page Generation Exception {}", e.getMessage(), e);
 		}
@@ -53,6 +55,7 @@ public class InvestmentsTemplate {
 				.fragment("fragments/Common :: InvestmentHeader")
 				.fragment("fragments/Investment :: InvestmentTable")
 				.fragment("fragments/Investment :: InvestmentChart")
+				.fragment("fragments/Investment :: InvestmentList")
 				.build();
 	}
 

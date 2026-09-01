@@ -46,7 +46,7 @@
             <div class="ui center aligned huge header"><span th:text="${header}">Current Investments</span> <a
                     th:href="|@{/Investments}?nextDisplayMode=${nextDisplayMode}|"
                     th:attr="hx-get=|@{/Investments}?nextDisplayMode=${nextDisplayMode}|,data-tooltip=|Switch to ${nextDisplayMode}|"
-                    hx-select-oob="#InvestmentTable, #InvestmentHeader, #InvestmentChart"
+                    hx-select-oob="#InvestmentTable, #InvestmentHeader, #InvestmentChart, #InvestmentList"
                     hx-swap="outerHTML"><i class="exchange alternate icon"></i></a>
             </div>
         </div>
