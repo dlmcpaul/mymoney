@@ -19,7 +19,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-public class SearchesController {
+public class SearchController {
 	private final ModelBuilderService uiModelBuilderService;
 	private final PrefillLogicService uiLogicService;
 
