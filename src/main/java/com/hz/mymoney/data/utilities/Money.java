@@ -7,7 +7,7 @@ import java.util.Locale;
 
 public final class Money {
 	// Hard coded to AU for the moment.  How to support other symbols?
-	public static final String MONEY_SYMBOL = NumberFormat.getCurrencyInstance(Locale.of("en", "au")).getCurrency().getSymbol();;
+	public static final String MONEY_SYMBOL = NumberFormat.getCurrencyInstance(Locale.of("en", "au")).getCurrency().getSymbol();
 
 	private Money() {}
 

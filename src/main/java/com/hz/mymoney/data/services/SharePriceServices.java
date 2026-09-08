@@ -89,7 +89,9 @@ public class SharePriceServices implements ApplicationRunner {
 		switch (commodityOption) {
 			case "internal" -> {
 				// Don't reload test data
-				if (investmentHistory == null || investmentHistory.commodityMap().isEmpty()) { loadCommoditiesFromArgs(); };
+				if (investmentHistory == null || investmentHistory.commodityMap().isEmpty()) {
+					loadCommoditiesFromArgs();
+				}
 			}
 			case "commodities" -> loadCommoditiesFromArgs();
 			case "quicken" -> loadCommoditiesFromQuickenFile();
