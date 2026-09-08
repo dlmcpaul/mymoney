@@ -11,6 +11,10 @@ public final class Money {
 
 	private Money() {}
 
+	public static boolean isMoney(String value) {
+		return value.startsWith(Money.MONEY_SYMBOL);
+	}
+
 	public static BigDecimal parseMoney(String amount, int scale) {
 		if (amount.startsWith(" ") || amount.endsWith(" ")) {
 			return parseMoney(amount.trim(), scale);

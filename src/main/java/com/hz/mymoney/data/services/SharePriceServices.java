@@ -185,7 +185,7 @@ public class SharePriceServices implements ApplicationRunner {
 	}
 
 	private BigDecimal parseBigDecimal(String value) {
-		if (value.startsWith(Money.MONEY_SYMBOL)) {
+		if (Money.isMoney(value)) {
 			return Money.parseMoney(value, 2);
 		}
 		return new BigDecimal(value);
