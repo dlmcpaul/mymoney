@@ -46,7 +46,7 @@ public class HomeTemplate {
 		return "index";
 	}
 
-	@GetMapping("/showScheduleModal")
+	@GetMapping("/schedule-modal")
 	@HxRequest
 	public View showScheduleModal(Model model, @RequestParam String scheduleDescription, HtmxResponse htmxResponse) {
 		try {

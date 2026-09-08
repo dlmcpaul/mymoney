@@ -86,7 +86,7 @@
 
 <button th:fragment="ScheduleButton (description, colour)" class="mini ui compact icon " th:classappend="${colour} != '' ? ${colour} + ' button' : 'button'" data-tooltip="Post or Skip"
         data-inverted=""
-        th:attr="hx-get=|@{/showScheduleModal}?scheduleDescription=${#uris.escapeQueryParam(description)}|"
+        th:attr="hx-get=|@{/schedule-modal}?scheduleDescription=${#uris.escapeQueryParam(description)}|"
         hx-swap="none" hx-trigger="click" hx-select-oob="#scheduleModal">
     <i class="balance scale icon"></i>
 </button>
