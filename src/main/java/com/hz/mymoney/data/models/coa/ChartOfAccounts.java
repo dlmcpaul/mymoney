@@ -47,17 +47,22 @@ public class ChartOfAccounts {
 		return Optional.empty();
 	}
 
+	private boolean isOneOf(String accountType, String accountName) {
+		return Arrays.stream(accountType.toLowerCase().split(",")).anyMatch(acc -> accountName.toLowerCase().startsWith(acc));
+	}
+
 	public SortedSet<Account> getZeroBalanceAccountsOfType(String accountType) {
 		return this.accounts.stream()
-				.filter(account -> account.getName().toLowerCase().startsWith(accountType.toLowerCase()))
+				.filter(account -> isOneOf(accountType, account.getName()))
 				.filter(account -> account.getTotalAmount().compareTo(BigDecimal.ZERO) == 0)
 				.collect(Collectors.toCollection(TreeSet::new));
 	}
 
 	public SortedSet<Account> getAccountsOfType(String accountType, boolean filterZeroAmounts) {
 		SortedSet<Account> typedAccounts = new TreeSet<>();
+
 		for (Account account : this.accounts) {
-			if (account.getName().toLowerCase().startsWith(accountType.toLowerCase())) {
+			if (isOneOf(accountType, account.getName())) {
 				if (filterZeroAmounts) {
 					if (account.getTotalAmount().compareTo(BigDecimal.ZERO) != 0) {
 						typedAccounts.add(account);

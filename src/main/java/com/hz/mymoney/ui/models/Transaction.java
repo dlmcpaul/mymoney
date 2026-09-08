@@ -1,5 +1,7 @@
 package com.hz.mymoney.ui.models;
 
+import com.hz.mymoney.data.models.coa.Movement;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -11,6 +13,16 @@ public record Transaction (
 	String sourceAccount,
 	boolean isShares,
 	BigDecimal sharePrice) {
+
+	public Transaction(Movement movement, String destinationAccount, boolean isShares) {
+		this(   movement.date(),
+				movement.getNote(),
+				isShares ? movement.amount() : movement.getValue(),
+				destinationAccount,
+				movement.sourceAccount(),
+				isShares,
+				movement.price());
+	}
 
 	public BigDecimal debitAmount() {
 		if (isDebit()) {
