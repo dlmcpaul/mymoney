@@ -16,7 +16,7 @@ public class SuperTemplate {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/Super")
+	@GetMapping("/super")
 	public String accounts(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());

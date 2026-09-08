@@ -65,7 +65,7 @@
 
 <td th:fragment="InvestmentLink (code, hasNote, note)" th:attr="data-tooltip = ${hasNote} ? ${note} : _">
     <a th:href="|@{/Investments/List}?code=${code}|"
-       th:attr="hx-get=|@{/Investments/List}?code=${code}|" hx-target="#InvestmentList"
+       th:attr="hx-get=|@{/investments/list}?code=${code}|" hx-target="#InvestmentList"
        hx-swap="outerHTML"
        th:text="${code}"></a>
 </td>

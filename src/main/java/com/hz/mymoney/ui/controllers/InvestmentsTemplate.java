@@ -16,7 +16,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.FragmentsRendering;
 
 @Controller
-@RequestMapping("/Investments")
+@RequestMapping("/investments")
 @RequiredArgsConstructor
 @Log4j2
 public class InvestmentsTemplate {
@@ -59,7 +59,7 @@ public class InvestmentsTemplate {
 				.build();
 	}
 
-	@GetMapping("/List")
+	@GetMapping("/list")
 	@HxRequest
 	public View investmentList(Model model, @RequestParam("code") String code) {
 		try {

@@ -16,7 +16,7 @@ public class EquityTemplate {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/Equity")
+	@GetMapping("/equity")
 	public String accounts(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());

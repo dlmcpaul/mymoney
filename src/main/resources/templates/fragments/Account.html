@@ -49,7 +49,7 @@
         <div th:if="${stats.first or account.category != accountList[stats.index-1].category}"
              class="ui horizontal mini fitted divider"
              th:text="${account.category}"></div>
-        <a th:href="|@{/Accounts/}${#uris.escapePathSegment(account.fullName)}| + (${#strings.isEmpty(fy)} ? '' : '?fy=' + ${fy})"
+        <a th:href="|@{/accounts/}${#uris.escapePathSegment(account.fullName)}| + (${#strings.isEmpty(fy)} ? '' : '?fy=' + ${fy})"
            class="item" th:attr="data-tooltip = ${account.hasNote()} ? ${account.note} : _">
             <div class="ui grid">
                 <div class="left aligned attached eight wide column">

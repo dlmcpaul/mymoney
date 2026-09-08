@@ -20,7 +20,7 @@ import org.springframework.web.servlet.view.FragmentsRendering;
 import java.time.LocalDate;
 
 @Controller
-@RequestMapping("/Accounts")
+@RequestMapping("/accounts")
 @RequiredArgsConstructor
 @Log4j2
 public class AccountsTemplate {
@@ -56,15 +56,19 @@ public class AccountsTemplate {
 	@HxRequest
 	public View changeFinancialYear(Model model, @RequestParam LocalDate currentFY, @RequestParam String direction) {
 		try {
+			LocalDate fyStart;
+			LocalDate fyEnd;
 			if (direction.equals("prev")) {
-				LocalDate fyStart = currentFY.minusYears(1);
-				model.addAttribute("accounts", uiModelBuilderService.createAccountsTemplateData(fyStart, currentFY.minusDays(1)));
+				fyStart = currentFY.minusYears(1);
+				fyEnd = currentFY.minusDays(1);
 			} else if (direction.equals("next")) {
-				LocalDate fyStart = currentFY.plusYears(1);
-				model.addAttribute("accounts", uiModelBuilderService.createAccountsTemplateData(fyStart, fyStart.plusYears(1).minusDays(1)));
+				fyStart = currentFY.plusYears(1);
+				fyEnd = fyStart.plusYears(1).minusDays(1);
 			} else {
 				throw new UnexpectedDataException("Invalid direction passed only prev or next allowed");
 			}
+			model.addAttribute("accounts", uiModelBuilderService.createAccountsTemplateData(fyStart, fyEnd));
+			model.addAttribute("incomeExpenseHistory", uiModelBuilderService.createIncomeExpenseHistory(fyStart));
 		} catch (Exception e) {
 			log.error("prevFinancialYear Page Generation Exception {}", e.getMessage(), e);
 		}

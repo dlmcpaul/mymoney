@@ -16,7 +16,7 @@ public class RecurringTransactionsTemplate {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/RecurringTransactions")
+	@GetMapping("/recurring-transactions")
 	public String transactions(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());

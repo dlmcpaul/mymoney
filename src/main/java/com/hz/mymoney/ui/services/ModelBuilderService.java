@@ -382,11 +382,10 @@ public class ModelBuilderService {
 		return "";
 	}
 
-	public String createIncomeExpenseHistory() {
+	public String createIncomeExpenseHistory(LocalDate financialYearStart) {
 		// Generate JSON array as String containing IncomeExpenseHistory
 		List<YearlyIncomeExpense> yearlyIncomeExpenseList = new ArrayList<>();
-		ChartOfAccounts chartOfAccounts = dataLoaderService.getCoa();
-		LocalDate financialYearStart = calculateStartOfFinancialYear(LocalDate.now());
+		ChartOfAccounts chartOfAccounts = new ChartOfAccounts(financialYearStart.plusYears(1), dataLoaderService.getCoa());
 
 		int year = financialYearStart.getYear();
 		int yearMin = year - 10;
@@ -397,10 +396,10 @@ public class ModelBuilderService {
 			yearlyIncomeExpenseList.add(new YearlyIncomeExpense("FY" + (year - 2000) + "/" + (year - 1999),
 					sumBalanceForFY(chartOfAccounts, INCOME_PREFIX, financialYearStart),
 					sumBalanceForFY(chartOfAccounts, "Expenses", financialYearStart)
-						.subtract(taxes)
-						.multiply(BigDecimal.valueOf(-1)),
+							.subtract(taxes)
+							.multiply(BigDecimal.valueOf(-1)),
 					taxes.multiply(BigDecimal.valueOf(-1)
-			)));
+					)));
 			year--;
 			chartOfAccounts = new ChartOfAccounts(financialYearStart.minusDays(1), chartOfAccounts);
 			financialYearStart = financialYearStart.minusYears(1);
@@ -409,6 +408,10 @@ public class ModelBuilderService {
 		JsonMapper mapper = JsonMapper.builder()
 				.build();
 		return mapper.writeValueAsString(yearlyIncomeExpenseList.reversed());
+	}
+
+	public String createIncomeExpenseHistory() {
+		return createIncomeExpenseHistory(calculateStartOfFinancialYear(LocalDate.now()));
 	}
 
 	private BigDecimal sumBalanceForFY(ChartOfAccounts chartOfAccounts, String accountType, LocalDate fyStart) {

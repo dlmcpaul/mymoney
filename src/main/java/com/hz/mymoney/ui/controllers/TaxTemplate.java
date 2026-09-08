@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/Tax")
+@RequestMapping("/tax")
 @RequiredArgsConstructor
 @Log4j2
 public class TaxTemplate {
@@ -45,7 +45,7 @@ public class TaxTemplate {
 		return "TaxEstimate";
 	}
 
-	@GetMapping("/Breakdown")
+	@GetMapping("/breakdown")
 	@HxRequest
 	public View breakdown(Model model, @RequestParam("tax_year_code") String taxYearCode, @RequestParam("breakdown_code") String breakdownType) {
 		try {

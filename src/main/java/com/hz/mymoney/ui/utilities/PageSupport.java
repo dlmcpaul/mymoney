@@ -9,14 +9,14 @@ import java.util.List;
 
 public final class PageSupport {
 	private static final List<Menu> menuList = List.of(new Menu("Home","","Dashboard"),
-			new Menu("Accounts","Accounts","Accounts"),
-			new Menu("Equity","Equity","Equity"),
-			new Menu("Investments","Investments","Investments"),
-			new Menu("NetWorth","NetWorth","Net Worth"),
-			new Menu("Superannuation","Super","Superannuation"),
-			new Menu("Recurring","RecurringTransactions","Recurring"),
-			new Menu("Tax","Tax","Taxation"),
-			new Menu("Trends","Trends","Trends")
+			new Menu("Accounts","accounts","Accounts"),
+			new Menu("Equity","equity","Equity"),
+			new Menu("Investments","investments","Investments"),
+			new Menu("NetWorth","net-worth","Net Worth"),
+			new Menu("Superannuation","super","Superannuation"),
+			new Menu("Recurring","recurring-transactions","Recurring"),
+			new Menu("Tax","tax","Taxation"),
+			new Menu("Trends","trends","Trends")
 	);
 
 	private static final String MONTHLY_INCOME_EXPENSE_FIELD = "monthlyChange";

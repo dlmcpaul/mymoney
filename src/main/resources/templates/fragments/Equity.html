@@ -11,7 +11,7 @@
             <div class="content">
                 <div class="ui small breadcrumb" th:with="breadcrums=${account.breadcrumb(accountFilter)}">
                     <th:block th:unless="${breadcrums.isEmpty()}" th:each="crumb, cstat : ${breadcrums}">
-                        <a th:attr="class=${cstat.last} ? 'active section' : 'section'" th:text="${crumb}" th:href="|@{/Accounts/}${#uris.escapePathSegment(account.fullName())}|">Home</a>
+                        <a th:attr="class=${cstat.last} ? 'active section' : 'section'" th:text="${crumb}" th:href="|@{/accounts/}${#uris.escapePathSegment(account.fullName())}|">Home</a>
                         <div th:unless="${cstat.last} or ${cstat.first}" class="divider"> / </div>
                     </th:block>
                 </div>

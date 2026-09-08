@@ -43,8 +43,8 @@
 </div>
 
 <div th:fragment="BreakdownLink (breakdown_code, tax_year_code, amount)" class="right aligned three wide column"><a
-        th:href="|@{/Tax/Breakdown}?breakdown_code=${breakdown_code}&tax_year_code=${tax_year_code}|"
-        th:attr="hx-get=|@{/Tax/Breakdown}?breakdown_code=${breakdown_code}&tax_year_code=${tax_year_code}|" hx-target="#TaxBreakdown"
+        th:href="|@{/tax/breakdown}?breakdown_code=${breakdown_code}&tax_year_code=${tax_year_code}|"
+        th:attr="hx-get=|@{/tax/breakdown}?breakdown_code=${breakdown_code}&tax_year_code=${tax_year_code}|" hx-target="#TaxBreakdown"
         hx-swap="outerHTML"
         th:text="${#numbers.formatCurrency(amount)}"></a>
 </div>

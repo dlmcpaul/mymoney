@@ -16,7 +16,7 @@ public class NetWorthTemplate {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/NetWorth")
+	@GetMapping("/net-worth")
 	public String netWorth(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());

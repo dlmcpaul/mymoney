@@ -20,7 +20,7 @@ public class TrendsTemplate {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/Trends")
+	@GetMapping("/trends")
 	public String accounts(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
