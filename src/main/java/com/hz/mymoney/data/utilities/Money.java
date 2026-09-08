@@ -1,47 +1,37 @@
 package com.hz.mymoney.data.utilities;
 
-import com.hz.mymoney.exceptions.ValidationException;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Locale;
 
 public final class Money {
-	public static final String MONEY_SYMBOL = "$";
-	private static final NumberFormat currency = NumberFormat.getCurrencyInstance(Locale.of("en", "au"));
+	// Hard coded to AU for the moment.  How to support other symbols?
+	public static final String MONEY_SYMBOL = NumberFormat.getCurrencyInstance(Locale.of("en", "au")).getCurrency().getSymbol();;
 
 	private Money() {}
 
 	public static BigDecimal parseMoney(String amount, int scale) {
-		if (amount.contains(MONEY_SYMBOL + "-") || amount.contains("-" + MONEY_SYMBOL)) {
+		if (amount.startsWith(" ") || amount.endsWith(" ")) {
+			return parseMoney(amount.trim(), scale);
+		} else if (amount.startsWith(MONEY_SYMBOL + "-") || amount.startsWith("-" + MONEY_SYMBOL)) {
 			// special case 1
-			return parseMoney(MONEY_SYMBOL + amount.substring(2), scale).multiply(BigDecimal.valueOf(-1));
-		} else if (amount.contains(MONEY_SYMBOL + " -")) {
+			return parseMoney(amount.substring(2), scale).multiply(BigDecimal.valueOf(-1));
+		} else if (amount.startsWith(MONEY_SYMBOL + " -")) {
 			// special case 2
-			return parseMoney(MONEY_SYMBOL + amount.substring(3), scale).multiply(BigDecimal.valueOf(-1));
+			return parseMoney(amount.substring(3), scale).multiply(BigDecimal.valueOf(-1));
 		} else if (amount.contains(".") == false) {
 			// special case 3
 			return parseMoney(amount + ".00", scale);
 		} else if (amount.startsWith(MONEY_SYMBOL + " ")) {
 			// special case 4
-			return parseMoney(MONEY_SYMBOL + amount.substring(2), scale);
-		} else if (amount.startsWith(MONEY_SYMBOL) == false) {
+			return parseMoney(amount.substring(2), scale);
+		} else if (amount.startsWith(MONEY_SYMBOL)) {
 			// special case 5
-			return parseMoney(MONEY_SYMBOL + amount, scale);
+			return parseMoney(amount.substring(1), scale);
 		}
 
-		try {
-			if (currency instanceof DecimalFormat decimal) {
-				decimal.setParseBigDecimal(true);
-				return ((BigDecimal) decimal.parse(amount)).setScale(scale, RoundingMode.HALF_UP);
-			}
-		} catch (ParseException e) {
-			throw new ValidationException("Could not parse money: " + amount, e);
-		}
-		return BigDecimal.ZERO;
+		return new BigDecimal(amount).setScale(scale, RoundingMode.HALF_UP);
 	}
 
 }

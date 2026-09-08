@@ -7,8 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public final class Dates {
-	private static final String DATE_FORMAT_1 = "yyyy/MM/dd";
-	private static final String DATE_FORMAT_2 = "yyyy-MM-dd";
+	private static final String DATE_FORMAT_1 = "yyyy/M/d";
+	private static final String DATE_FORMAT_2 = "yyyy-M-d";
 	private static final String QUICKEN_DATE_FORMAT = "d/M/yy";
 	private static final char ZERO = '0';
 
@@ -39,6 +39,7 @@ public final class Dates {
 
 	public static LocalDate parseDate(String dateString) {
 		try {
+			// Dates formatted to 10 characters delimted by - or / can be fast parsed
 			if (dateString.length() == 10 && (dateString.charAt(4) == '-' || dateString.charAt(4) == '/') && (dateString.charAt(7) == '-' || dateString.charAt(7) == '/')) {
 				return fastParseDate(dateString);
 			}
