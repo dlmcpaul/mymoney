@@ -5,7 +5,7 @@ import com.hz.mymoney.ui.models.RunningTotaler;
 import com.hz.mymoney.ui.models.Transaction;
 import com.hz.mymoney.ui.models.templates.TaxTemplateData;
 import com.hz.mymoney.ui.models.templates.TaxYear;
-import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.util.List;
 @Log4j2
 public class TaxTemplate {
 	private final ReleaseInfoContributor release;
-	private final UiModelBuilderService uiModelBuilderService;
+	private final ModelBuilderService uiModelBuilderService;
 
 	private TaxTemplateData taxTemplateData;
 

@@ -3,7 +3,7 @@ package com.hz.mymoney.ui.controllers;
 import com.hz.mymoney.components.ReleaseInfoContributor;
 import com.hz.mymoney.exceptions.UnexpectedDataException;
 import com.hz.mymoney.ui.models.RunningTotaler;
-import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.time.LocalDate;
 @Log4j2
 public class AccountsTemplate {
 	private final ReleaseInfoContributor release;
-	private final UiModelBuilderService uiModelBuilderService;
+	private final ModelBuilderService uiModelBuilderService;
 
 	@GetMapping
 	public String accounts(Model model) {

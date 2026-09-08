@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class UILogicService {
+public class PrefillLogicService {
 	private final LedgerServices dataLoaderService;
 
 	public record JournalResult(String description, String debitAccount, String creditAccount) {}

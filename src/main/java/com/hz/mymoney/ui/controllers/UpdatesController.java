@@ -7,8 +7,8 @@ import com.hz.mymoney.ui.models.Toast;
 import com.hz.mymoney.ui.models.inputs.BasicJournalInput;
 import com.hz.mymoney.ui.models.inputs.DistributionTypeInput;
 import com.hz.mymoney.ui.models.inputs.DividendJournalInput;
-import com.hz.mymoney.ui.services.UIDataUpdateService;
-import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.services.FileUpdateService;
+import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
@@ -31,8 +31,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log4j2
 public class UpdatesController {
-	private final UiModelBuilderService uiModelBuilderService;
-	private final UIDataUpdateService uiDataUpdateService;
+	private final ModelBuilderService uiModelBuilderService;
+	private final FileUpdateService uiDataUpdateService;
 
 	@PostMapping("/scheduleSkip")
 	@HxRequest

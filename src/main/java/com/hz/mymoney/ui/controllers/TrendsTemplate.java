@@ -1,7 +1,7 @@
 package com.hz.mymoney.ui.controllers;
 
 import com.hz.mymoney.components.ReleaseInfoContributor;
-import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.web.servlet.view.FragmentsRendering;
 @Log4j2
 public class TrendsTemplate {
 	private final ReleaseInfoContributor release;
-	private final UiModelBuilderService uiModelBuilderService;
+	private final ModelBuilderService uiModelBuilderService;
 
 	@GetMapping("/Trends")
 	public String accounts(Model model) {

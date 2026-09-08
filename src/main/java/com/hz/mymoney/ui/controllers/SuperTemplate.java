@@ -1,7 +1,7 @@
 package com.hz.mymoney.ui.controllers;
 
 import com.hz.mymoney.components.ReleaseInfoContributor;
-import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Log4j2
 public class SuperTemplate {
 	private final ReleaseInfoContributor release;
-	private final UiModelBuilderService uiModelBuilderService;
+	private final ModelBuilderService uiModelBuilderService;
 
 	@GetMapping("/Super")
 	public String accounts(Model model) {

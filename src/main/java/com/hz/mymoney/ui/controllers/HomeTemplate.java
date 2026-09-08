@@ -3,7 +3,7 @@ package com.hz.mymoney.ui.controllers;
 import com.hz.mymoney.components.ReleaseInfoContributor;
 import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.ui.models.Toast;
-import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
@@ -27,7 +27,7 @@ import java.util.Optional;
 @Log4j2
 public class HomeTemplate {
 	private final ReleaseInfoContributor release;
-	private final UiModelBuilderService uiModelBuilderService;
+	private final ModelBuilderService uiModelBuilderService;
 
 	// Load initial page
 	@GetMapping("/")

@@ -1,7 +1,7 @@
 package com.hz.mymoney.ui.utilities;
 
 import com.hz.mymoney.ui.models.support.Menu;
-import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.services.ModelBuilderService;
 import org.springframework.ui.Model;
 
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ public final class PageSupport {
 
 	private PageSupport() {}
 
-	public static void populateDefaultPageModelData(Model model, UiModelBuilderService uiModelBuilderService) {
+	public static void populateDefaultPageModelData(Model model, ModelBuilderService uiModelBuilderService) {
 		LocalDate pnlDate = LocalDate.now().withDayOfMonth(1);
 
 		model.addAttribute("readOnlyLedger", uiModelBuilderService.isLedgerReadOnly());
@@ -32,15 +32,15 @@ public final class PageSupport {
 		populateMonthlyIncomeExpense(model, uiModelBuilderService, pnlDate);
 	}
 
-	public static void populateCurrentPosition(Model model, UiModelBuilderService uiModelBuilderService) {
+	public static void populateCurrentPosition(Model model, ModelBuilderService uiModelBuilderService) {
 		model.addAttribute("currentPosition", uiModelBuilderService.createCurrentPosition());
 	}
 
-	public static void populateScheduledTransactions(Model model, UiModelBuilderService uiModelBuilderService) {
+	public static void populateScheduledTransactions(Model model, ModelBuilderService uiModelBuilderService) {
 		model.addAttribute("scheduledTransactions", uiModelBuilderService.getScheduledTransactions());
 	}
 
-	public static void populateMonthlyIncomeExpense(Model model, UiModelBuilderService uiModelBuilderService, LocalDate pnlDate) {
+	public static void populateMonthlyIncomeExpense(Model model, ModelBuilderService uiModelBuilderService, LocalDate pnlDate) {
 		model.addAttribute("pnlDate", pnlDate);
 		model.addAttribute(MONTHLY_INCOME_EXPENSE_FIELD, uiModelBuilderService.createMonthlyIncomeExpense(pnlDate));
 	}

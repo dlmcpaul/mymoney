@@ -1,8 +1,8 @@
 package com.hz.mymoney.ui.controllers;
 
 import com.hz.mymoney.configuration.AccountConstants;
-import com.hz.mymoney.ui.services.UILogicService;
-import com.hz.mymoney.ui.services.UiModelBuilderService;
+import com.hz.mymoney.ui.services.ModelBuilderService;
+import com.hz.mymoney.ui.services.PrefillLogicService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,17 +20,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @Log4j2
 public class SearchesController {
-	private final UiModelBuilderService uiModelBuilderService;
-	private final UILogicService uiLogicService;
+	private final ModelBuilderService uiModelBuilderService;
+	private final PrefillLogicService uiLogicService;
 
 	@GetMapping("/descriptionSearch")
 	@HxRequest
 	public View descriptionSearch(Model model, @RequestParam String description, @RequestParam String label, @RequestParam String id) {
-		List<UILogicService.JournalResult> prefillResults = uiLogicService.smartPreFill(description);
-		List<UILogicService.JournalResult> prefillExactResults = uiLogicService.smartPreFillExact(description);
+		List<PrefillLogicService.JournalResult> prefillResults = uiLogicService.smartPreFill(description);
+		List<PrefillLogicService.JournalResult> prefillExactResults = uiLogicService.smartPreFillExact(description);
 		try {
 			List<String> descriptions = prefillResults.stream()
-					.map(UILogicService.JournalResult::description)
+					.map(PrefillLogicService.JournalResult::description)
 					.sorted()
 					.toList();
 			String descriptionValue = descriptions.size() != 1 ? description : descriptions.getFirst();

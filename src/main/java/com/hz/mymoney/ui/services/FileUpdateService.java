@@ -27,7 +27,7 @@ import static com.hz.mymoney.configuration.AccountConstants.*;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class UIDataUpdateService {
+public class FileUpdateService {
 	private final LedgerServices ledgerServices;
 	private final SchedulesServices schedulesServices;
 	private final SharePriceServices sharePriceServices;
