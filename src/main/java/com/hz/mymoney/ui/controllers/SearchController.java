@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.FragmentsRendering;
@@ -17,13 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@RequestMapping("/search")
 @RequiredArgsConstructor
 @Log4j2
 public class SearchController {
 	private final ModelBuilderService uiModelBuilderService;
 	private final PrefillLogicService uiLogicService;
 
-	@GetMapping("/descriptionSearch")
+	@GetMapping("/description")
 	@HxRequest
 	public View descriptionSearch(Model model, @RequestParam String description, @RequestParam String label, @RequestParam String id) {
 		List<PrefillLogicService.JournalResult> prefillResults = uiLogicService.smartPreFill(description);
@@ -69,7 +71,7 @@ public class SearchController {
 				.build();
 	}
 
-	@GetMapping("/investmentsSearch")
+	@GetMapping("/investment")
 	@HxRequest
 	public View investmentSearch(Model model, @RequestParam(name = "accounts") String searchValue, @RequestParam String id, @RequestParam String label) {
 		try {
@@ -92,26 +94,29 @@ public class SearchController {
 				.build();
 	}
 
-	@GetMapping("/accountSearch")
+	@GetMapping("/account")
 	@HxRequest
 	public View accountSearch(Model model, @RequestParam(name = "accounts") String searchValue, @RequestParam String id, @RequestParam String label) {
 		try {
 			boolean showError = false;
+			List<String> predictedAccounts = new ArrayList<>();
 
-			searchValue = uiLogicService.smartShortcuts(searchValue);
-			if (searchValue.length() > (searchValue.lastIndexOf(":") + 1) && searchValue.split(":").length == 2) {
-				searchValue = uiLogicService.smartLookahead(searchValue, uiModelBuilderService.searchAccounts(searchValue));
-			}
+			if (searchValue.trim().length() > 0) {
+				searchValue = uiLogicService.smartShortcuts(searchValue);
+				if (searchValue.length() > (searchValue.lastIndexOf(":") + 1) && searchValue.split(":").length == 2) {
+					searchValue = uiLogicService.smartLookahead(searchValue, uiModelBuilderService.searchAccounts(searchValue));
+				}
 
-			List<String> predictedAccounts = uiModelBuilderService.searchAccounts(searchValue);
+				predictedAccounts = uiModelBuilderService.searchAccounts(searchValue);
 
-			if (predictedAccounts.size() == 1) {
-				searchValue = uiModelBuilderService.searchAccounts(searchValue).getFirst();
-				predictedAccounts = new ArrayList<>();
-			} else if (predictedAccounts.size() > 20) {
-				predictedAccounts = predictedAccounts.subList(0, 20);
-			} else {
-				showError = predictedAccounts.isEmpty();
+				if (predictedAccounts.size() == 1) {
+					searchValue = uiModelBuilderService.searchAccounts(searchValue).getFirst();
+					predictedAccounts = new ArrayList<>();
+				} else if (predictedAccounts.size() > 20) {
+					predictedAccounts = predictedAccounts.subList(0, 20);
+				} else {
+					showError = predictedAccounts.isEmpty();
+				}
 			}
 
 			model.addAttribute("id", id);

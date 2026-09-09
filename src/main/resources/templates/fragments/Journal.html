@@ -4,7 +4,7 @@
 
 <div th:fragment="InvestmentAccountInput (id, label, value)" class="ui input right icon">
     <input th:id="|${id}-input|" name="accounts" placeholder="Code"
-           th:attr="hx-get=|@{/investmentsSearch}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
+           th:attr="hx-get=|@{/search/investment}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
            th:value="${value}"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
            hx-swap="morph:outerHTML focus-scroll:true" type="search"
@@ -14,7 +14,7 @@
 
 <div th:fragment="StandardAccountInput (id, label, value)" class="ui input right icon">
     <input th:id="|${id}-input|" name="accounts" placeholder="Account"
-           th:attr="hx-get=|@{/accountSearch}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
+           th:attr="hx-get=|@{/search/account}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
            th:value="${value}"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
            hx-swap="morph:outerHTML focus-scroll:true" type="search"
@@ -46,7 +46,7 @@
     <label th:for="|${id}-input|" for="desc-id" th:text="${label}">Why</label>
     <div class="ui input right icon">
         <input id="desc-id" th:id="|${id}-input|" name="description" placeholder="Description"
-               th:attr="hx-get=|@{/descriptionSearch}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
+               th:attr="hx-get=|@{/search/description}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
                hx-select-oob="#from-account,#to-account"
                hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
                hx-swap="morph:outerHTML focus-scroll:true"

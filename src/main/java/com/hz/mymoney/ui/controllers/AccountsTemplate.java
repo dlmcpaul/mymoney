@@ -52,7 +52,7 @@ public class AccountsTemplate {
 		return "SingleAccount";
 	}
 
-	@GetMapping("/changeFY")
+	@GetMapping("/financial-year")
 	@HxRequest
 	public View changeFinancialYear(Model model, @RequestParam LocalDate currentFY, @RequestParam String direction) {
 		try {

@@ -57,13 +57,13 @@
     <div class="row">
         <div class="column">
             <div class="ui center aligned huge header">All Open Accounts for Financial Year
-                <a class="header" data-tooltip="Previous Financial Year" th:with="url=|@{/accounts/changeFY}?currentFY=${accounts.financialYear}&direction=prev|"
+                <a class="header" data-tooltip="Previous Financial Year" th:with="url=|@{/accounts/financial-year}?currentFY=${accounts.financialYear}&direction=prev|"
                    th:href="${url}"
                    th:attr="hx-get=${url}"
                    hx-select-oob="#AccountsHeader,#AccountsBody"
                    hx-swap="outerHTML"><i class="angle left icon"></i></a>
                 <span data-th-text="${accounts.financialPeriod()}"></span>
-                <a class="header" data-tooltip="Next Financial Year" th:with="url=|@{/accounts/changeFY}?currentFY=${accounts.financialYear}&direction=next|"
+                <a class="header" data-tooltip="Next Financial Year" th:with="url=|@{/accounts/financial-year}?currentFY=${accounts.financialYear}&direction=next|"
                    th:href="${url}"
                    th:attr="hx-get=${url}"
                    hx-select-oob="#AccountsHeader,#AccountsBody"
