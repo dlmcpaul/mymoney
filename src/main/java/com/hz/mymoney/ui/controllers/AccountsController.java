@@ -23,7 +23,7 @@ import java.time.LocalDate;
 @RequestMapping("/accounts")
 @RequiredArgsConstructor
 @Log4j2
-public class AccountsTemplate {
+public class AccountsController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 

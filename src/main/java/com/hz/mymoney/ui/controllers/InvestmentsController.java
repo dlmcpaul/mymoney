@@ -19,7 +19,7 @@ import org.springframework.web.servlet.view.FragmentsRendering;
 @RequestMapping("/investments")
 @RequiredArgsConstructor
 @Log4j2
-public class InvestmentsTemplate {
+public class InvestmentsController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 	private final FileUpdateService uiDataUpdateService;

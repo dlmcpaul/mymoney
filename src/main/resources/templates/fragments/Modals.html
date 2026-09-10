@@ -20,11 +20,11 @@
     </div>
     <div class="actions" th:unless="${schedule} eq null">
             <div class="ui green approve button"
-                 th:attr="hx-post=|@{/schedulePost}?scheduleDescription=${#uris.escapeQueryParam(schedule.ledgerEntry.description)}|"
+                 th:attr="hx-post=|@{/schedule/post}?scheduleDescription=${#uris.escapeQueryParam(schedule.ledgerEntry.description)}|"
                  hx-swap="none" hx-swap-oob="true" hx-select-oob="#ScheduleList,#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
                  hx-trigger="click">Accept&nbsp;</div>
             <div class="ui blue approve button"
-                 th:attr="hx-post=|@{/scheduleSkip}?scheduleDescription=${#uris.escapeQueryParam(schedule.ledgerEntry.description)}|"
+                 th:attr="hx-post=|@{/schedule/skip}?scheduleDescription=${#uris.escapeQueryParam(schedule.ledgerEntry.description)}|"
                  hx-swap="none" hx-swap-oob="true" hx-select-oob="#ScheduleList"
                  hx-trigger="click">&nbsp;Skip&nbsp;</div>
             <div class="ui negative cancel button">Cancel</div>

@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-public class SuperTemplate {
+public class EquityController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/super")
+	@GetMapping("/equity")
 	public String accounts(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
-			model.addAttribute("accounts", uiModelBuilderService.createSuperTemplateData());
+			model.addAttribute("accounts", uiModelBuilderService.createEquityTemplateData());
 		} catch (Exception e) {
-			log.error("Super Page Generation Exception {}", e.getMessage(), e);
+			log.error("Equity Page Generation Exception {}", e.getMessage(), e);
 		}
-		return "Superannuation";
+		return "Equity";
 	}
 }

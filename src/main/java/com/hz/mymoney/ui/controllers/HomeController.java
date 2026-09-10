@@ -3,6 +3,7 @@ package com.hz.mymoney.ui.controllers;
 import com.hz.mymoney.components.ReleaseInfoContributor;
 import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.ui.models.Toast;
+import com.hz.mymoney.ui.services.FileUpdateService;
 import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
@@ -13,8 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.FragmentsRendering;
 
@@ -22,12 +23,12 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Controller
-@SessionAttributes("profitLossMonth")
 @RequiredArgsConstructor
 @Log4j2
-public class HomeTemplate {
+public class HomeController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
+	private final FileUpdateService uiDataUpdateService;
 
 	// Load initial page
 	@GetMapping("/")
@@ -79,12 +80,51 @@ public class HomeTemplate {
 				.build();
 	}
 
-	@GetMapping("/distributionButtonClick")
+	// Save the ledger and schedules
+	@PostMapping("/ledger")
 	@HxRequest
-	public View distributionButtonsClick(Model model, @RequestParam String button) {
-		model.addAttribute("activeButton", button);
+	public View saveData(HtmxResponse htmxResponse) {
+		try {
+			uiDataUpdateService.saveData();
+			htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "All Data Saved Successfully" ));
+		} catch (Exception e) {
+			log.error("Save Ledger Exception {}", e.getMessage(), e);
+			htmxResponse.addTrigger("showMessage", new Toast("error", "Failed", "Failed to Save All Data - Files may be corrupt" ));
+		}
 		return FragmentsRendering
-				.fragment("fragments/Journal :: DistributionButtons")
+				.fragment("fragments/Common :: SaveButton")
 				.build();
 	}
+
+	@PostMapping("/reload")
+	@HxRequest
+	public View reload(Model model,
+	                   HtmxResponse htmxResponse) {
+
+		try {
+			uiDataUpdateService.reloadFiles();
+
+			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
+			model.addAttribute("today", LocalDate.now());
+
+			if (uiModelBuilderService.isLedgerReadOnly()) {
+				htmxResponse.addTrigger("showMessage", new Toast("error", "Error", "Failed to load Ledger.  See log for errors"));
+			} else {
+				htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "Files Reloaded Successfully"));
+			}
+		} catch (Exception e) {
+			log.error("Reload All Files Exception {}", e.getMessage(), e);
+			htmxResponse.addTrigger("showMessage", new Toast("error", "Error", "Reload All Files failed"));
+		}
+		return FragmentsRendering
+				.fragment("fragments/Common :: RefreshButton")
+				.fragment("fragments/Common :: DashboardHeader")
+				.fragment("fragments/Account :: BalanceSheet")
+				.fragment("fragments/Schedules :: ScheduleList (schedules=${scheduledTransactions})")
+				.fragment("fragments/Journal :: JournalForms (entryDate=${today})")
+				.fragment("fragments/IncomeExpense :: IncomeExpenseHeader")
+				.fragment("fragments/IncomeExpense :: IncomeExpenseBody")
+				.build();
+	}
+
 }

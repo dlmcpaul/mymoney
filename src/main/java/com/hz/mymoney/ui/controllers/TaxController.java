@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping("/tax")
 @RequiredArgsConstructor
 @Log4j2
-public class TaxTemplate {
+public class TaxController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 

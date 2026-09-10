@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-public class NetWorthTemplate {
+public class SuperController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/net-worth")
-	public String netWorth(Model model) {
+	@GetMapping("/super")
+	public String accounts(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
-			model.addAttribute("netWorth", uiModelBuilderService.createNetWorthTemplateData());
+			model.addAttribute("accounts", uiModelBuilderService.createSuperTemplateData());
 		} catch (Exception e) {
-			log.error("index Page Generation Exception {}", e.getMessage(), e);
+			log.error("Super Page Generation Exception {}", e.getMessage(), e);
 		}
-		return "NetWorth";
+		return "Superannuation";
 	}
 }

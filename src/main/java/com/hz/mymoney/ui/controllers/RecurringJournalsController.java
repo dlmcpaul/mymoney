@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-public class EquityTemplate {
+public class RecurringJournalsController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/equity")
-	public String accounts(Model model) {
+	@GetMapping("/recurring-transactions")
+	public String transactions(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
-			model.addAttribute("accounts", uiModelBuilderService.createEquityTemplateData());
+			model.addAttribute("schedules", uiModelBuilderService.getScheduledTransactions());
 		} catch (Exception e) {
-			log.error("Equity Page Generation Exception {}", e.getMessage(), e);
+			log.error("RecurringTransactions Page Generation Exception {}", e.getMessage(), e);
 		}
-		return "Equity";
+		return "RecurringTransactions";
 	}
 }

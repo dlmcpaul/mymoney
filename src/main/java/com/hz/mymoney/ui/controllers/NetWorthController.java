@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-public class RecurringTransactionsTemplate {
+public class NetWorthController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/recurring-transactions")
-	public String transactions(Model model) {
+	@GetMapping("/net-worth")
+	public String netWorth(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
-			model.addAttribute("schedules", uiModelBuilderService.getScheduledTransactions());
+			model.addAttribute("netWorth", uiModelBuilderService.createNetWorthTemplateData());
 		} catch (Exception e) {
-			log.error("RecurringTransactions Page Generation Exception {}", e.getMessage(), e);
+			log.error("index Page Generation Exception {}", e.getMessage(), e);
 		}
-		return "RecurringTransactions";
+		return "NetWorth";
 	}
 }
