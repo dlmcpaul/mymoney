@@ -72,7 +72,7 @@ public class HomeController {
 		try {
 			PageSupport.populateMonthlyIncomeExpense(model, uiModelBuilderService, pnlDate);
 		} catch (Exception e) {
-			log.error("Next Month Generation Exception {}", e.getMessage(), e);
+			log.error("Income and Expense Generation Exception {}", e.getMessage(), e);
 		}
 		return FragmentsRendering
 				.fragment("fragments/IncomeExpense :: IncomeExpenseHeader")
@@ -100,7 +100,6 @@ public class HomeController {
 	@HxRequest
 	public View reload(Model model,
 	                   HtmxResponse htmxResponse) {
-
 		try {
 			uiDataUpdateService.reloadFiles();
 
