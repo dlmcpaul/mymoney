@@ -1,5 +1,6 @@
 package com.hz.mymoney.data.utilities;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.ledger.*;
 import lombok.extern.log4j.Log4j2;
 
@@ -7,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,9 +21,10 @@ import java.util.regex.Pattern;
 public class LedgerParser {
 
 	private static final Pattern TWO_SPACES = Pattern.compile(" {2}");
+	private static final Pattern ONE_OR_MORE_SPACES = Pattern.compile("(\\s+)");
 	private static final Pattern LINE_STARTS_WITH_DATE = Pattern.compile("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\s.*");
 
-	private enum LedgerEntryState {
+	public enum LedgerEntryState {
 		COMMENT,
 		EMPTY,
 		UNKNOWN,
@@ -80,42 +81,48 @@ public class LedgerParser {
 	private void readLedgerEntries(Ledger ledger, BufferedReader br, String lastLine) throws IOException {
 		// lastLine should be the start of a ledgerEntry
 		String line = lastLine;
-		LedgerEntry ledgerEntry = null;
-		while (line != null) {
-			switch (scanLine(line)) {
-				case ENTRY_START -> {
-					addLedgerEntry(ledger, ledgerEntry);
-					ledgerEntry = newLedgerEntry(line);
+		try {
+			LedgerEntry ledgerEntry = null;
+			while (line != null) {
+				switch (scanLine(line)) {
+					case ENTRY_START -> {
+						addLedgerEntry(ledger, ledgerEntry);
+						ledgerEntry = newLedgerEntry(line);
+					}
+					case EMPTY -> {}
+					case CASH_POSTING -> {
+						assert ledgerEntry != null : "ledgerEntry is null";
+						addPosting(ledgerEntry, parseCashPosting(line));
+					}
+					case FUND_POSTING -> {
+						assert ledgerEntry != null : "ledgerEntry is null";
+						addPosting(ledgerEntry, parseFundPosting(line));
+					}
+					case SHARE_POSTING -> {
+						assert ledgerEntry != null : "ledgerEntry is null";
+						addPosting(ledgerEntry, parseSharePosting(line));
+					}
+					case SHARE_RESET_POSTING -> {
+						assert ledgerEntry != null : "ledgerEntry is null";
+						addPosting(ledgerEntry, parseShareResetPosting(line));
+					}
+					case REMAINDER_POSTING -> {
+						assert ledgerEntry != null : "ledgerEntry is null";
+						addPosting(ledgerEntry, parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
+					}
+					default -> {
+						ledger.addErrorCount();
+						log.error("Unsupported entry '{}'", line);
+					}
 				}
-				case EMPTY -> {}
-				case CASH_POSTING -> {
-					assert ledgerEntry != null : "ledgerEntry is null";
-					addPosting(ledgerEntry, parseCashPosting(line));
-				}
-				case FUND_POSTING -> {
-					assert ledgerEntry != null : "ledgerEntry is null";
-					addPosting(ledgerEntry, parseFundPosting(line));
-				}
-				case SHARE_POSTING -> {
-					assert ledgerEntry != null : "ledgerEntry is null";
-					addPosting(ledgerEntry, parseSharePosting(line));
-				}
-				case SHARE_RESET_POSTING -> {
-					assert ledgerEntry != null : "ledgerEntry is null";
-					addPosting(ledgerEntry, parseShareResetPosting(line));
-				}
-				case REMAINDER_POSTING -> {
-					assert ledgerEntry != null : "ledgerEntry is null";
-					addPosting(ledgerEntry, parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
-				}
-				default -> {
-					ledger.addErrorCount();
-					log.error("Unsupported entry '{}'", line);
-				}
+				line = br.readLine();
 			}
-			line = br.readLine();
+			addLedgerEntry(ledger, ledgerEntry);
+		} catch (Exception e) {
+			ledger.addErrorCount();
+			log.error("Error Parsing Line {}", line);
+			throw e;
 		}
-		addLedgerEntry(ledger, ledgerEntry);
 	}
 
 	private void addPosting(LedgerEntry ledgerEntry, IPosting posting) {
@@ -133,8 +140,8 @@ public class LedgerParser {
 		}
 	}
 
-	private LedgerEntry newLedgerEntry(String line) {
-		LocalDate date = Dates.parseDate(line.substring(0, line.indexOf(' ')));  // Everything up to first space should be a date
+	public LedgerEntry newLedgerEntry(String line) {
+		LocalDate date = DateParser.parseDate(line.substring(0, line.indexOf(' ')));  // Everything up to first space should be a date
 		String remaining = line.substring(line.indexOf(' ')).trim();
 		String status = null;
 		String description;
@@ -155,56 +162,77 @@ public class LedgerParser {
 		return new LedgerEntry(date, status, description, note, new ArrayList<>());
 	}
 
-	private IPosting parseCashPosting(String line) {
+	public IPosting parseCashPosting(String line) {
 		// Account  Amount [Currency]
 		List<String> tokens = tokenize(line);
 		String account = tokens.getFirst().trim();
 		String amount = tokens.getLast().trim();
+		String currency = "AUD";
 
 		if (amount.isEmpty()) {
 			log.warn("For cash line '{}' amount needs to be calculated", line);
 		}
 
-		return new Posting(account, Money.parseMoney(amount, 2), getNote(line));
+		return new Posting(account, MoneyParser.parseMoney(amount, 2), getNote(line));
 	}
 
-	private IPosting parseRemainderPosting(String line, BigDecimal remainder) {
+	public IPosting parseRemainderPosting(String line, Money remainder) {
 		String account = tokenize(line).getFirst().trim();
 
 		return new Posting(account, remainder, getNote(line));
 	}
 
-	private IPosting parseSharePosting(String line) {
+	public IPosting parseSharePosting(String line) {
 		String account = tokenize(line).getFirst().trim();
 		String amount;
-		String shares;
+		String code;
+		String cost;
+		boolean hasCosting = line.contains("@");
 
-		if (tokenize(line).size() == 3) {
-			// Follows the defined convention of 2 spaces between Account, Amount and Share Name
-			// Account  Amount  Share Name @ Share Price
+		if (tokenize(line).size() == 3 && tokenize(line).get(2).trim().contains("@")) {
+			// Follows the defined convention of 2 spaces between Account, Amount and Share Definition
+			// Account  Amount  code @ Cost currency
 			amount = tokenize(line).get(1).trim();
-			shares = tokenize(line).get(2).trim();
+			String shares = tokenize(line).get(2).trim();
+			code = shares.split(" ")[0];
+			if (shares.split(" ").length > 3) {
+				cost = shares.split(" ")[2] + " " + shares.split(" ")[3];
+			} else {
+				cost = shares.split(" ")[2];
+			}
 		} else {
-			String misformed = tokenize(line).get(1).trim();
-			amount = misformed.split(" ")[0];
-			shares = misformed.substring(amount.length()).trim();
+			String misformed = line.trim().substring(account.length()+1).trim();
+			List<String> tokens = Arrays.stream(ONE_OR_MORE_SPACES.split(misformed))
+					.map(String::trim)
+					.filter(s -> s.isEmpty() == false)
+					.filter(s -> s.equals(MoneyParser.MONEY_SYMBOL) == false)
+					.toList();
+			amount = tokens.getFirst();
+			code = tokens.get(1);
+			if (tokens.size() == 2) {
+				cost = "0.00";
+			} else if (tokens.size() < 5) {
+				cost = tokens.get(3);
+			} else {
+				cost = tokens.get(3) + " " + tokens.get(4);
+			}
 		}
 
-		if (shares.contains("@")) {
-			return new SharePosting(account, Money.parseMoney(amount, 2), Money.parseMoney(shares.split(" ")[2], 6), shares.split(" ")[0], getNote(line));
+		if (hasCosting) {
+			return new SharePosting(account, MoneyParser.parseMoney(amount, 2), MoneyParser.parseMoney(cost, 6), code, getNote(line));
 		}
-		return new SharePosting(account, Money.parseMoney(amount, 2), BigDecimal.ZERO, shares.split(" ")[0], getNote(line));
+		return new SharePosting(account, MoneyParser.parseMoney(amount, 2), Money.ZERO, code, getNote(line));
 	}
 
-	private IPosting parseShareResetPosting(String line) {
+	public IPosting parseShareResetPosting(String line) {
 		String account = tokenize(line).getFirst().trim();
 		String amount = tokenize(line).get(2).trim();
 		String shareCode = tokenize(line).getLast().trim();
 
-		return new SharePosting(account, Money.parseMoney(amount, 2), BigDecimal.ZERO, shareCode, true, getNote(line));
+		return new SharePosting(account, MoneyParser.parseMoney(amount, 2), Money.ZERO, shareCode, true, getNote(line));
 	}
 
-	private IPosting parseFundPosting(String line) {
+	public IPosting parseFundPosting(String line) {
 		String account = tokenize(line).getFirst().trim();
 		String amount = tokenize(line).getLast().trim();
 
@@ -212,10 +240,10 @@ public class LedgerParser {
 			log.warn("For fund line '{}' amount needs to be calculated", line);
 		}
 
-		return new FundPosting(account, Money.parseMoney(amount, 2), getNote(line));
+		return new FundPosting(account, MoneyParser.parseMoney(amount, 2), getNote(line));
 	}
 
-	private LedgerEntryState scanLine(String line) {
+	public LedgerEntryState scanLine(String line) {
 		if (isLedgerEntryStart(line)) {
 			return LedgerEntryState.ENTRY_START;
 		} else if (isCommentLine(line)) {
@@ -286,7 +314,7 @@ public class LedgerParser {
 		return Arrays.stream(TWO_SPACES.split(line))
 				.map(String::trim)
 				.filter(s -> s.isEmpty() == false)
-				.filter(s -> s.equals(Money.MONEY_SYMBOL) == false)
+				.filter(s -> s.equals(MoneyParser.MONEY_SYMBOL) == false)
 				.toList();
 	}
 

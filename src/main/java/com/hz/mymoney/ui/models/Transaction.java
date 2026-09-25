@@ -1,18 +1,18 @@
 package com.hz.mymoney.ui.models;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.Movement;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record Transaction (
 	LocalDate asAt,
 	String description,
-	BigDecimal amount,
+	Money amount,
 	String destinationAccount,
 	String sourceAccount,
 	boolean isShares,
-	BigDecimal sharePrice) {
+	Money sharePrice) {
 
 	public Transaction(Movement movement, String destinationAccount, boolean isShares) {
 		this(   movement.date(),
@@ -24,18 +24,25 @@ public record Transaction (
 				movement.price());
 	}
 
-	public BigDecimal debitAmount() {
-		if (isDebit()) {
-			return amount.abs();
+	private String formattedAmount(Money money) {
+		if (isShares) {
+			return money.getAmount().stripTrailingZeros().toPlainString();
 		}
-		return BigDecimal.ZERO;
+		return money.formatCurrency();
 	}
 
-	public BigDecimal creditAmount() {
+	public String debitAmount() {
 		if (isDebit()) {
-			return BigDecimal.ZERO;
+			return formattedAmount(amount.abs());
 		}
-		return amount.abs();
+		return formattedAmount(Money.ZERO);
+	}
+
+	public String creditAmount() {
+		if (isDebit()) {
+			return formattedAmount(Money.ZERO);
+		}
+		return formattedAmount(amount.abs());
 	}
 
 	public boolean isCredit() {
@@ -43,7 +50,7 @@ public record Transaction (
 	}
 
 	public boolean isDebit() {
-		boolean negative = amount.compareTo(BigDecimal.ZERO) < 0;
+		boolean negative = amount.compareTo(Money.ZERO) < 0;
 
 		return switch (destinationAccount.substring(0,destinationAccount.indexOf(":")).toLowerCase()) {
 			case "assets", "expenses" -> negative == false;

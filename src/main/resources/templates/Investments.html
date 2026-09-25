@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: InvestmentHeader (${nextDisplayMode}, ${header})}, content=~{::main}, menucode='Investments', scripts=~{::script})}"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: InvestmentHeader (${nextDisplayMode}, ${titleText})}, content=~{::main}, menucode='Investments', scripts=~{::script})}"
       lang="en">
 <body>
 <main>
-    <div th:replace="~{fragments/Investment :: InvestmentTable (${investmentsData})}"></div>
+    <div th:replace="~{fragments/Investment :: InvestmentTable (${investmentsData}, ${titleText})}"></div>
     <div class="ui horizontal divider">Investment Details</div>
-    <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${header})}"></div>
+    <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${titleText})}"></div>
     <div th:replace="~{fragments/Investment :: InvestmentList (null, '')}"></div>
 </main>
 <script th:inline="javascript" type="text/javascript">
@@ -94,7 +94,7 @@
             data: {
                 labels: data.map(row => row.name),
                 datasets: [{
-                    data: data.map(row => row.value)
+                    data: data.map(row => row.value.amount)
                 }]
             },
             plugins: [ChartDataLabels],

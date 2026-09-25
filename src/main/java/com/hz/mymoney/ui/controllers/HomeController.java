@@ -120,7 +120,7 @@ public class HomeController {
 				.fragment("fragments/Common :: DashboardHeader")
 				.fragment("fragments/Account :: BalanceSheet")
 				.fragment("fragments/Schedules :: ScheduleList (schedules=${scheduledTransactions})")
-				.fragment("fragments/Journal :: JournalForms (entryDate=${today})")
+				.fragment("fragments/Journal :: JournalTabs (entryDate=${today})")
 				.fragment("fragments/IncomeExpense :: IncomeExpenseHeader")
 				.fragment("fragments/IncomeExpense :: IncomeExpenseBody")
 				.build();

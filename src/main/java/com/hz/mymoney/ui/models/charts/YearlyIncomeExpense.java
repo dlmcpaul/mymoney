@@ -1,17 +1,16 @@
 package com.hz.mymoney.ui.models.charts;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.hz.mymoney.data.models.Money;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
 @JsonPropertyOrder({"financialYear", "income", "expense", "taxes"})
 public class YearlyIncomeExpense {
 	public final String financialYear;
-	public final BigDecimal income;
-	public final BigDecimal expense;
-	public final BigDecimal taxes;
+	public final Money income;
+	public final Money expense;
+	public final Money taxes;
 }

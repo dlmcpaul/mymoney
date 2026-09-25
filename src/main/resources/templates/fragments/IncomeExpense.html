@@ -26,7 +26,7 @@
                 <div class="description">Income</div>
             </div>
             <div class="right attached right aligned column">
-                <div class="description"><span class="ui blue text" data-th-text="${#numbers.formatCurrency(monthlyChange.incoming())}">$0</span></div>
+                <div class="description"><span class="ui blue text" data-th-text="${monthlyChange.incoming().formatCurrency()}">$0</span></div>
             </div>
         </div>
         <div class="row">
@@ -34,7 +34,7 @@
                 <div class="description">Expenses</div>
             </div>
             <div class="right attached right aligned column">
-                <div class="description"><span class="ui red text" data-th-text="${#numbers.formatCurrency(monthlyChange.outgoing())}">$0</span></div>
+                <div class="description"><span class="ui red text" data-th-text="${monthlyChange.outgoing().formatCurrency()}">$0</span></div>
             </div>
         </div>
         <div class="row">
@@ -42,8 +42,8 @@
                 <div class="description">Net</div>
             </div>
             <div class="right attached right aligned column">
-                <div th:if="${monthlyChange.getBalance()} lt 0" class="description"><span><i class="minus icon"></i></span><span class="ui red text" data-th-text="${#numbers.formatCurrency(monthlyChange.getBalance())}">$0</span></div>
-                <div th:if="${monthlyChange.getBalance()} ge 0" class="description"><span><i class="plus icon"></i></span><span class="ui green text" data-th-text="${#numbers.formatCurrency(monthlyChange.getBalance())}">$0</span></div>
+                <div th:if="${monthlyChange.getBalance().amount} lt 0" class="description"><span><i class="minus icon"></i></span><span class="ui red text" data-th-text="${monthlyChange.getBalance().formatCurrency()}">$0</span></div>
+                <div th:if="${monthlyChange.getBalance().amount} ge 0" class="description"><span><i class="plus icon"></i></span><span class="ui green text" data-th-text="${monthlyChange.getBalance().formatCurrency()}">$0</span></div>
             </div>
         </div>
     </div>
@@ -58,7 +58,7 @@
         <tbody>
         <tr th:unless="${monthlyChange.transactions().isEmpty()}" th:each="txn, stats : ${monthlyChange.transactions()}">
             <td data-label="Description" data-th-text="${txn.description()}"></td>
-            <td class="right aligned" data-label="Amount" data-th-text="${#numbers.formatCurrency(txn.amount())}"></td>
+            <td class="right aligned" data-label="Amount" data-th-text="${txn.amount().formatCurrency()}"></td>
         </tr>
         </tbody>
     </table>

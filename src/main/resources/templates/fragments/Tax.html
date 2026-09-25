@@ -15,12 +15,12 @@
     <div class="ui three column compact grid">
         <div class="row">
             <div class="five wide column">Earnings from Salary</div>
-            <div class="right aligned eight wide column">Excluding Super <span class="ui teal text" th:text="${#numbers.formatCurrency(taxYear.getSuperContribAmount())}">$1000</span></div>
+            <div class="right aligned eight wide column">Excluding Super <span class="ui teal text" th:text="${taxYear.getSuperContribAmount().formatCurrency()}">$1000</span></div>
             <div th:replace="~{fragments/Tax :: BreakdownLink ('income', ${yearType}, ${taxYear.getEarnedIncome()})}"></div>
         </div>
         <div class="row">
             <div class="five wide column">Earnings from Investments</div>
-            <div class="right aligned eight wide column">Including Franking Credits <span class="ui teal text" th:text="${#numbers.formatCurrency(taxYear.getImputationCreditAmount())}">$1000</span></div>
+            <div class="right aligned eight wide column">Including Franking Credits <span class="ui teal text" th:text="${taxYear.getImputationCreditAmount().formatCurrency()}">$1000</span></div>
             <div th:replace="~{fragments/Tax :: BreakdownLink ('investment', ${yearType}, ${taxYear.getInvestmentIncomeAmount()})}"></div>
         </div>
     </div>
@@ -46,7 +46,7 @@
         th:href="|@{/tax/breakdown}?breakdown_code=${breakdown_code}&tax_year_code=${tax_year_code}|"
         th:attr="hx-get=|@{/tax/breakdown}?breakdown_code=${breakdown_code}&tax_year_code=${tax_year_code}|" hx-target="#TaxBreakdown"
         hx-swap="outerHTML"
-        th:text="${#numbers.formatCurrency(amount)}"></a>
+        th:text="${amount.formatCurrency()}"></a>
 </div>
 
 </body>

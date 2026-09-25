@@ -12,7 +12,7 @@
                 <div class="right aligned two wide column">
                     <div class="ui labeled input">
                         <label for="amounts" class="ui label">$</label>
-                        <input name="amounts" type="number" step="any" placeholder="100.00" id="amounts" size="6" th:value="${posting.amount}">
+                        <input name="amounts" type="number" step="any" placeholder="100.00" id="amounts" size="6" th:value="${posting.amount.getAmount()}">
                     </div>
                 </div>
             </div>

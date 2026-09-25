@@ -13,7 +13,7 @@
                         <div th:if="${stats.last}" class="active section" th:text="${elem}">T-Shirt</div>
                     </th:block>
                 </div>
-                <p th:text="${singleAccount.description()} + ${#numbers.formatCurrency(singleAccount.balance())} + ' at end of period'"></p>
+                <p th:text="${singleAccount.description()} + ${singleAccount.balance().formatCurrency()} + ' at end of period'"></p>
             </div>
         </div>
         <div class="ui horizontal center aligned divider" th:unless="${singleAccount.fyTransactions.isEmpty()}"

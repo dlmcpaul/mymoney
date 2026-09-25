@@ -2,18 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <body>
 <!--/*@thymesVar id="shareGraphData" type="com.hz.mymoney.ui.models.templates.InvestmentsTemplateData"*/-->
-<table id="InvestmentTable" th:fragment="InvestmentTable (investmentsData)"
-       class="ui unstackable single line small compact celled table">
+<div id="InvestmentTable" th:fragment="InvestmentTable (investmentsData, titleText)" th:with="showCurrent = ${#strings.contains(titleText,'Current')}"
+     class="ui short scrolling fluid container">
+<table class="ui unstackable head stuck single line small compact celled table">
     <thead>
     <tr>
         <th>Investment</th>
         <th class="left aligned">Purchased</th>
-        <th class="right aligned" th:if="${#strings.contains(header,'Current')}">Quantity</th>
-        <th class="right aligned" th:if="${#strings.contains(header,'Current')}">Last Price</th>
+        <th class="right aligned" th:if="${showCurrent}">Quantity</th>
+        <th class="right aligned" th:if="${showCurrent}">Last Price</th>
         <th class="right aligned big-screen-table">Outlay</th>
         <th class="right aligned big-screen-table">Earnings</th>
         <th class="right aligned big-screen-table">Sales</th>
-        <th class="right aligned" th:if="${#strings.contains(header,'Current')}">Market Value</th>
+        <th class="right aligned" th:if="${showCurrent}">Market Value</th>
         <th class="right aligned big-screen-table">Profit/Loss</th>
         <th class="right aligned">Annual Return</th>
     </tr>
@@ -24,46 +25,47 @@
         th:each="investment : ${investmentsData.investmentSummaries}">
         <td th:replace="~{this :: InvestmentLink (${investment.code}, ${investment.hasNote()}, ${investment.note})}"></td>
         <td th:text="${#temporals.format(investment.firstPurchase, 'dd MMM yyyy')}"></td>
-        <td class="right aligned" th:if="${#strings.contains(header,'Current')}" th:text="${investment.quantity()}"></td>
-        <td class="right aligned" th:if="${#strings.contains(header,'Current')}">
-        <span th:text="${#numbers.formatCurrency(investment.lastPrice)}"></span> <i th:class="${investment.isIncreaseInValue()} ? 'green arrow up icon' : 'red arrow down icon'"></i></td>
-        <td class="right aligned big-screen-table" th:text="${#numbers.formatCurrency(investment.costBase)}"></td>
-        <td class="right aligned big-screen-table" th:text="${#numbers.formatCurrency(investment.earnings)}"></td>
-        <td class="right aligned big-screen-table" th:text="${#numbers.formatCurrency(investment.sales)}"></td>
-        <td class="right aligned" th:if="${#strings.contains(header,'Current')}"
-            th:text="${#numbers.formatCurrency(investment.balance)}"></td>
-        <td th:text="${#numbers.formatCurrency(investment.netProfitLoss)}"
+        <td class="right aligned" th:if="${showCurrent}" th:text="${investment.quantity()}"></td>
+        <td class="right aligned" th:if="${showCurrent}">
+        <span th:text="${investment.lastPrice.formatCurrency()}"></span> <i th:class="${investment.isIncreaseInValue()} ? 'green arrow up icon' : 'red arrow down icon'"></i></td>
+        <td class="right aligned big-screen-table" th:text="${investment.costBase.formatCurrency()}"></td>
+        <td class="right aligned big-screen-table" th:text="${investment.earnings.formatCurrency()}"></td>
+        <td class="right aligned big-screen-table" th:text="${investment.sales.formatCurrency()}"></td>
+        <td class="right aligned" th:if="${showCurrent}"
+            th:text="${investment.balance.formatCurrency()}"></td>
+        <td th:text="${investment.netProfitLoss.formatCurrency()}"
             th:attr="class=${investment.isProfit() ? 'right aligned green big-screen-table' : 'right aligned red big-screen-table'}"></td>
         <td th:text="${#numbers.formatPercent(investment.yearlyReturn,1,2)}"
             th:attr="class=${investment.isProfit() ? 'right aligned green' : 'right aligned red'}"></td>
     </tr>
     <tr th:unless="${investmentsData.investmentSummaries.isEmpty()}">
-        <td th:if="${#strings.contains(header,'Current')}"></td>
-        <td th:if="${#strings.contains(header,'Current')}"></td>
+        <td th:if="${showCurrent}"></td>
+        <td th:if="${showCurrent}"></td>
         <td></td>
-        <td class="right aligned big-screen-table" th:if="${#strings.contains(header,'Current')}"><b>Total Outlay</b>
+        <td class="right aligned big-screen-table" th:if="${showCurrent}"><b>Total Outlay</b>
         </td>
-        <td class="right aligned blue big-screen-table" th:if="${#strings.contains(header,'Current')}"
-            th:text="${#numbers.formatCurrency(investmentsData.getTotalOutlay())}">$0.00
+        <td class="right aligned blue big-screen-table" th:if="${showCurrent}"
+            th:text="${investmentsData.getTotalOutlay().formatCurrency()}">$0.00
         </td>
-        <td th:if="${#strings.contains(header,'Current')}"></td>
-        <td class="right aligned big-screen-table" th:unless="${#strings.contains(header,'Current')}"><b>Total
+        <td th:if="${showCurrent}"></td>
+        <td class="right aligned big-screen-table" th:unless="${showCurrent}"><b>Total
             Outlay</b></td>
-        <td class="right aligned blue big-screen-table" th:unless="${#strings.contains(header,'Current')}"
-            th:text="${#numbers.formatCurrency(investmentsData.getTotalOutlay())}">$0.00
+        <td class="right aligned blue big-screen-table" th:unless="${showCurrent}"
+            th:text="${investmentsData.getTotalOutlay().formatCurrency()}">$0.00
         </td>
         <td></td>
         <td class="right aligned big-screen-table"><b>Total Profit/Loss</b></td>
         <td class="right aligned blue big-screen-table"
-            th:text="${#numbers.formatCurrency(investmentsData.getTotalProfitOrLoss())}">
+            th:text="${investmentsData.getTotalProfitOrLoss().formatCurrency()}">
             $0.00
         </td>
         <td></td>
     </tr>
     </tbody>
 </table>
+</div>
 
-<td th:fragment="InvestmentLink (code, hasNote, note)" th:attr="data-tooltip = ${hasNote} ? ${note} : _">
+<td th:fragment="InvestmentLink (code, hasNote, note)" th:attr="data-tooltip = ${hasNote} ? ${note} : _, data-position='right center'">
     <a th:href="|@{/Investments/List}?code=${code}|"
        th:attr="hx-get=|@{/investments/list}?code=${code}|" hx-target="#InvestmentList"
        hx-swap="outerHTML"
@@ -88,9 +90,9 @@
                 <tr th:if="${elem.isShares}">
                     <td th:text="${#temporals.format(elem.asAt,'dd MMM yyyy', #locale)}">Date</td>
                     <td th:text="${elem.description}">Description</td>
-                    <td th:text="${elem.amount() ge 0} ? ${elem.amount()} : ''">On</td>
-                    <td th:text="${elem.amount() lt 0} ? ${elem.amount()} : ''">Off</td>
-                    <td th:text="${#numbers.formatCurrency(elem.sharePrice())}">Price</td>
+                    <td th:text="${elem.amount().getAmount() ge 0} ? ${elem.amount().getAmount()} : ''">On</td>
+                    <td th:text="${elem.amount().getAmount() lt 0} ? ${elem.amount().getAmount()} : ''">Off</td>
+                    <td th:text="${elem.sharePrice().formatCurrency()}">Price</td>
                 </tr>
             </th:block>
             </tbody>
@@ -111,7 +113,7 @@
                 <tr th:unless="${elem.isShares}">
                 <td th:text="${#temporals.format(elem.asAt,'dd MMM yyyy', #locale)}">Date</td>
                 <td th:text="${elem.description}">Description</td>
-                <td th:text="${#numbers.formatCurrency(elem.amount())}">$0.00</td>
+                <td th:text="${elem.amount().formatCurrency()}">$0.00</td>
             </tr>
             </th:block>
             </tbody>
@@ -119,15 +121,16 @@
     </div>
 </div>
 
-<div id="InvestmentChart" th:fragment="InvestmentChart(investmentsData, header)"
-     th:class="${#strings.contains(header,'Current')} ? 'ui two column grid' : 'ui two column grid container'">
-    <div th:if="${#strings.contains(header,'Current')}" class="column">
+<div id="InvestmentChart" th:fragment="InvestmentChart(investmentsData, titleText)"
+     th:with="showCurrent = ${#strings.contains(titleText,'Current')}"
+     th:class="${showCurrent} ? 'ui two column grid' : 'ui two column grid container'">
+    <div th:if="${showCurrent}" class="column">
         <canvas id="investmentsTotalChart" class="chart"></canvas>
     </div>
-    <div th:unless="${#strings.contains(header,'Current')}" class="three wide column"></div>
+    <div th:unless="${showCurrent}" class="three wide column"></div>
     <div class="column">
         <canvas id="marketValueChart" class="chart"
-             th:attr="data-chart-data=${investmentsData.getMarketValuesJson()}, data-chart-title=${#strings.contains(header,'Current')?'Market Value':'Net Profit/Loss'}">
+             th:attr="data-chart-data=${investmentsData.getMarketValuesJson()}, data-chart-title=${#strings.contains(titleText,'Current')?'Market Value':'Net Profit/Loss'}">
         </canvas>
     </div>
 </div>

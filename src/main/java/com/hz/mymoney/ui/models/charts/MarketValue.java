@@ -1,10 +1,9 @@
 package com.hz.mymoney.ui.models.charts;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.hz.mymoney.data.models.Money;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 // Chart data classes must be a POJO not a record for the JSON to conversion to work
 @Data
@@ -12,5 +11,5 @@ import java.math.BigDecimal;
 @JsonPropertyOrder({"name", "value"})
 public class MarketValue {
 	private String name;
-	private BigDecimal value;
+	private Money value;
 }

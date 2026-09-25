@@ -14,7 +14,7 @@
                         </div>
                     </div>
                     <div class="left attached right aligned three wide column">
-                        <div class="description" th:text="${#numbers.formatCurrency(txn.amount())}">$30</div>
+                        <div class="description" th:text="${txn.amount().formatCurrency()}">$30</div>
                     </div>
                     <div class="right aligned six wide column">
                         <div class="description" th:if="${txn.isNotYetDue()}">

@@ -1,11 +1,11 @@
 package com.hz.mymoney.data.models.coa;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.ledger.IPosting;
 import com.hz.mymoney.data.models.ledger.SharePosting;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
@@ -54,7 +54,7 @@ public class ChartOfAccounts {
 	public SortedSet<Account> getZeroBalanceAccountsOfType(String accountType) {
 		return this.accounts.stream()
 				.filter(account -> isOneOf(accountType, account.getName()))
-				.filter(account -> account.getTotalAmount().compareTo(BigDecimal.ZERO) == 0)
+				.filter(account -> account.getTotalAmount().compareTo(Money.ZERO) == 0)
 				.collect(Collectors.toCollection(TreeSet::new));
 	}
 
@@ -64,7 +64,7 @@ public class ChartOfAccounts {
 		for (Account account : this.accounts) {
 			if (isOneOf(accountType, account.getName())) {
 				if (filterZeroAmounts) {
-					if (account.getTotalAmount().compareTo(BigDecimal.ZERO) != 0) {
+					if (account.getTotalAmount().compareTo(Money.ZERO) != 0) {
 						typedAccounts.add(account);
 					}
 				} else {
@@ -75,7 +75,7 @@ public class ChartOfAccounts {
 		return typedAccounts;
 	}
 
-	public void addPosting(IPosting posting, LocalDate date, String description, String sourceAccount, BigDecimal commission) {
+	public void addPosting(IPosting posting, LocalDate date, String description, String sourceAccount, Money commission) {
 		Optional<Account> account = findAccount(posting.getAccount());
 		if (account.isEmpty()) {
 			accounts.add(new Account(posting.getAccount(), posting instanceof SharePosting, new Movement(date, sourceAccount, description, posting.getAmount(), posting.getPrice(), posting.getCode(), posting.isSplit(), commission, posting.getNote())));
@@ -84,23 +84,23 @@ public class ChartOfAccounts {
 		}
 	}
 
-	public BigDecimal getBalanceForAccountType(String accountType, InvestmentHistory investmentHistory) {
+	public Money getBalanceForAccountType(String accountType, InvestmentHistory investmentHistory) {
 		return this.getAccountsOfType(accountType, true).stream()
 				.map(account -> account.getBalance(asAt, investmentHistory))
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.reduce(Money.ZERO, Money::add)
 				.setScale(2, RoundingMode.HALF_UP);
 	}
 
-	public BigDecimal getBalanceForAccount(String accountName, InvestmentHistory investmentHistory) {
+	public Money getBalanceForAccount(String accountName, InvestmentHistory investmentHistory) {
 		return accounts.stream()
 				.filter(account -> account.getName().equals(accountName))
 				.map(account -> account.getBalance(asAt, investmentHistory))
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.reduce(Money.ZERO, Money::add)
 				.setScale(2, RoundingMode.HALF_UP);
 	}
 
 	private LocalDate get2ndOldestDate(PriorityQueue<Movement> movements) {
-		LocalDate oneYearAgo = LocalDate.now().minusYears(1);
+		LocalDate oneYearAgo = LocalDate.now().minusYears(1).withDayOfMonth(1);
 		Optional<Movement> oldest = movements.stream()
 				.filter(movement -> movement.date().isAfter(oneYearAgo))
 				.findFirst();
@@ -125,11 +125,11 @@ public class ChartOfAccounts {
 				.collect(Collectors.toCollection(PriorityQueue::new)));
 	}
 
-	public BigDecimal getTotalInvestmentIncomeForCode(String code) {
+	public Money getTotalInvestmentIncomeForCode(String code) {
 		return Arrays.stream(INVESTMENT_INCOME
 				.split(","))
 				.map(x -> this.sumAmountForAccountsWithCode(x, code))
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 	}
 
 	public List<Movement> getInvestmentMovementsForCode(String code) {
@@ -150,30 +150,30 @@ public class ChartOfAccounts {
 				.toList();
 	}
 
-	private BigDecimal sumAmountForAccountExactWithCode(String accountType, String code) {
+	private Money sumAmountForAccountExactWithCode(String accountType, String code) {
 		return accounts.stream()
 				.filter(account -> account.getName().equalsIgnoreCase(accountType))
 				.map(account -> account.getMovementsForCode(code))
 				.map(this::sum)
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.reduce(Money.ZERO, Money::add)
 				.abs()
 				.setScale(2, RoundingMode.HALF_UP);
 	}
 
-	private BigDecimal sumAmountForAccountsWithCode(String accountType, String code) {
+	private Money sumAmountForAccountsWithCode(String accountType, String code) {
 		return accounts.stream()
 				.filter(account -> account.getName().toLowerCase().startsWith(accountType.toLowerCase()))
 				.map(account -> account.getMovementsForCode(code))
 				.map(this::sum)
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.reduce(Money.ZERO, Money::add)
 				.abs()
 				.setScale(2, RoundingMode.HALF_UP);
 	}
 
-	private BigDecimal sum(Collection<Movement> movements) {
+	private Money sum(Collection<Movement> movements) {
 		return movements.stream()
 				.map(Movement::amount)
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.reduce(Money.ZERO, Money::add)
 				.setScale(2, RoundingMode.HALF_UP);
 	}
 }

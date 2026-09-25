@@ -21,23 +21,23 @@
                 <td th:text="${#temporals.format(elem.asAt,'dd MMM yyyy', #locale)}" class="two wide"></td>
                 <td th:text="${elem.description}" class="four wide"></td>
                 <td th:if="${elem.isDebit()}" class="right aligned two wide"
-                    th:text="${elem.isShares} ? ${elem.debitAmount()} + ' @ ' + ${#numbers.formatCurrency(elem.sharePrice())} : ${#numbers.formatCurrency(elem.debitAmount())}"></td>
+                    th:text="${elem.isShares} ? ${elem.debitAmount()} + ' @ ' + ${elem.sharePrice().formatCurrency()} : ${elem.debitAmount()}"></td>
                 <td th:if="${elem.isCredit()}" class="right aligned two wide"></td>
                 <td th:if="${elem.isCredit()}" class="right aligned two wide"
-                    th:text="${elem.isShares} ? ${elem.creditAmount()} + ' @ ' + ${#numbers.formatCurrency(elem.sharePrice())} : ${#numbers.formatCurrency(elem.creditAmount())}"></td>
+                    th:text="${elem.isShares} ? ${elem.creditAmount()} + ' @ ' + ${elem.sharePrice().formatCurrency()} : ${elem.creditAmount()}"></td>
                 <td th:if="${elem.isDebit()}" class="right aligned two wide"></td>
                 <td th:text="${elem.sourceAccount()}" class="four wide"></td>
                 <td th:if="${showRunningTotal}" class="right aligned two wide"
-                    th:text="${elem.isShares} ? ${runningTotal} : ${#numbers.formatCurrency(runningTotal)}"></td>
+                    th:text="${elem.isShares} ? ${runningTotal} : ${runningTotal.formatCurrency()}"></td>
             </tr>
             <tr th:each="elem, stats : ${transactions}"
                 th:with="runningTotal = ${totaler.calculateTotal(stats.count, transactions)}" th:if="${isAmountOnly}">
                 <td th:text="${#temporals.format(elem.asAt,'dd MMM yyyy', #locale)}" class="two wide"></td>
                 <td th:text="${elem.description}" class="five wide"></td>
-                <td th:text="${#numbers.formatCurrency(elem.amount.abs())}" class="right aligned two wide"></td>
+                <td th:text="${elem.amount.abs().formatCurrency()}" class="right aligned two wide"></td>
                 <td th:text="${elem.sourceAccount()}" class="five wide"></td>
                 <td th:if="${showRunningTotal}" class="right aligned two wide"
-                    th:text="${elem.isShares} ? ${runningTotal} : ${#numbers.formatCurrency(runningTotal)}"></td>
+                    th:text="${elem.isShares} ? ${runningTotal} : ${runningTotal.formatCurrency()}"></td>
             </tr>
             </tbody>
         </table>

@@ -1,21 +1,22 @@
 package com.hz.mymoney.data.models.ledger;
 
-import java.math.BigDecimal;
+import com.hz.mymoney.data.models.Money;
+
 import java.math.RoundingMode;
 
 public class SharePosting extends Posting implements IPosting {
-	protected final BigDecimal price;
+	protected final Money price;
 	protected final String code;
 	protected final boolean split;      // Stock Split occurred
 
-	public SharePosting(String account, BigDecimal amount, BigDecimal price, String code, String note) {
+	public SharePosting(String account, Money amount, Money price, String code, String note) {
 		super(account, amount, note);
 		this.price = price;
 		this.code = code;
 		this.split = false;
 	}
 
-	public SharePosting(String account, BigDecimal amount, BigDecimal price, String code, boolean split, String note) {
+	public SharePosting(String account, Money amount, Money price, String code, boolean split, String note) {
 		super(account, amount, note);
 		this.price = price;
 		this.code = code;
@@ -27,7 +28,7 @@ public class SharePosting extends Posting implements IPosting {
 	}
 
 	private boolean showPrice() {
-		return (price != null && price.compareTo(BigDecimal.ZERO) != 0 && split == false);
+		return (price != null && price.compareTo(Money.ZERO) != 0 && split == false);
 	}
 
 	@Override
@@ -37,17 +38,17 @@ public class SharePosting extends Posting implements IPosting {
 				+ splitPosting()
 				+ (this.amount != null ? "  " + this.amount.stripTrailingZeros().toPlainString() : "")
 				+ (this.code != null ? "  " + this.code : "")
-				+ (showPrice() ? " @ $" + this.price.stripTrailingZeros().toPlainString() : "")
+				+ (showPrice() ? " @ " + this.price : "")
 				+ (this.note != null ? "  ;" + this.note : "");
 	}
 
 	@Override
-	public BigDecimal getValue() {
+	public Money getValue() {
 		return price.multiply(amount).setScale(2, RoundingMode.HALF_UP);
 	}
 
 	@Override
-	public BigDecimal getPrice() {
+	public Money getPrice() {
 		return price;
 	}
 

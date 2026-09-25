@@ -1,6 +1,7 @@
 package com.hz.mymoney.ui.services;
 
 import com.hz.mymoney.configuration.AccountConstants;
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.ChartOfAccounts;
 import com.hz.mymoney.data.models.coa.Movement;
 import com.hz.mymoney.ui.models.Transaction;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -41,14 +41,14 @@ public class ReportModelBuilderService {
 				.filter(account -> account.hasMovementBetween(financialYearStartDate, financialYearEndDate))
 				.map(account -> mapMovementsToTransactions(account.getMovementsBetween(financialYearStartDate, financialYearEndDate), account.getName(), account.isShareAccount()))
 				.flatMap(List::stream)
-				.filter(transaction -> transaction.amount().compareTo(BigDecimal.ZERO) >= 0)
+				.filter(transaction -> transaction.amount().compareTo(Money.ZERO) >= 0)
 				.toList();
 
 		List<Transaction> supercontribTransactions = coa.getAccountsOfType(AccountConstants.SUPER_ACCOUNTS, false).stream()
 				.filter(account -> account.hasMovementBetween(financialYearStartDate, financialYearEndDate))
 				.map(account -> mapMovementsToTransactions(account.getMovementsBetween(financialYearStartDate, financialYearEndDate), account.getName(), account.isShareAccount()))
 				.flatMap(List::stream)
-				.filter(transaction -> transaction.amount().compareTo(BigDecimal.ZERO) >= 0)
+				.filter(transaction -> transaction.amount().compareTo(Money.ZERO) >= 0)
 				.filter(transaction -> transaction.description().equalsIgnoreCase(SUPER_CONTRIBUTION_NOTE))
 				.toList();
 
@@ -60,7 +60,7 @@ public class ReportModelBuilderService {
 				.filter(account -> account.hasMovementBetween(paygStartDate, paygEndDate))
 				.map(account -> mapMovementsToTransactions(account.getMovementsBetween(paygStartDate, paygEndDate), account.getName(), account.isShareAccount()))
 				.flatMap(List::stream)
-				.filter(transaction -> transaction.amount().compareTo(BigDecimal.ZERO) >= 0)
+				.filter(transaction -> transaction.amount().compareTo(Money.ZERO) >= 0)
 				.toList();
 
 		return new TaxYear(incomeTransactions, expenseTransactions, imputationTransactions, paygTransactions, supercontribTransactions);

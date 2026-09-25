@@ -1,10 +1,10 @@
 package com.hz.mymoney.ui.models.templates;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.ui.models.Account;
 import com.hz.mymoney.ui.models.Transaction;
 import lombok.RequiredArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +41,7 @@ public class SingleAccountTemplateData {
 		return accountName.startsWith("Income:") || accountName.startsWith("Expenses:") || accountName.startsWith("Equity:");
 	}
 
-	public BigDecimal balance() {
+	public Money balance() {
 		if (accountName.startsWith("Assets:") || accountName.startsWith("Income:")) {
 			return account.balance().abs();
 		}

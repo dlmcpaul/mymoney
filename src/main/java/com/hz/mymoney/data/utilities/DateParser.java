@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public final class Dates {
+public final class DateParser {
 	private static final String DATE_FORMAT_1 = "yyyy/M/d";
 	private static final String DATE_FORMAT_2 = "yyyy-M-d";
 	private static final String QUICKEN_DATE_FORMAT = "d/M/yy";
@@ -15,7 +15,7 @@ public final class Dates {
 	private static final DateTimeFormatter DATE_FORMATTER_1 = DateTimeFormatter.ofPattern(DATE_FORMAT_1);
 	private static final DateTimeFormatter DATE_FORMATTER_2 = DateTimeFormatter.ofPattern(DATE_FORMAT_2);
 
-	private Dates() {}
+	private DateParser() {}
 
 	private static int fastParseInt2(String value) {
 		return (value.charAt(0) - ZERO) * 10

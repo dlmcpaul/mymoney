@@ -1,12 +1,12 @@
 package com.hz.mymoney.ui.models.templates;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.ui.models.InvestmentSummary;
 import com.hz.mymoney.ui.models.charts.InvestmentTotal;
 import com.hz.mymoney.ui.models.charts.MarketValue;
 import lombok.Data;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class InvestmentsTemplateData {
 	public List<MarketValue> getTotalProfitLossValues() {
 		return investmentSummaries.stream()
 				.map(investmentSummary -> new MarketValue(investmentSummary.code(), investmentSummary.netProfitLoss()))
-				.filter(marketValue -> marketValue.getValue().compareTo(BigDecimal.ZERO) > 0)
+				.filter(marketValue -> marketValue.getValue().compareTo(Money.ZERO) > 0)
 				.sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
 				.limit(20)
 				.toList();
@@ -49,12 +49,12 @@ public class InvestmentsTemplateData {
 		return mapper.writeValueAsString(getTotalProfitLossValues());
 	}
 
-	public BigDecimal getTotalProfitOrLoss() {
-		return investmentSummaries.stream().map(InvestmentSummary::netProfitLoss).reduce(BigDecimal.ZERO, BigDecimal::add);
+	public Money getTotalProfitOrLoss() {
+		return investmentSummaries.stream().map(InvestmentSummary::netProfitLoss).reduce(Money.ZERO, Money::add);
 	}
 
-	public BigDecimal getTotalOutlay() {
-		return investmentSummaries.stream().map(InvestmentSummary::costBase).reduce(BigDecimal.ZERO, BigDecimal::add);
+	public Money getTotalOutlay() {
+		return investmentSummaries.stream().map(InvestmentSummary::costBase).reduce(Money.ZERO, Money::add);
 	}
 
 }

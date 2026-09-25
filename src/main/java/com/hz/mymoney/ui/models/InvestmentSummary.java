@@ -1,5 +1,7 @@
 package com.hz.mymoney.ui.models;
 
+import com.hz.mymoney.data.models.Money;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -8,13 +10,13 @@ import java.time.LocalDate;
 public record InvestmentSummary(
 		String code,
 		BigDecimal count,
-		BigDecimal lastPrice,
-		BigDecimal priorPrice,
-		BigDecimal balance,
-		BigDecimal costBase,
-		BigDecimal sales,
-		BigDecimal earnings,
-		BigDecimal netProfitLoss,
+		Money lastPrice,
+		Money priorPrice,
+		Money balance,
+		Money costBase,
+		Money sales,
+		Money earnings,
+		Money netProfitLoss,
 		LocalDate firstPurchase,
 		LocalDate lastDate,
 		String note
@@ -29,7 +31,7 @@ public record InvestmentSummary(
 	}
 
 	public boolean isProfit() {
-		return netProfitLoss.compareTo(BigDecimal.ZERO) >= 0;
+		return netProfitLoss.compareTo(Money.ZERO) >= 0;
 	}
 
 	public boolean isClosed() {
@@ -38,10 +40,10 @@ public record InvestmentSummary(
 
 	public BigDecimal yearlyReturn() {
 		BigDecimal yearsOfOwnership = BigDecimal.valueOf((lastDate.toEpochDay() - firstPurchase.toEpochDay() + 364) / 365);
-		BigDecimal adjustedBalance = costBase;
-		BigDecimal closingBalance = isClosed() ? sales.add(earnings) : sales.add(earnings).add(balance);
+		Money adjustedBalance = costBase;
+		Money closingBalance = isClosed() ? sales.add(earnings) : sales.add(earnings).add(balance);
 
-		if (adjustedBalance.compareTo(BigDecimal.ZERO) == 0 || yearsOfOwnership.compareTo(BigDecimal.ZERO) == 0) {
+		if (adjustedBalance.compareTo(Money.ZERO) == 0 || yearsOfOwnership.compareTo(BigDecimal.ZERO) == 0) {
 			return BigDecimal.ZERO;
 		}
 

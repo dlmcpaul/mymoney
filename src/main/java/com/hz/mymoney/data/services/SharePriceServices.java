@@ -1,9 +1,10 @@
 package com.hz.mymoney.data.services;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.InvestmentHistory;
 import com.hz.mymoney.data.models.coa.InvestmentHistoryEntry;
-import com.hz.mymoney.data.utilities.Dates;
-import com.hz.mymoney.data.utilities.Money;
+import com.hz.mymoney.data.utilities.DateParser;
+import com.hz.mymoney.data.utilities.MoneyParser;
 import com.hz.mymoney.exceptions.ValidationException;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -46,11 +47,11 @@ public class SharePriceServices implements ApplicationRunner {
 		this.resourceLoader = resourceLoader;
 	}
 
-	public BigDecimal getInvestmentValue(String code, LocalDate asAt) {
+	public Money getInvestmentValue(String code, LocalDate asAt) {
 		return investmentHistory.getInvestmentValue(code, asAt);
 	}
 
-	public BigDecimal getPreviousInvestmentValue(String code, LocalDate asAt) {
+	public Money getPreviousInvestmentValue(String code, LocalDate asAt) {
 		return investmentHistory.getPreviousInvestmentValue(code, asAt);
 	}
 
@@ -76,7 +77,7 @@ public class SharePriceServices implements ApplicationRunner {
 	}
 
 	// If internal commodity map then allow updates from journal load
-	public void updateFromJournal(LocalDate effective, String code, BigDecimal price) {
+	public void updateFromJournal(LocalDate effective, String code, Money price) {
 		if (commodityOption.equals("internal")) {
 			log.info("Adding investment history entry {} {} {}", effective, code, price);
 			addEntry(investmentHistory.commodityMap(), code, effective, price);
@@ -123,7 +124,7 @@ public class SharePriceServices implements ApplicationRunner {
 						String line = reader.readLine();
 						while (line != null) {
 							List<String> tokens = Arrays.stream(comma_delimited.split(line)).toList();
-							addEntry(entries, tokens.get(0), Dates.parseQuickenDate(tokens.get(2)), parseBigDecimal(tokens.get(1)));
+							addEntry(entries, tokens.get(0), DateParser.parseQuickenDate(tokens.get(2)), parseBigDecimal(tokens.get(1)));
 
 							line = reader.readLine();
 						}
@@ -175,7 +176,7 @@ public class SharePriceServices implements ApplicationRunner {
 				// P date commodity value currency
 				if (line.startsWith("P")) {
 					tokens = line.split(" ");
-					addEntry(entries, tokens[2], Dates.parseDate(tokens[1]), parseBigDecimal(tokens[3]));
+					addEntry(entries, tokens[2], DateParser.parseDate(tokens[1]), parseBigDecimal(tokens[3]));
 				}
 				line = reader.readLine();
 			}
@@ -186,14 +187,14 @@ public class SharePriceServices implements ApplicationRunner {
 		loadSuccess = true;
 	}
 
-	private BigDecimal parseBigDecimal(String value) {
-		if (Money.isMoney(value)) {
-			return Money.parseMoney(value, 2);
+	private Money parseBigDecimal(String value) {
+		if (MoneyParser.isMoney(value)) {
+			return MoneyParser.parseMoney(value, 2);
 		}
-		return new BigDecimal(value);
+		return new Money(new BigDecimal(value));
 	}
 
-	private void addEntry(Map<String, SortedSet<InvestmentHistoryEntry>> entries, String commodityCode, LocalDate asAt, BigDecimal value) {
+	private void addEntry(Map<String, SortedSet<InvestmentHistoryEntry>> entries, String commodityCode, LocalDate asAt, Money value) {
 		entries.computeIfAbsent(commodityCode, k -> new TreeSet<>());
 		entries.get(commodityCode).add(new InvestmentHistoryEntry(asAt, value));
 	}

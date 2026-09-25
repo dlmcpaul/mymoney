@@ -58,7 +58,7 @@
                 <div class="right aligned eight wide column">
                     <div class="description">
                         <span th:attr="class=${account.balance == highest ? 'ui teal text' : 'ui text'}"
-                              th:text="${#numbers.formatCurrency(account.balance)}">$0</span>
+                              th:text="${account.balance.formatCurrency()}">$0</span>
                     </div>
                 </div>
             </div>
@@ -73,7 +73,7 @@
         </div>
         <div class="right aligned eight wide column">
             <div class="description"
-                 th:text="${#numbers.formatCurrency(balance)}">$0
+                 th:text="${balance.formatCurrency()}">$0
             </div>
         </div>
     </div>

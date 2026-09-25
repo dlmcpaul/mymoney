@@ -1,11 +1,11 @@
 package com.hz.mymoney.data.models.coa;
 
 import com.hz.mymoney.configuration.AccountConstants;
+import com.hz.mymoney.data.models.Money;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.jspecify.annotations.NonNull;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -24,7 +24,7 @@ public class Account implements Comparable<Account> {
 	private final boolean isShareAccount;
 	@Getter
 	private final PriorityQueue<Movement> movements;
-	private BigDecimal cachedAmount = BigDecimal.ZERO;
+	private Money cachedAmount = Money.ZERO;
 
 	public Account(String name, boolean isShareAccount, Movement movement) {
 		this.name = name;
@@ -87,11 +87,11 @@ public class Account implements Comparable<Account> {
 		return movements.size() > 0;
 	}
 
-	public @NonNull BigDecimal getTotalAmount() {
+	public @NonNull Money getTotalAmount() {
 		return cachedAmount;
 	}
 
-	private BigDecimal addMovementAmount(Movement movement) {
+	private Money addMovementAmount(Movement movement) {
 		if (isShareAccount) {
 			if (movement.split()) {
 				return movement.amount().setScale(2, RoundingMode.HALF_UP);
@@ -102,10 +102,10 @@ public class Account implements Comparable<Account> {
 	}
 
 	// Used to get share counts not share value/balance
-	private @NonNull BigDecimal calculateTotalAmount() {
+	private @NonNull Money calculateTotalAmount() {
 		if (isShareAccount) {
 			// Share accounts can have splits that make summing tricky.  Each split resets the sum
-			BigDecimal sum = BigDecimal.ZERO;
+			Money sum = Money.ZERO;
 			for (Movement movement : movements) {
 				sum = movement.split() ? movement.amount() : sum.add(movement.amount());
 			}
@@ -115,10 +115,10 @@ public class Account implements Comparable<Account> {
 				.map(Movement::amount));
 	}
 
-	public @NonNull BigDecimal getBalance(LocalDate endDate, InvestmentHistory investmenthistory) {
+	public @NonNull Money getBalance(LocalDate endDate, InvestmentHistory investmenthistory) {
 		if (isShareAccount) {
 			// Share accounts can have splits that make summing tricky.  Each split resets the sum
-			BigDecimal sum = BigDecimal.ZERO;
+			Money sum = Money.ZERO;
 			for (Movement movement : movements) {
 				if (movement.isBeforeOrEqual(endDate)) {
 					sum = movement.split() ? movement.getValue(investmenthistory.getInvestmentValue(getCode(), endDate)) : sum.add(movement.getValue(investmenthistory.getInvestmentValue(getCode(), endDate)));
@@ -131,29 +131,29 @@ public class Account implements Comparable<Account> {
 				.map(Movement::amount));
 	}
 
-	private @NonNull BigDecimal sumBigDecimals(Stream<BigDecimal> bigDecimals) {
+	private @NonNull Money sumBigDecimals(Stream<Money> bigDecimals) {
 		return bigDecimals
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.reduce(Money.ZERO, Money::add)
 				.setScale(2, RoundingMode.HALF_UP);
 	}
 
 	// Not really cost base currently cost of purchases and commissions
 	// Need to handle Capital Returns or just rename as outlay
-	public @NonNull BigDecimal getCostBase() {
+	public @NonNull Money getCostBase() {
 		if (isShareAccount) {
 			return sumBigDecimals(movements.stream()
 					.map(movement -> movement.amount().multiply(movement.price()).add(movement.commission()))
-					.filter(amount -> amount.compareTo(BigDecimal.ZERO) > 0));
+					.filter(amount -> amount.compareTo(Money.ZERO) > 0));
 		} else if (isManagedFund()) {
 			return getManagedFundCostBase();
 		}
 		// Only shares and managed funds have a cost base
-		return BigDecimal.ZERO;
+		return Money.ZERO;
 	}
 
-	private @NonNull BigDecimal getManagedFundCostBase() {
+	private @NonNull Money getManagedFundCostBase() {
 		return sumBigDecimals(movements.stream()
-				.filter(movement -> movement.amount().compareTo(BigDecimal.ZERO) > 0
+				.filter(movement -> movement.amount().compareTo(Money.ZERO) > 0
 						&& (movement.sourceAccount().toLowerCase().startsWith(EQUITY_FUND_OPENING_BALANCE.toLowerCase())  // Opening balances prior to tracking
 						|| movement.sourceAccount().toLowerCase().startsWith(REINVESTMENT_INCOME.toLowerCase()) // Reinvestment schemes
 						|| movement.description().toLowerCase().startsWith(OPENING_BALANCE_DESCRIPTION.toLowerCase())))   // Opening balances after tracking (MEF)
@@ -162,18 +162,18 @@ public class Account implements Comparable<Account> {
 	}
 
 	// Value of all share and managed fund sales less commission
-	public @NonNull BigDecimal getSales() {
+	public @NonNull Money getSales() {
 		if (isShareAccount) {
 			return sumBigDecimals(movements.stream()
-					.filter(movement -> movement.amount().compareTo(BigDecimal.ZERO) < 0)
+					.filter(movement -> movement.amount().compareTo(Money.ZERO) < 0)
 					.map(movement -> movement.amount().multiply(movement.price()).abs().subtract(movement.commission())));
 		} else if (isManagedFund()) {
 			return sumBigDecimals(movements.stream()
-					.filter(movement -> movement.amount().compareTo(BigDecimal.ZERO) < 0 && movement.description().startsWith(SHARES_SOLD_DESCRIPTION))
+					.filter(movement -> movement.amount().compareTo(Money.ZERO) < 0 && movement.description().startsWith(SHARES_SOLD_DESCRIPTION))
 					.map(movement -> movement.amount().abs()));
 		}
 		// Only shares and Managed Funds have sales
-		return BigDecimal.ZERO;
+		return Money.ZERO;
 	}
 
 	private boolean isManagedFund() {
@@ -196,15 +196,15 @@ public class Account implements Comparable<Account> {
 
 		if (isShareAccount) {
 			if (getCode().equals("CPXXMV")) {
-				return getTotalAmount() + " " + simpleName + " warrants";
+				return getTotalAmount().getAmount() + " " + simpleName + " warrants";
 			}
 
 			if ((getCode().length() == 4 && getCode().charAt(3) == 'O')) {
 				// Option not share?
-				return getTotalAmount() + " options (" + getCode() + ") for " + getCode().substring(0,3);
+				return getTotalAmount().getAmount() + " options (" + getCode() + ") for " + getCode().substring(0,3);
 			}
 			;
-			return new DecimalFormat("#.##").format(getTotalAmount()) + " shares in " + simpleName;
+			return new DecimalFormat("#.##").format(getTotalAmount().getAmount()) + " shares in " + simpleName;
 		} else if (isManagedFund()) {
 			return simpleName + " Fund";
 		}

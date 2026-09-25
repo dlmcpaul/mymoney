@@ -4,7 +4,7 @@
       lang="en">
 <body>
 <main>
-    <div class="ui raised horizontal equal width segments" th:with="open=${account.balance() gt 0}"
+    <div class="ui raised horizontal equal width segments" th:with="open=${account.balance().amount gt 0}"
          th:unless="${accounts.superAccounts.isEmpty()}"
          th:each="account, stats : ${accounts.superAccounts}">
         <div class="ui segment">
@@ -16,7 +16,7 @@
                         th:text="|${account.name()} (${#temporals.format(account.openingDate(), 'MMM yyyy')})|"></span>
                 </div>
                 <div th:if="${open}" class="right aligned six wide column"><b><span
-                        th:text="${#numbers.formatCurrency(account.balance())}"></span></b></div>
+                        th:text="${account.balance().formatCurrency()}"></span></b></div>
                 <div th:unless="${open}" class="column"
                      th:text="|${account.name()} (${#temporals.format(account.openingDate(), 'MMM yyyy')} - ${#temporals.format(account.closingDate(), 'MMM yyyy')})|"></div>
             </div>
@@ -27,7 +27,7 @@
                     <div class="center aligned column"><b>Earnings</b></div>
                 </div>
                 <div class="row">
-                    <div class="center aligned column" th:text="${#numbers.formatCurrency(account.earnings())}">
+                    <div class="center aligned column" th:text="${account.earnings().formatCurrency()}">
                         Earnings
                     </div>
                 </div>
@@ -42,12 +42,12 @@
                 </div>
                 <div class="row">
                     <div class="center aligned column"
-                         th:text="${#numbers.formatCurrency(account.openingBalance())}">Opening Balance
+                         th:text="${account.openingBalance().formatCurrency()}">Opening Balance
                     </div>
                     <div class="center aligned column"
-                         th:text="${#numbers.formatCurrency(account.contributions())}">Contributions
+                         th:text="${account.contributions().formatCurrency()}">Contributions
                     </div>
-                    <div class="center aligned column" th:text="${#numbers.formatCurrency(account.earnings())}">
+                    <div class="center aligned column" th:text="${account.earnings().formatCurrency()}">
                         Earnings
                     </div>
                 </div>
@@ -61,13 +61,13 @@
                     <div class="center aligned column"><b>Taxes</b></div>
                 </div>
                 <div class="row">
-                    <div class="center aligned column" th:text="${#numbers.formatCurrency(account.losses())}">
+                    <div class="center aligned column" th:text="${account.losses().formatCurrency()}">
                         Opening Balance
                     </div>
                     <div class="center aligned column"
-                         th:text="${#numbers.formatCurrency(account.insurance() + account.fees())}">Contributions
+                         th:text="${(account.insurance().add(account.fees())).formatCurrency()}">Contributions
                     </div>
-                    <div class="center aligned column" th:text="${#numbers.formatCurrency(account.taxes())}">
+                    <div class="center aligned column" th:text="${account.taxes().formatCurrency()}">
                         Contributions
                     </div>
                 </div>

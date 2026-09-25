@@ -1,9 +1,9 @@
 package com.hz.mymoney.data.models.coa;
 
 import com.hz.mymoney.configuration.AccountConstants;
+import com.hz.mymoney.data.models.Money;
 import lombok.extern.log4j.Log4j2;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static com.hz.mymoney.configuration.AccountConstants.SUPER_CONTRIBUTION_NOTE;
@@ -12,10 +12,10 @@ import static com.hz.mymoney.configuration.AccountConstants.SUPER_CONTRIBUTION_N
  * @param split Stock Split occurred
  */
 @Log4j2
-public record Movement(LocalDate date, String sourceAccount, String description, BigDecimal amount, BigDecimal price,
-                       String code, boolean split, BigDecimal commission, String note) implements Comparable<Movement> {
+public record Movement(LocalDate date, String sourceAccount, String description, Money amount, Money price,
+                       String code, boolean split, Money commission, String note) implements Comparable<Movement> {
 
-	public BigDecimal getValue() {
+	public Money getValue() {
 		return price.multiply(amount);
 	}
 
@@ -63,7 +63,7 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 		return code;
 	}
 
-	public BigDecimal getValue(BigDecimal newPrice) {
+	public Money getValue(Money newPrice) {
 		return newPrice.multiply(amount);
 	}
 
@@ -94,7 +94,7 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 	// Should be a transfer in from another super account
 	public boolean isSuperTransferIn() {
 		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_ACCOUNTS.toLowerCase())
-				&& amount.compareTo(BigDecimal.ZERO) > 0;
+				&& amount.compareTo(Money.ZERO) > 0;
 	}
 
 	public boolean isSuperEarnings() {
@@ -119,7 +119,7 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 
 	public boolean isSuperTransferOut() {
 		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_ACCOUNTS.toLowerCase())
-				&& amount.compareTo(BigDecimal.ZERO) < 0;
+				&& amount.compareTo(Money.ZERO) < 0;
 	}
 
 	@Override

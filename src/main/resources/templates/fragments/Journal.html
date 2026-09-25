@@ -106,13 +106,10 @@
     </button>
 </form>
 
-<form th:fragment="DividendJournal (defaultDate)" class="ui form" th:attr="hx-post=|@{/journal/dividend}|" hx-swap="none"
-      hx-swap-oob="true" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
->
-    <div class="two fields">
-        <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
-        <div class="field"></div>
-    </div>
+<form th:fragment="DividendJournal (defaultDate)" class="ui form" th:attr="hx-post=|@{/journal/dividend}|" hx-swap="outerHTML"
+      hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
+      id="NewDividendForm">
+    <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
     <div class="two fields">
         <div th:replace="~{fragments/Journal :: InvestmentAccountInputField ('investment', 'Investment', '', null, false)}"></div>
         <div th:replace="~{fragments/Journal :: AmountInputField ('Franked Dividend', true)}"></div>
@@ -130,8 +127,7 @@
 </form>
 
 <form th:fragment="DistributionJournal (defaultDate, activeButton)" class="ui form"
-      th:attr="hx-post=|@{/journal/distribution}|"
-      hx-swap="outerHTML"
+      th:attr="hx-post=|@{/journal/distribution}|" hx-swap="outerHTML"
       hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
       id="NewFundIncomeForm">
     <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
@@ -148,13 +144,7 @@
     </button>
 </form>
 
-<div id="JournalForms" th:fragment="JournalForms (entryDate)" class="ui basic fitted segment">
-    <div class="ui top attached tabular menu" id="journal-tabs">
-        <div class="active item" data-tab="one" id="journal-tab-item-1">Journal Entry
-        </div>
-        <div class="center item" data-tab="two" id="journal-tab-item-2">Dividend Income</div>
-        <div class="item" data-tab="three" id="journal-tab-item-3">Fund Income</div>
-    </div>
+<div id="JournalTabs" th:fragment="JournalTabs (entryDate)">
     <div class="ui bottom attached active tab segment" data-tab="one">
         <div class="ui padded basic segment">
             <div th:replace="~{fragments/Journal :: BasicJournal (${entryDate})}"></div>
@@ -170,6 +160,15 @@
             <div th:replace="~{fragments/Journal :: DistributionJournal (${entryDate}, 'distribution')}"></div>
         </div>
     </div>
+</div>
+
+<div id="JournalForms" th:fragment="JournalForms (entryDate)" class="ui basic fitted segment">
+    <div class="ui top attached tabular menu" id="journal-tabs">
+        <div class="active item" data-tab="one" id="journal-tab-item-1">Journal Entry</div>
+        <div class="center item" data-tab="two" id="journal-tab-item-2">Dividend Income</div>
+        <div class="item" data-tab="three" id="journal-tab-item-3">Fund Income</div>
+    </div>
+    <div th:replace="~{fragments/Journal :: JournalTabs (${entryDate})}"></div>
 </div>
 
 </body>

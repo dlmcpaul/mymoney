@@ -1,5 +1,6 @@
 package com.hz.mymoney.data.services;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.Account;
 import com.hz.mymoney.data.models.coa.ChartOfAccounts;
 import com.hz.mymoney.data.models.coa.Movement;
@@ -7,6 +8,7 @@ import com.hz.mymoney.data.models.ledger.IPosting;
 import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;
 import com.hz.mymoney.data.models.ledger.SharePosting;
+import com.hz.mymoney.data.utilities.LedgerEntrySupport;
 import com.hz.mymoney.data.utilities.LedgerParser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -89,37 +90,104 @@ public class LedgerServices implements ApplicationRunner {
 		// Convert to Chart of Accounts
 		this.coa = new ChartOfAccounts(LocalDate.now().plusDays(1));
 		ledger.getLedgerEntries()
-			.forEach(entry -> addPostings(coa, entry));
+			.forEach(entry -> mapLedgerEntryToPostings(coa, entry));
 	}
 
-	private void addPostings(ChartOfAccounts coa, LedgerEntry entry) {
-		BigDecimal commission = entry.hasCommissionPosting() ? entry.getCommission() : BigDecimal.ZERO;
+	private Optional<IPosting> findMatching(List<IPosting> postings, IPosting posting) {
+		return postings.stream().filter(p -> p.getAmount().equals(posting.getAmount().negate())).findFirst();
+	}
+
+	private List<IPosting> findBalancedPostings(LedgerEntry entry) {
+		for (IPosting posting : entry.getPostings()) {
+			Optional<IPosting> matched = findMatching(entry.getPostings(), posting);
+			if (matched.isPresent()) {
+				return List.of(posting, matched.get());
+			}
+		}
+		return new ArrayList<>();
+	}
+
+	private void mapLedgerEntryToPostingsUnBalanced(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
+		List<IPosting> matchedPostings = findBalancedPostings(entry);
+		if (matchedPostings.size() == 2) {
+			// Process the balanced entries and retry remaining?
+			coa.addPosting(matchedPostings.getFirst(), entry.getDate(), entry.getDescription(), matchedPostings.getLast().getAccount(), commission);
+			coa.addPosting(matchedPostings.getLast(), entry.getDate(), entry.getDescription(), matchedPostings.getFirst().getAccount(), commission);
+
+			List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.removePostings(entry.getPostings(), matchedPostings.getFirst(), matchedPostings.getLast()));
+
+			if (sortedPostings.getLast().getAmount().compareTo(Money.ZERO) > 0) {
+				IPosting sourcePosting = sortedPostings.getLast();
+				coa.addPosting(sourcePosting, entry.getDate(), entry.getDescription(), sortedPostings.getFirst().getAccount(), commission);
+				sortedPostings.subList(0, sortedPostings.size()-1).forEach(p -> coa.addPosting(p, entry.getDate(), entry.getDescription(), sourcePosting.getAccount(), commission));
+			} else {
+				log.error("Could not determine positive source posting {}", entry);
+			}
+		} else {
+			log.error("Unhandled Unbalanced Ledger Entry with {} postings {}", entry.getPostings().size(), entry);
+		}
+	}
+
+	private void mapLedgerEntryToPostingsBalanced(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
+		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
+		List<IPosting> negativeAmounts = LedgerEntrySupport.splitAndReturnFirst(sortedPostings);
+		List<IPosting> positiveAmounts = LedgerEntrySupport.splitAndReturnLast(sortedPostings);
+
+		int i = positiveAmounts.size()-1;
+		for (IPosting posting : negativeAmounts) {
+			if (posting.getAmount().abs().compareTo(positiveAmounts.get(i).getAmount()) == 0) {
+				// They match
+				coa.addPosting(posting, entry.getDate(), entry.getDescription(), positiveAmounts.get(i).getAccount(), commission);
+				coa.addPosting(positiveAmounts.get(i), entry.getDate(), entry.getDescription(), posting.getAccount(), commission);
+			} else {
+				log.error("Unhandled Ledger Entry with {} postings and multiple negative sources {}", entry.getPostings().size(), entry);
+			}
+			i--;
+		}
+	}
+
+	private void mapLedgerEntryToPostingsSingleNegative(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
+		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
+
+		if (sortedPostings.getFirst().getAmount().compareTo(Money.ZERO) < 0) {
+			IPosting sourcePosting = sortedPostings.getFirst();
+			coa.addPosting(sourcePosting, entry.getDate(), entry.getDescription(), entry.getNonSourcePosting(sourcePosting.getAccount()).getAccount(), commission);
+			sortedPostings.subList(1, sortedPostings.size()).forEach(p -> coa.addPosting(p, entry.getDate(), entry.getDescription(), sourcePosting.getAccount(), commission));
+		} else {
+			log.error("Could not determine negative source posting {}", entry);
+		}
+	}
+
+	private void mapLedgerEntryToPostingsSinglePositive(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
+		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
+
+		if (sortedPostings.getLast().getAmount().compareTo(Money.ZERO) > 0) {
+			IPosting sourcePosting = sortedPostings.getLast();
+			coa.addPosting(sourcePosting, entry.getDate(), entry.getDescription(), entry.getNonSourcePosting(sourcePosting.getAccount()).getAccount(), commission);
+			sortedPostings.subList(0, sortedPostings.size()-1).forEach(p -> coa.addPosting(p, entry.getDate(), entry.getDescription(), sourcePosting.getAccount(), commission));
+		} else {
+			log.error("Could not determine positive source posting {}", entry);
+		}
+	}
+
+	public void mapLedgerEntryToPostings(ChartOfAccounts coa, LedgerEntry entry) {
+		Money commission = entry.hasCommissionPosting() ? entry.getCommission() : Money.ZERO;
 		List<IPosting> postings = entry.getPostings();
 		if (postings.size() == 2) {
 			// Simple case (does not assume order)
 			postings.forEach(p -> coa.addPosting(p, entry.getDate(), entry.getDescription(), entry.getNonSourcePosting(p.getAccount()).getAccount(), commission));
 		} else if (postings.size() > 2) {
-			// Complex multiline posting so need to determine source account (ie where the money came from)
-			if (postings.getFirst().getAmount().compareTo(BigDecimal.ZERO) < 0) {
-				// First account is source
-				IPosting sourcePosting = postings.getFirst();
-				coa.addPosting(sourcePosting, entry.getDate(), entry.getDescription(), entry.getNonSourcePosting(sourcePosting.getAccount()).getAccount(), commission);
-				postings.subList(1, postings.size()).forEach(p -> coa.addPosting(p, entry.getDate(), entry.getDescription(), sourcePosting.getAccount(), commission));
-			} else if (postings.getLast().getAmount().compareTo(BigDecimal.ZERO) < 0) {
-				// Last account is source
-				IPosting sourcePosting = postings.getLast();
-				coa.addPosting(sourcePosting, entry.getDate(), entry.getDescription(), entry.getNonSourcePosting(sourcePosting.getAccount()).getAccount(), commission);
-				postings.subList(0, postings.size()-1).forEach(p -> coa.addPosting(p, entry.getDate(), entry.getDescription(), sourcePosting.getAccount(), commission));
+			// Complex multiline posting so need to determine a primary source account (ie where the money came from (-) or goes to (+))
+			// We define the source account as the negative amounts
+			if (entry.totalNegativePostings() == 1) {
+				mapLedgerEntryToPostingsSingleNegative(coa, entry, commission);
+			} else if (entry.totalPositivePostings() == 1) {
+				mapLedgerEntryToPostingsSinglePositive(coa, entry, commission);
+			} else if (entry.canMatchPostings()) {
+				// Complex case where there are multiple sources but for now we assume it is balanced (equal + and - amounts that match)
+				mapLedgerEntryToPostingsBalanced(coa, entry, commission);
 			} else {
-				// Not first or last.
-				postings.sort(Comparator.comparing(IPosting::getAmount));
-				if (postings.getFirst().getAmount().compareTo(BigDecimal.ZERO) < 0) {
-					IPosting sourcePosting = postings.getFirst();
-					coa.addPosting(sourcePosting, entry.getDate(), entry.getDescription(), entry.getNonSourcePosting(sourcePosting.getAccount()).getAccount(), commission);
-					postings.subList(1, postings.size()).forEach(p -> coa.addPosting(p, entry.getDate(), entry.getDescription(), sourcePosting.getAccount(), commission));
-				} else {
-					log.error("Could not determine source posting {}", entry);
-				}
+				mapLedgerEntryToPostingsUnBalanced(coa, entry, commission);
 			}
 		} else {
 			log.error("Unhandled Ledger Entry with {} postings", postings.size());

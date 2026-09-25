@@ -16,6 +16,7 @@ public class AccountConstants {
 	public static final String DIVIDEND_INCOME = INVESTMENT_INCOME + "Dividends";
 	public static final String FRANKED_DIVIDEND = DIVIDEND_INCOME + ":Franked";
 	public static final String UNFRANKED_DIVIDEND = DIVIDEND_INCOME + ":Unfranked";
+	public static final String TAX_CREDIT = INVESTMENT_INCOME + "Tax Credit";
 	public static final String DISTRIBUTION_INCOME = "Income:Investment:Distribution";
 	public static final String REINVESTMENT_INCOME = "Income:Investment:Reinvestment";
 	public static final String CAPITAL_GAINS_INCOME = "Income:Investment:Capital Gains";

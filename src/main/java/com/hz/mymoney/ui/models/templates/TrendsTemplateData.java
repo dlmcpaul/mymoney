@@ -1,12 +1,12 @@
 package com.hz.mymoney.ui.models.templates;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.Movement;
 import com.hz.mymoney.ui.models.charts.TrendData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -58,7 +58,7 @@ public class TrendsTemplateData {
 		};
 	}
 
-	public BigDecimal total() {
+	public Money total() {
 		LocalDate start = startDate();
 		LocalDate end = LocalDate.now();
 
@@ -66,16 +66,16 @@ public class TrendsTemplateData {
 			return movements.stream()
 					.filter(movement -> movement.isBetween(start, end))
 					.map(Movement::amount)
-					.reduce(BigDecimal.ZERO, BigDecimal::add)
+					.reduce(Money.ZERO, Money::add)
 					.abs();
 		}
 		return movements.stream()
 				.filter(movement -> movement.isBetween(start, end))
 				.map(Movement::amount)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 	}
 
-	private TrendData buildTrendData(String name, BigDecimal value) {
+	private TrendData buildTrendData(String name, Money value) {
 		return new TrendData(name, account.startsWith("Income:") ? value.abs() : value);
 	}
 
@@ -88,7 +88,7 @@ public class TrendsTemplateData {
 		var yAxisValues = movements.stream()
 				.filter(movement -> movement.isBetween(start, end))
 				.collect(Collectors.groupingBy(movement -> groupBy(movement.date()),
-						Collectors.mapping(Movement::amount, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))))
+						Collectors.mapping(Movement::amount, Collectors.reducing(Money.ZERO, Money::add))))
 				.entrySet().stream()
 				.sorted(Map.Entry.comparingByKey())
 				.map(e -> buildTrendData(toDisplayName(e.getKey()), e.getValue()))

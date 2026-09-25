@@ -1,6 +1,7 @@
 package com.hz.mymoney.ui.models;
 
-import java.math.BigDecimal;
+import com.hz.mymoney.data.models.Money;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,21 +23,21 @@ public class NetAssetLiabilityPosition {
 		liabilityAccounts.add(account);
 	}
 
-	private BigDecimal sum(List<Account> accounts) {
+	private Money sum(List<Account> accounts) {
 		return accounts.stream()
 				.map(Account::balance)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 	}
 
-	public BigDecimal getAssetBalance() {
+	public Money getAssetBalance() {
 		return sum(assetAccounts);
 	}
 
-	public BigDecimal getLiabilityBalance() {
+	public Money getLiabilityBalance() {
 		return sum(liabilityAccounts);
 	}
 
-	public BigDecimal getNetPosition() {
+	public Money getNetPosition() {
 		return sum(assetAccounts).add(sum(liabilityAccounts));
 	}
 

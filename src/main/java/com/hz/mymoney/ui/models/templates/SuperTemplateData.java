@@ -1,21 +1,21 @@
 package com.hz.mymoney.ui.models.templates;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.ui.models.SuperannuationAccount;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SuperTemplateData {
 	public final List<SuperannuationAccount> superAccounts = new ArrayList<>();
 
-	private BigDecimal sum(List<SuperannuationAccount> accounts) {
+	private Money sum(List<SuperannuationAccount> accounts) {
 		return accounts.stream()
 				.map(SuperannuationAccount::balance)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 	}
 
-	public BigDecimal getTotalIncome() {
+	public Money getTotalIncome() {
 		return sum(superAccounts);
 	}
 }

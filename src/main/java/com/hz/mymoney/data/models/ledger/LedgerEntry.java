@@ -1,8 +1,8 @@
 package com.hz.mymoney.data.models.ledger;
 
+import com.hz.mymoney.data.models.Money;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -48,31 +48,31 @@ public class LedgerEntry {
 		if (postings.size() < 2) {
 			return false;
 		}
-		BigDecimal total = postings.stream()
+		Money total = postings.stream()
 				.map(IPosting::getValue)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 		// Financial calculations should always balance
-		return total.compareTo(BigDecimal.ZERO) == 0;
+		return total.compareTo(Money.ZERO) == 0;
 	}
 
-	public BigDecimal getRemainingBalance() {
-		BigDecimal total = BigDecimal.ZERO;
+	public Money getRemainingBalance() {
+		Money total = Money.ZERO;
 		for (IPosting p : postings) {
 			total = total.add(p.getValue());
 		}
-		return total.multiply(BigDecimal.valueOf(-1)).setScale(2, RoundingMode.HALF_UP);
+		return total.multiply(Money.valueOf(-1)).setScale(2, RoundingMode.HALF_UP);
 	}
 
 	public boolean hasCommissionPosting() {
 		return postings.stream().anyMatch(IPosting::isCommissionPosting);
 	}
 
-	public BigDecimal getCommission() {
+	public Money getCommission() {
 		if (hasCommissionPosting()) {
 			return postings.stream().filter(IPosting::isCommissionPosting)
 					.findFirst().orElseThrow().getValue();
 		}
-		return BigDecimal.ZERO;
+		return Money.ZERO;
 	}
 
 	public SharePosting getSharePosting() {
@@ -90,6 +90,35 @@ public class LedgerEntry {
 				&& this.getFirstAmount().abs().compareTo(transaction.getFirstAmount().abs()) == 0;
 	}
 
+	public long totalNegativePostings() {
+		return postings.stream()
+				.filter(iPosting -> iPosting.getAmount().compareTo(Money.ZERO) < 0)
+				.count();
+	}
+
+	public long totalPositivePostings() {
+		return postings.stream()
+				.filter(iPosting -> iPosting.getAmount().compareTo(Money.ZERO) > 0)
+				.count();
+	}
+
+	// Create a new list that doesn't contain the 2 postings provided
+	public List<IPosting> removePostings(List<IPosting> source, IPosting posting1, IPosting posting2) {
+		return source.stream()
+				.filter(p -> p.equals(posting1) == false)
+				.filter(p -> p.equals(posting2) == false)
+				.toList();
+	}
+
+	// Can each posting be matched with its reverse
+	public boolean canMatchPostings() {
+		// basic test first must be equal numbers of positive and negative postings
+		if (totalPositivePostings() == totalNegativePostings()) {
+			return true;
+		}
+		return false;
+	}
+
 	public IPosting getNonSourcePosting(String account) {
 		for (IPosting p : postings) {
 			if (p.getAccount().equalsIgnoreCase(account) == false) {
@@ -102,7 +131,7 @@ public class LedgerEntry {
 
 	public IPosting getFirstNegativePosting() {
 		for (IPosting p : postings) {
-			if (p.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+			if (p.getAmount().compareTo(Money.ZERO) < 0) {
 				return p;
 			}
 		}
@@ -111,7 +140,7 @@ public class LedgerEntry {
 
 	public IPosting getFirstPositivePosting() {
 		for (IPosting p : postings) {
-			if (p.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+			if (p.getAmount().compareTo(Money.ZERO) > 0) {
 				return p;
 			}
 		}
@@ -126,13 +155,14 @@ public class LedgerEntry {
 		return this.postings.get(postings.size() - 1);
 	}
 
-	public BigDecimal getFirstAmount() {
+	public Money getFirstAmount() {
 		return postings.stream()
 				.findFirst()
-				.orElseGet(() -> new Posting("Empty")).getAmount();
+				.orElseGet(() -> new Posting("Empty"))
+				.getAmount();
 	}
 
-	public IPosting getPostingWithAmount(BigDecimal amount) {
+	public IPosting getPostingWithAmount(Money amount) {
 		return postings.stream()
 				.filter(t -> t.getAmount().equals(amount))
 				.findFirst().orElse(null);

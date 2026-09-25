@@ -1,9 +1,9 @@
 package com.hz.mymoney.ui.models.templates;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.ui.models.Transaction;
 import lombok.Getter;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,45 +28,45 @@ public class TaxYear {
 	}
 
 	// Income = Salary Less Super
-	public BigDecimal getEarnedIncome() {
+	public Money getEarnedIncome() {
 		return sum(this.getEarnedIncomeTransactions()).abs()
 				.subtract(sum(this.supercontribTransactions).abs());
 	}
 
 	// Investment income is dividends and capitals gains but also franking credits and Interest earned
-	public BigDecimal getInvestmentIncomeAmount() {
+	public Money getInvestmentIncomeAmount() {
 		return sum(this.getInvestmentIncomeTransactions()).abs().add(this.getImputationCreditAmount());
 	}
 
-	public BigDecimal getTaxDeductionsAmount() {
+	public Money getTaxDeductionsAmount() {
 		return sum(this.getTaxDeductionTransactions()).abs();
 	}
 
-	public BigDecimal getDonationsAmount() {
+	public Money getDonationsAmount() {
 		return sum(this.getDonationTransactions()).abs();
 	}
 
-	public BigDecimal getSalaryTaxPaidAmount() {
+	public Money getSalaryTaxPaidAmount() {
 		return this.sum(this.getSalaryTaxTransactions()).abs();
 	}
 
-	public BigDecimal getPAYGPaidAmount() {
+	public Money getPAYGPaidAmount() {
 		return this.sum(this.paygTransactions).abs();
 	}
 
 	// This applies to both sides of the tax equation (income and tax paid)
-	public BigDecimal getImputationCreditAmount() {
+	public Money getImputationCreditAmount() {
 		return sum(imputationTransactions).abs();
 	}
 
-	public BigDecimal getSuperContribAmount() {
+	public Money getSuperContribAmount() {
 		return sum(supercontribTransactions).abs();
 	}
 
-	private BigDecimal sum(List<Transaction> transactions) {
+	private Money sum(List<Transaction> transactions) {
 		return transactions.stream()
 				.map(Transaction::amount)
-				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.reduce(Money.ZERO, Money::add)
 				.setScale(2, RoundingMode.HALF_UP);
 	}
 

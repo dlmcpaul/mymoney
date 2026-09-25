@@ -1,8 +1,8 @@
 package com.hz.mymoney.ui.models.templates;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.ui.models.Account;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,13 +16,13 @@ public class EquityTemplateData {
 				.toList();
 	}
 
-	private BigDecimal sum(List<Account> accounts) {
+	private Money sum(List<Account> accounts) {
 		return accounts.stream()
 				.map(Account::balance)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 	}
 
-	public BigDecimal getTotalIncome() {
+	public Money getTotalIncome() {
 		return sum(equityAccounts);
 	}
 }

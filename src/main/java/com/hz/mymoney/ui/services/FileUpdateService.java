@@ -1,5 +1,6 @@
 package com.hz.mymoney.ui.services;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.data.models.ledger.IPosting;
 import com.hz.mymoney.data.models.ledger.Ledger;
@@ -33,7 +34,7 @@ public class FileUpdateService {
 	private final SharePriceServices sharePriceServices;
 
 	public void addNewTransaction(BasicJournalInput basicJournalInput) {
-		BigDecimal amount = basicJournalInput.getAmounts().getFirst() != null ? basicJournalInput.getAmounts().getFirst() : basicJournalInput.getAmounts().getLast();
+		Money amount = new Money(basicJournalInput.getAmounts().getFirst() != null ? basicJournalInput.getAmounts().getFirst() : basicJournalInput.getAmounts().getLast());
 
 		log.info("New Simple Journal {} {} {}", basicJournalInput.getJournalDate(), basicJournalInput.getAccounts(), amount);
 
@@ -51,7 +52,7 @@ public class FileUpdateService {
 		log.info("New Distribution Journal Request {} {} {} {}", distributionInputJournal.getDistributionType(), distributionInputJournal.getJournalDate(), distributionInputJournal.getAccounts().getFirst(), distributionInputJournal.getAmounts().getFirst());
 		Ledger ledger = ledgerServices.getLedger();
 
-		BigDecimal amount = distributionInputJournal.getAmounts().getFirst() != null ? distributionInputJournal.getAmounts().getFirst() : distributionInputJournal.getAmounts().getLast();
+		Money amount = new Money(distributionInputJournal.getAmounts().getFirst() != null ? distributionInputJournal.getAmounts().getFirst() : distributionInputJournal.getAmounts().getLast());
 		String shareAccount = distributionInputJournal.getAccounts().getFirst();
 		String description;
 		String code = shareAccount.substring(shareAccount.lastIndexOf(":") + 1);
@@ -98,8 +99,8 @@ public class FileUpdateService {
 		BigDecimal cashAmount = frankedAmount.add(unfrankedAmount);
 
 		String code = shareAccount.substring(shareAccount.lastIndexOf(":") + 1);
-		String description = "Dividend from " + code;
-		String imputationNote = "Imputation Credit from " + code;
+		String description = (unfrankedAmount.compareTo(BigDecimal.ZERO) == 0 ? "Franked " : "") + "Dividend from " + code;
+		String imputationNote = "Tax Credit from " + code;
 
 		// If there is a franked amount then there must be an imputation amount
 		if (imputationAmount.compareTo(BigDecimal.ZERO) == 0 && frankedAmount.compareTo(BigDecimal.ZERO) != 0) {
@@ -119,10 +120,11 @@ public class FileUpdateService {
 			postings.add(new Posting(IMPUTATION_ACCOUNT, imputationAmount, imputationNote));
 		}
 		if (frankedAmount.compareTo(BigDecimal.ZERO) > 0) {
-			postings.add(new Posting(FRANKED_DIVIDEND, frankedAmount.add(imputationAmount).multiply(BigDecimal.valueOf(-1))));
+			postings.add(new Posting(FRANKED_DIVIDEND, frankedAmount.negate(), "Franked Dividend from " + code));
+			postings.add(new Posting(TAX_CREDIT, imputationAmount.negate(), imputationNote));
 		}
 		if (unfrankedAmount.compareTo(BigDecimal.ZERO) > 0) {
-			postings.add(new Posting(UNFRANKED_DIVIDEND, unfrankedAmount.multiply(BigDecimal.valueOf(-1))));
+			postings.add(new Posting(UNFRANKED_DIVIDEND, unfrankedAmount.multiply(BigDecimal.valueOf(-1)),"Unfranked Dividend from " + code));
 		}
 		ledger.add(dividendInputJournal.getJournalDate(),
 				description,
@@ -154,7 +156,7 @@ public class FileUpdateService {
 				LocalDate today = LocalDate.now();
 				log.info("Posting Scheduled Journal @ {}", today);
 				schedule.ledgerEntry.getPostings().forEach(posting -> {
-					posting.setAmount(amountOverrides.get(schedule.ledgerEntry.getPostings().indexOf(posting)));
+					posting.setAmount(new Money(amountOverrides.get(schedule.ledgerEntry.getPostings().indexOf(posting))));
 					log.info("  {} {}", posting.getAccount(), posting.getAmount());
 				});
 

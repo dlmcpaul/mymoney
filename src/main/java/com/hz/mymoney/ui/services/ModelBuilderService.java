@@ -1,6 +1,7 @@
 package com.hz.mymoney.ui.services;
 
 import com.hz.mymoney.configuration.AccountConstants;
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.ChartOfAccounts;
 import com.hz.mymoney.data.models.coa.Movement;
 import com.hz.mymoney.data.models.coa.Schedule;
@@ -15,7 +16,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -117,19 +117,26 @@ public class ModelBuilderService {
 				.flatMap(List::stream)
 				.toList();
 
-		BigDecimal income = incomeTransactions.stream().map(Transaction::amount).reduce(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), BigDecimal::add).abs();
-		BigDecimal expenses = expensesTransactions.stream().map(Transaction::amount).reduce(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), BigDecimal::add).multiply(BigDecimal.valueOf(-1));
+		Money income = incomeTransactions.stream()
+				.map(Transaction::amount)
+				.reduce(Money.ZERO, Money::add)
+				.abs();
+
+		Money expenses = expensesTransactions.stream()
+				.map(Transaction::amount)
+				.reduce(Money.ZERO, Money::add)
+				.negate();
 
 		monthlyTransactions.addAll(incomeTransactions.stream()
-				.collect(groupingBy(Transaction::description, Collectors.reducing(BigDecimal.ZERO, Transaction::amount, BigDecimal::add)))
+				.collect(groupingBy(Transaction::description, Collectors.reducing(Money.ZERO, Transaction::amount, Money::add)))
 				.entrySet().stream()
 				.map(stringBigDecimalEntry -> new SummedTransaction(stringBigDecimalEntry.getKey(), stringBigDecimalEntry.getValue().abs()))
 				.sorted((o1, o2) -> o2.amount().compareTo(o1.amount()))
 				.toList());
 		monthlyTransactions.addAll(expensesTransactions.stream()
-				.collect(groupingBy(Transaction::description, Collectors.reducing(BigDecimal.ZERO, Transaction::amount, BigDecimal::add)))
+				.collect(groupingBy(Transaction::description, Collectors.reducing(Money.ZERO, Transaction::amount, Money::add)))
 				.entrySet().stream()
-				.map(entry -> new SummedTransaction(entry.getKey(), entry.getValue().multiply(BigDecimal.valueOf(-1))))
+				.map(entry -> new SummedTransaction(entry.getKey(), entry.getValue().negate()))
 				.sorted(Comparator.comparing(SummedTransaction::amount))
 				.toList());
 
@@ -173,7 +180,7 @@ public class ModelBuilderService {
 				.toList());
 
 		investmentTransactions.addAll(coa.getInvestmentMovementsForCode(code).stream()
-				.map(m -> new Transaction(m.date(), m.description(), m.amount().multiply(BigDecimal.valueOf(-1)), "", "", false, BigDecimal.ZERO))
+				.map(m -> new Transaction(m.date(), m.getNote(), m.amount().negate(), "", "", false, Money.ZERO))
 						.toList());
 
 		investmentTransactions.sort(Comparator.comparing(Transaction::asAt));
@@ -297,23 +304,23 @@ public class ModelBuilderService {
 		return financialYearStartDate;
 	}
 
-	private InvestmentSummary mapAccountToShareSummary(com.hz.mymoney.data.models.coa.Account account, BigDecimal earnings, LocalDate asAt) {
-		BigDecimal currentShareValue = account.isShareAccount() ? shareValueService.getInvestmentValue(account.getCode(), asAt) : BigDecimal.ZERO;
-		BigDecimal yesterdayShareValue = account.isShareAccount() ? shareValueService.getPreviousInvestmentValue(account.getCode(), asAt) : BigDecimal.ZERO;
-		BigDecimal currentValue = account.getTotalAmount().multiply(currentShareValue).setScale(2, RoundingMode.HALF_UP);
-		BigDecimal netProfitLoss = currentValue.compareTo(BigDecimal.ZERO) != 0
+	private InvestmentSummary mapAccountToShareSummary(com.hz.mymoney.data.models.coa.Account account, Money earnings, LocalDate asAt) {
+		Money currentShareValue = account.isShareAccount() ? shareValueService.getInvestmentValue(account.getCode(), asAt) : Money.ZERO;
+		Money yesterdayShareValue = account.isShareAccount() ? shareValueService.getPreviousInvestmentValue(account.getCode(), asAt) : Money.ZERO;
+		Money currentValue = account.getTotalAmount().multiply(currentShareValue).setScale(2, RoundingMode.HALF_UP);
+		Money netProfitLoss = currentValue.compareTo(Money.ZERO) != 0
 				? currentValue.subtract(account.getCostBase().subtract(earnings).subtract(account.getSales()))
 				: earnings.add(account.getSales()).subtract(account.getCostBase());
 
 		PriorityQueue<Movement> movementsForCode = account.getMovementsForCode(account.getCode());
 		if (movementsForCode.isEmpty()) {
-			return new InvestmentSummary(account.getCode(), account.getTotalAmount(), currentShareValue, yesterdayShareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, LocalDate.of(2000,1,1), LocalDate.now(), getNextInvestmentIncomeNote(account.getCode()));
+			return new InvestmentSummary(account.getCode(), account.getTotalAmount().getAmount(), currentShareValue, yesterdayShareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, LocalDate.of(2000,1,1), LocalDate.now(), getNextInvestmentIncomeNote(account.getCode()));
 		}
 
 		LocalDate earliestMovementDate = movementsForCode.stream().findFirst().orElseThrow().date();
 		LocalDate lastMovementDate = movementsForCode.stream().toList().getLast().date();
 
-		return new InvestmentSummary(account.getCode(), account.getTotalAmount(), currentShareValue, yesterdayShareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, earliestMovementDate, lastMovementDate, getNextInvestmentIncomeNote(account.getCode()));
+		return new InvestmentSummary(account.getCode(), account.getTotalAmount().getAmount(), currentShareValue, yesterdayShareValue, currentValue, account.getCostBase(), account.getSales(), earnings, netProfitLoss, earliestMovementDate, lastMovementDate, getNextInvestmentIncomeNote(account.getCode()));
 	}
 
 	private NetAssetLiabilityPosition createNetAssetLiabilityPosition(ChartOfAccounts chartOfAccounts, boolean includeNote) {
@@ -337,16 +344,16 @@ public class ModelBuilderService {
 
 	private Account mapEquityAccount(com.hz.mymoney.data.models.coa.Account account, LocalDate asAt) {
 		if (account.isShareAccount()) {
-			BigDecimal shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
+			Money shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
 			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getTotalAmount().multiply(shareValue).setScale(2, RoundingMode.HALF_UP), account.isShareAccount(), null);
 		}
 
-		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getBalance(asAt, shareValueService.getInvestmentHistory()).multiply(BigDecimal.valueOf(-1)), false, null);
+		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getBalance(asAt, shareValueService.getInvestmentHistory()).negate(), false, null);
 	}
 
 	private Account mapAccount(com.hz.mymoney.data.models.coa.Account account, LocalDate asAt, boolean includeNote) {
 		if (account.isShareAccount()) {
-			BigDecimal shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
+			Money shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
 			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getTotalAmount().multiply(shareValue).setScale(2, RoundingMode.HALF_UP), account.isShareAccount(), includeNote ? getNextInvestmentIncomeNote(account.getCode()) : null);
 		}
 
@@ -354,12 +361,12 @@ public class ModelBuilderService {
 	}
 
 	private Account mapAccount(com.hz.mymoney.data.models.coa.Account account, List<Transaction> transactions, LocalDate asAt) {
-		BigDecimal total = transactions.stream()
+		Money total = transactions.stream()
 				.map(Transaction::amount)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 
 		if (account.isShareAccount()) {
-			BigDecimal shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
+			Money shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
 			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), total.multiply(shareValue).setScale(2, RoundingMode.HALF_UP), account.isShareAccount(), getNextInvestmentIncomeNote(account.getCode()));
 		}
 
@@ -391,15 +398,15 @@ public class ModelBuilderService {
 		int yearMin = year - 10;
 
 		while (year > yearMin) {
-			BigDecimal taxes = sumBalanceForFY(chartOfAccounts, EMPLOYMENT_TAXES, financialYearStart)
+			Money taxes = sumBalanceForFY(chartOfAccounts, EMPLOYMENT_TAXES, financialYearStart)
 					.add(sumBalanceForFY(chartOfAccounts, SUPER_TAXES, financialYearStart));
 			yearlyIncomeExpenseList.add(new YearlyIncomeExpense("FY" + (year - 2000) + "/" + (year - 1999),
 					sumBalanceForFY(chartOfAccounts, INCOME_PREFIX, financialYearStart),
 					sumBalanceForFY(chartOfAccounts, "Expenses", financialYearStart)
 							.subtract(taxes)
-							.multiply(BigDecimal.valueOf(-1)),
-					taxes.multiply(BigDecimal.valueOf(-1)
-					)));
+							.negate(),
+					taxes.negate()
+					));
 			year--;
 			chartOfAccounts = new ChartOfAccounts(financialYearStart.minusDays(1), chartOfAccounts);
 			financialYearStart = financialYearStart.minusYears(1);
@@ -414,12 +421,12 @@ public class ModelBuilderService {
 		return createIncomeExpenseHistory(calculateStartOfFinancialYear(LocalDate.now()));
 	}
 
-	private BigDecimal sumBalanceForFY(ChartOfAccounts chartOfAccounts, String accountType, LocalDate fyStart) {
+	private Money sumBalanceForFY(ChartOfAccounts chartOfAccounts, String accountType, LocalDate fyStart) {
 		return chartOfAccounts.getAccountsOfType(accountType, true).stream()
 				.filter(account -> account.hasMovementBetween(fyStart, chartOfAccounts.getAsAt()))
 				.map(account -> buildFilteredAccount(account, fyStart, chartOfAccounts.getAsAt()))
 				.map(Account::balance)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 	}
 
 	public EquityTemplateData createEquityTemplateData() {

@@ -6,7 +6,7 @@
     <div class="ui small list" th:unless="${subaccounts.isEmpty()}" th:each="account, stats : ${subaccounts}">
         <div class="item">
             <div class="right floated content">
-                <div th:text="${#numbers.formatCurrency(account.balance)}">$0</div>
+                <div th:text="${account.balance.formatCurrency()}">$0</div>
             </div>
             <div class="content">
                 <div class="ui small breadcrumb" th:with="breadcrums=${account.breadcrumb(accountFilter)}">

@@ -15,40 +15,40 @@
             <div class="row">
                 <div class="four wide column">Assets</div>
                 <div class="right aligned four wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentAssetBalance())}"></div>
+                     data-th-text="${netWorth.getCurrentAssetBalance().formatCurrency()}"></div>
                 <div class="right aligned four wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearAssetBalance())}"></div>
-                <div class="right aligned four wide column" th:if="${netWorth.assetDifference()} lt 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.assetDifference())}">$0</span><span> <i
+                     data-th-text="${netWorth.getLastYearAssetBalance().formatCurrency()}"></div>
+                <div class="right aligned four wide column" th:if="${netWorth.assetDifference().amount} lt 0"><span
+                        data-th-text="${netWorth.assetDifference().formatCurrency()}">$0</span><span> <i
                         class="fitted arrow down icon"></i></span></div>
-                <div class="right aligned four wide column" th:if="${netWorth.assetDifference()} ge 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.assetDifference())}">$0</span><span> <i
+                <div class="right aligned four wide column" th:if="${netWorth.assetDifference().amount} ge 0"><span
+                        data-th-text="${netWorth.assetDifference().formatCurrency()}">$0</span><span> <i
                         class="fitted arrow up icon"></i></span></div>
             </div>
             <div class="row">
                 <div class="four wide column">Liabilities</div>
                 <div class="right aligned four wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentLiabilityBalance())}"></div>
+                     data-th-text="${netWorth.getCurrentLiabilityBalance().formatCurrency()}"></div>
                 <div class="right aligned four wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearLiabilityBalance())}"></div>
-                <div class="right aligned four wide column" th:if="${netWorth.liabilityDifference()} lt 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.liabilityDifference())}">$0</span><span> <i
+                     data-th-text="${netWorth.getLastYearLiabilityBalance().formatCurrency()}"></div>
+                <div class="right aligned four wide column" th:if="${netWorth.liabilityDifference().amount} lt 0"><span
+                        data-th-text="${netWorth.liabilityDifference().formatCurrency()}">$0</span><span> <i
                         class="fitted arrow down icon"></i></span></div>
-                <div class="right aligned four wide column" th:if="${netWorth.liabilityDifference()} ge 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.liabilityDifference())}">$0</span><span> <i
+                <div class="right aligned four wide column" th:if="${netWorth.liabilityDifference().amount} ge 0"><span
+                        data-th-text="${netWorth.liabilityDifference().formatCurrency()}">$0</span><span> <i
                         class="fitted arrow up icon"></i></span></div>
             </div>
             <div class="row">
                 <div class="four wide column">Net Worth</div>
                 <div class="right aligned four wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentNetPosition())}"></div>
+                     data-th-text="${netWorth.getCurrentNetPosition().formatCurrency()}"></div>
                 <div class="right aligned four wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearNetPosition())}"></div>
-                <div class="right aligned four wide column" th:if="${netWorth.netWorthDifference()} lt 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.netWorthDifference())}">$0</span><span> <i
+                     data-th-text="${netWorth.getLastYearNetPosition().formatCurrency()}"></div>
+                <div class="right aligned four wide column" th:if="${netWorth.netWorthDifference().amount} lt 0"><span
+                        data-th-text="${netWorth.netWorthDifference().formatCurrency()}">$0</span><span> <i
                         class="fitted arrow down icon"></i></span></div>
-                <div class="right aligned four wide column" th:if="${netWorth.netWorthDifference()} ge 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.netWorthDifference())}">$0</span><span> <i
+                <div class="right aligned four wide column" th:if="${netWorth.netWorthDifference().amount} ge 0"><span
+                        data-th-text="${netWorth.netWorthDifference().formatCurrency()}">$0</span><span> <i
                         class="fitted arrow up icon"></i></span></div>
             </div>
         </div>
@@ -64,40 +64,40 @@
             <div class="row">
                 <div class="ten wide column">Assets</div>
                 <div class="right aligned two wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentAssetBalance())}"></div>
+                     data-th-text="${netWorth.getCurrentAssetBalance().formatCurrency()}"></div>
                 <div class="right aligned two wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearAssetBalance())}"></div>
-                <div class="right aligned two wide column" th:if="${netWorth.assetDifference()} lt 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.assetDifference())}">$0</span><span> <i
+                     data-th-text="${netWorth.getLastYearAssetBalance().formatCurrency()}"></div>
+                <div class="right aligned two wide column" th:if="${netWorth.assetDifference().amount} lt 0"><span
+                        data-th-text="${netWorth.assetDifference().formatCurrency()}">$0</span><span> <i
                         class="arrow down icon"></i></span></div>
-                <div class="right aligned two wide column" th:if="${netWorth.assetDifference()} ge 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.assetDifference())}">$0</span><span> <i
+                <div class="right aligned two wide column" th:if="${netWorth.assetDifference().amount} ge 0"><span
+                        data-th-text="${netWorth.assetDifference().formatCurrency()}">$0</span><span> <i
                         class="arrow up icon"></i></span></div>
             </div>
             <div class="row">
                 <div class="ten wide column">Liabilities</div>
                 <div class="right aligned two wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentLiabilityBalance())}"></div>
+                     data-th-text="${netWorth.getCurrentLiabilityBalance().formatCurrency()}"></div>
                 <div class="right aligned two wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearLiabilityBalance())}"></div>
-                <div class="right aligned two wide column" th:if="${netWorth.liabilityDifference()} lt 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.liabilityDifference())}">$0</span><span> <i
+                     data-th-text="${netWorth.getLastYearLiabilityBalance().formatCurrency()}"></div>
+                <div class="right aligned two wide column" th:if="${netWorth.liabilityDifference().amount} lt 0"><span
+                        data-th-text="${netWorth.liabilityDifference().formatCurrency()}">$0</span><span> <i
                         class="arrow down icon"></i></span></div>
-                <div class="right aligned two wide column" th:if="${netWorth.liabilityDifference()} ge 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.liabilityDifference())}">$0</span><span> <i
+                <div class="right aligned two wide column" th:if="${netWorth.liabilityDifference().amount} ge 0"><span
+                        data-th-text="${netWorth.liabilityDifference().formatCurrency()}">$0</span><span> <i
                         class="arrow up icon"></i></span></div>
             </div>
             <div class="row">
                 <div class="ten wide column">Net Worth</div>
                 <div class="right aligned two wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getCurrentNetPosition())}"></div>
+                     data-th-text="${netWorth.getCurrentNetPosition().formatCurrency()}"></div>
                 <div class="right aligned two wide column"
-                     data-th-text="${#numbers.formatCurrency(netWorth.getLastYearNetPosition())}"></div>
-                <div class="right aligned two wide column" th:if="${netWorth.netWorthDifference()} lt 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.netWorthDifference())}">$0</span><span> <i
+                     data-th-text="${netWorth.getLastYearNetPosition().formatCurrency()}"></div>
+                <div class="right aligned two wide column" th:if="${netWorth.netWorthDifference().amount} lt 0"><span
+                        data-th-text="${netWorth.netWorthDifference().formatCurrency()}">$0</span><span> <i
                         class="arrow down icon"></i></span></div>
-                <div class="right aligned two wide column" th:if="${netWorth.netWorthDifference()} ge 0"><span
-                        data-th-text="${#numbers.formatCurrency(netWorth.netWorthDifference())}">$0</span><span> <i
+                <div class="right aligned two wide column" th:if="${netWorth.netWorthDifference().amount} ge 0"><span
+                        data-th-text="${netWorth.netWorthDifference().formatCurrency()}">$0</span><span> <i
                         class="arrow up icon"></i></span></div>
             </div>
         </div>

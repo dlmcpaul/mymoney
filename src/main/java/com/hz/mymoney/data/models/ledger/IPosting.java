@@ -1,6 +1,6 @@
 package com.hz.mymoney.data.models.ledger;
 
-import java.math.BigDecimal;
+import com.hz.mymoney.data.models.Money;
 
 public interface IPosting {
 
@@ -10,12 +10,12 @@ public interface IPosting {
 
 	String postLine();
 	String getAccount();
-	BigDecimal getAmount();
-	BigDecimal getPrice();
+	Money getAmount();
+	Money getPrice();
 	String getCode();
-	BigDecimal getValue();
+	Money getValue();
 	boolean isSplit();
 	String getNote();
 
-	void setAmount(BigDecimal amount);
+	void setAmount(Money amount);
 }

@@ -1,5 +1,7 @@
 package com.hz.mymoney.data.models.ledger;
 
+import com.hz.mymoney.data.models.Money;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -9,21 +11,33 @@ import static com.hz.mymoney.configuration.AccountConstants.INCOME_PREFIX;
 public class Posting implements IPosting {
 	protected final String account;
 	protected final String note;
-	protected BigDecimal amount;
+	protected Money amount;
 
 	public Posting(String account) {
 		this.account = account;
-		this.amount = BigDecimal.ZERO;
+		this.amount = Money.ZERO;
 		this.note = null;
 	}
 
 	public Posting(String account, BigDecimal amount) {
 		this.account = account;
-		this.amount = amount.setScale(2, RoundingMode.HALF_UP);
+		this.amount = new Money(amount);
 		this.note = null;
 	}
 
 	public Posting(String account, BigDecimal amount, String note) {
+		this.account = account;
+		this.amount = new Money(amount);
+		this.note = note;
+	}
+
+	public Posting(String account, Money amount) {
+		this.account = account;
+		this.amount = amount.setScale(2, RoundingMode.HALF_UP);
+		this.note = null;
+	}
+
+	public Posting(String account, Money amount, String note) {
 		this.account = account;
 		this.amount = amount.setScale(2, RoundingMode.HALF_UP);
 		this.note = note;
@@ -36,7 +50,7 @@ public class Posting implements IPosting {
 	public String postLine() {
 		return "  "
 				+ account
-				+ (amount != null ? "  $" + amount.setScale(2, RoundingMode.HALF_UP).toPlainString() : "")
+				+ (amount != null ? "  " + amount : "")
 				+ (note != null ? "  ;" + note : "");
 	}
 
@@ -46,13 +60,13 @@ public class Posting implements IPosting {
 	}
 
 	@Override
-	public BigDecimal getAmount() {
+	public Money getAmount() {
 		return amount;
 	}
 
 	@Override
-	public BigDecimal getPrice() {
-		return BigDecimal.ONE;
+	public Money getPrice() {
+		return Money.ONE;
 	}
 
 	@Override
@@ -61,7 +75,7 @@ public class Posting implements IPosting {
 	}
 
 	@Override
-	public BigDecimal getValue() {
+	public Money getValue() {
 		return amount;
 	}
 
@@ -76,7 +90,7 @@ public class Posting implements IPosting {
 	}
 
 	@Override
-	public void setAmount(BigDecimal amount) {
+	public void setAmount(Money amount) {
 		this.amount = amount.setScale(2, RoundingMode.HALF_UP);
 	}
 

@@ -25,38 +25,20 @@ public class InvestmentsController {
 	private final FileUpdateService uiDataUpdateService;
 
 	@GetMapping
-	public String investments(Model model) {
+	public String showInvestments(Model model, @RequestParam(value = "nextDisplayMode", required = false) String nextDisplayMode) {
 		try {
+			boolean isCurrent = nextDisplayMode == null || nextDisplayMode.equals("current");
+
 			uiDataUpdateService.reloadCommodities();
 			PageSupport.populateDefaultModelData(model, release.getVersion());
-			model.addAttribute("nextDisplayMode", "historical");
-			model.addAttribute("header", "Current Investments");
-			model.addAttribute("investmentsData", uiModelBuilderService.createCurrentInvestmentsTemplateData());
+			model.addAttribute("nextDisplayMode", isCurrent ? "historical" : "current");
+			model.addAttribute("titleText", isCurrent ? "Current Investments" : "Historical Investments");
+			model.addAttribute("investmentsData", isCurrent ? uiModelBuilderService.createCurrentInvestmentsTemplateData() : uiModelBuilderService.createPriorInvestmentsTemplateData());
 			model.addAttribute("investments", null);
 		} catch (Exception e) {
 			log.error("Investments Page Generation Exception {}", e.getMessage(), e);
 		}
 		return "Investments";
-	}
-
-	@GetMapping
-	@HxRequest
-	public View switchInvestments(Model model, @RequestParam("nextDisplayMode") String nextDisplayMode) {
-		try {
-			PageSupport.populateDefaultModelData(model, release.getVersion());
-			model.addAttribute("nextDisplayMode", nextDisplayMode.equals("current") ? "historical" : "current");
-			model.addAttribute("header", nextDisplayMode.equals("current") ? "Current Investments" : "Historical Investments");
-			model.addAttribute("investmentsData", nextDisplayMode.equals("current") ? uiModelBuilderService.createCurrentInvestmentsTemplateData() : uiModelBuilderService.createPriorInvestmentsTemplateData());
-			model.addAttribute("investments", null);
-		} catch (Exception e) {
-			log.error("Switch Investments Page Generation Exception {}", e.getMessage(), e);
-		}
-		return FragmentsRendering
-				.fragment("fragments/Common :: InvestmentHeader")
-				.fragment("fragments/Investment :: InvestmentTable")
-				.fragment("fragments/Investment :: InvestmentChart")
-				.fragment("fragments/Investment :: InvestmentList")
-				.build();
 	}
 
 	@GetMapping("/list")

@@ -30,17 +30,17 @@
                     {
                         label: 'Income',
                         backgroundColor: '#0080FF',
-                        data: data.map(row => row.income)
+                        data: data.map(row => row.income.amount)
                     },
                     {
                         label: 'Expenses',
                         backgroundColor: '#FF9900',
-                        data: data.map(row => row.expense)
+                        data: data.map(row => row.expense.amount)
                     },
                     {
                         label: 'Taxes',
                         backgroundColor: '#FF4000',
-                        data: data.map(row => row.taxes)
+                        data: data.map(row => row.taxes.amount)
                     }
                 ]
             },

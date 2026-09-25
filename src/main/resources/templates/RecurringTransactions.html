@@ -20,9 +20,9 @@
             <td data-label="Description" th:text="${schedule.description()}">James</td>
             <td data-label="Due Date" th:text="${#temporals.format(schedule.dueDate(),'dd MMM yyyy', #locale)}">24</td>
             <td data-label="Recurrence" th:text="${schedule.recurrenceDescription()}">Engineer</td>
-            <td data-label="Amount" class="right aligned" th:text="${#numbers.formatCurrency(schedule.amount())}"></td>
+            <td data-label="Amount" class="right aligned" th:text="${schedule.amount().formatCurrency()}"></td>
             <td data-label="Yearly Estimate" class="right aligned big-screen-table"
-                th:text="${#numbers.formatCurrency(schedule.totalForYear())}"></td>
+                th:text="${schedule.totalForYear().formatCurrency()}"></td>
             <td data-label="Actions" class="center aligned big-screen-table">
                 <div class="ui small spaced buttons">
                     <button class="ui compact button">Edit</button>

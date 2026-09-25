@@ -39,15 +39,14 @@
     </div>
 </div>
 
-<div id="InvestmentHeader" th:fragment="InvestmentHeader (nextDisplayMode, header)"
+<div id="InvestmentHeader" th:fragment="InvestmentHeader (nextDisplayMode, titleText)"
      class="ui one column middle aligned grid">
     <div class="row">
         <div class="column">
-            <div class="ui center aligned huge header"><span th:text="${header}">Current Investments</span> <a
-                    th:href="|@{/Investments}?nextDisplayMode=${nextDisplayMode}|"
-                    th:attr="hx-get=|@{/Investments}?nextDisplayMode=${nextDisplayMode}|,data-tooltip=|Switch to ${nextDisplayMode}|"
-                    hx-select-oob="#InvestmentTable, #InvestmentHeader, #InvestmentChart, #InvestmentList"
-                    hx-swap="outerHTML"><i class="exchange alternate icon"></i></a>
+            <div class="ui center aligned huge header"><span th:text="${titleText}">Current Investments</span> <a
+                    th:href="|@{/investments}?nextDisplayMode=${nextDisplayMode}|"
+                    th:attr="hx-get=|@{/investments}?nextDisplayMode=${nextDisplayMode}|,data-tooltip=|Switch to ${nextDisplayMode}|"
+                    hx-target="body" hx-swap="outerHTML"><i class="exchange alternate icon"></i></a>
             </div>
         </div>
     </div>
@@ -74,7 +73,7 @@
 </div>
 
 <div th:fragment="SaveButton" data-tooltip="Save" class="ui large icon" id="SaveButton" th:classappend="${readOnlyLedger} ? ' disabled button' : ' button'"
-     th:attr="hx-post=|@{/save}|" hx-swap="outerHTML" hx-select="#SaveButton"
+     th:attr="hx-post=|@{/ledger}|" hx-swap="outerHTML" hx-select="#SaveButton"
 ><i class="fitted inverted black save icon"></i>
 </div>
 

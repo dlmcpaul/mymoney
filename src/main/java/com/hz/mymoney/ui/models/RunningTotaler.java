@@ -1,10 +1,11 @@
 package com.hz.mymoney.ui.models;
 
-import java.math.BigDecimal;
+import com.hz.mymoney.data.models.Money;
+
 import java.util.List;
 
 public class RunningTotaler {
-	BigDecimal runningTotal;
+	Money runningTotal;
 	String accountName;
 
 	public RunningTotaler() {
@@ -15,7 +16,7 @@ public class RunningTotaler {
 		this.accountName = accountName;
 	}
 
-	public BigDecimal calculateTotal(int index, List<Transaction> transactions) {
+	public Money calculateTotal(int index, List<Transaction> transactions) {
 		if (index == 1) {
 			runningTotal = transactions.getFirst().amount();
 		} else {

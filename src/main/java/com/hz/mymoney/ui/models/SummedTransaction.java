@@ -1,6 +1,6 @@
 package com.hz.mymoney.ui.models;
 
-import java.math.BigDecimal;
+import com.hz.mymoney.data.models.Money;
 
-public record SummedTransaction(String description, BigDecimal amount) {
+public record SummedTransaction(String description, Money amount) {
 }

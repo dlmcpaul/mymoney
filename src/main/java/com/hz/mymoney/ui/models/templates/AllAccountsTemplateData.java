@@ -1,8 +1,8 @@
 package com.hz.mymoney.ui.models.templates;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.ui.models.Account;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,30 +18,30 @@ public class AllAccountsTemplateData {
 		this.financialYear = financialYear;
 	}
 
-	private BigDecimal sum(List<Account> accounts) {
+	private Money sum(List<Account> accounts) {
 		return accounts.stream()
 				.map(Account::balance)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+				.reduce(Money.ZERO, Money::add);
 	}
 
-	public BigDecimal getNetPosition() {
+	public Money getNetPosition() {
 		return sum(assetAccounts).add(sum(liabilityAccounts));
 	}
 
-	public BigDecimal getTotalIncome() {
+	public Money getTotalIncome() {
 		return sum(incomeAccounts);
 	}
 
-	public BigDecimal getTotalExpenses() {
+	public Money getTotalExpenses() {
 		return sum(expenseAccounts);
 	}
 
-	public BigDecimal getHighestIncome() {
-		return incomeAccounts.stream().map(Account::balance).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+	public Money getHighestIncome() {
+		return incomeAccounts.stream().map(Account::balance).max(Money::compareTo).orElse(Money.ZERO);
 	}
 
-	public BigDecimal getHighestExpense() {
-		return expenseAccounts.stream().map(Account::balance).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+	public Money getHighestExpense() {
+		return expenseAccounts.stream().map(Account::balance).max(Money::compareTo).orElse(Money.ZERO);
 	}
 
 	public String financialPeriod() {

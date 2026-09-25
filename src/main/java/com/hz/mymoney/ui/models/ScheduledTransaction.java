@@ -1,8 +1,8 @@
 package com.hz.mymoney.ui.models;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.ui.models.support.Recurrence;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,7 +10,7 @@ public record ScheduledTransaction(
 		String description,
 		boolean isIncoming,
 		LocalDate dueDate,
-		BigDecimal amount,
+		Money amount,
 		int recurrenceAmount,
 		String recurrenceType,
 		List<Journal> journals) implements Comparable<ScheduledTransaction> {
@@ -48,9 +48,9 @@ public record ScheduledTransaction(
 		};
 	}
 
-	public BigDecimal totalForYear() {
+	public Money totalForYear() {
 		int count = oneYear() / recurrenceAmount;
-		return amount.multiply(BigDecimal.valueOf(count));
+		return amount.multiply(Money.valueOf(count));
 	}
 
 	@Override

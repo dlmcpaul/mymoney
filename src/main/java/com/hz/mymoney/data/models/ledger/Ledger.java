@@ -1,9 +1,9 @@
 package com.hz.mymoney.data.models.ledger;
 
+import com.hz.mymoney.data.models.Money;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +19,9 @@ public class Ledger {
 		this.ledgerEntries.addAll(ledgerEntries);
 	}
 
-	private void add(LocalDate date, String description, BigDecimal amount, BigDecimal price, String code, String to, String from) {
+	private void add(LocalDate date, String description, Money amount, Money price, String code, String to, String from) {
 		SharePosting fromAccount = new SharePosting(from, amount, price, code, null);
-		Posting toAccount = new Posting(to, amount.multiply(BigDecimal.valueOf(-1)));
+		Posting toAccount = new Posting(to, amount.negate());
 		LedgerEntry ledgerEntry = new LedgerEntry(date, description, List.of(toAccount, fromAccount));
 		this.add(ledgerEntry);
 	}
@@ -40,9 +40,9 @@ public class Ledger {
 		this.add(new LedgerEntry(date, description, postings));
 	}
 
-	public void add(LocalDate date, String description, BigDecimal amount, String to, String from) {
+	public void add(LocalDate date, String description, Money amount, String to, String from) {
 		Posting fromAccount = new Posting(from, amount);
-		Posting toAccount = new Posting(to, amount.multiply(BigDecimal.valueOf(-1)));
+		Posting toAccount = new Posting(to, amount.negate());
 		this.add(date, description, List.of(toAccount, fromAccount));
 	}
 

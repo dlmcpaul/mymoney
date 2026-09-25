@@ -30,7 +30,7 @@
     </div>
     <div class="ui raised segment">
         <div class="ui center aligned header" id="trendsTotal"
-             th:text="|Total ${#numbers.formatCurrency(trendsData.total())}|">Total $0.00
+             th:text="|Total ${trendsData.total().formatCurrency()}|">Total $0.00
         </div>
     </div>
 </main>

@@ -1,5 +1,6 @@
 package com.hz.mymoney.ui.models;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.Movement;
 
 import java.math.BigDecimal;
@@ -8,65 +9,65 @@ import java.time.LocalDate;
 import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
-public record SuperannuationAccount(String name, String fullName, BigDecimal balance, LocalDate openingDate, LocalDate closingDate, PriorityQueue<Movement> movements) {
+public record SuperannuationAccount(String name, String fullName, Money balance, LocalDate openingDate, LocalDate closingDate, PriorityQueue<Movement> movements) {
 
-	public BigDecimal adminCosts() {
+	public Money adminCosts() {
 		return taxes().add(insurance()).add(fees());
 	}
 
-	private BigDecimal sum(Stream<BigDecimal> stream) {
-		return stream.reduce(BigDecimal.ZERO, BigDecimal::add)
+	private Money sum(Stream<Money> stream) {
+		return stream.reduce(Money.ZERO, Money::add)
 				.setScale(2, RoundingMode.HALF_EVEN);
 	}
 
-	public BigDecimal contributions() {
+	public Money contributions() {
 		return sum(movements.stream()
 				.filter(movement -> movement.isSuperContribution() || movement.isSuperTransferIn())
 				.map(movement -> movement.amount().abs()));
 	}
 
-	public BigDecimal earnings() {
+	public Money earnings() {
 		return sum(movements.stream()
 				.filter(Movement::isSuperEarnings)
 				.map(Movement::amount));
 	}
 
-	public BigDecimal losses() {
+	public Money losses() {
 		return sum(movements.stream()
 				.filter(Movement::isSuperLosses)
 				.map(Movement::amount))
 				.abs();
 	}
 
-	public BigDecimal openingBalance() {
+	public Money openingBalance() {
 		return sum(movements.stream()
 				.filter(Movement::isSuperOpeningBalance)
 				.map(Movement::amount))
 				.abs();
 	}
 
-	public BigDecimal taxes() {
+	public Money taxes() {
 		return sum(movements.stream()
 				.filter(Movement::isSuperTaxes)
 				.map(Movement::amount))
 				.abs();
 	}
 
-	public BigDecimal insurance() {
+	public Money insurance() {
 		return sum(movements.stream()
 				.filter(Movement::isSuperInsurance)
 				.map(Movement::amount))
 				.abs();
 	}
 
-	public BigDecimal fees() {
+	public Money fees() {
 		return sum(movements.stream()
 				.filter(Movement::isSuperFees)
 				.map(Movement::amount))
 				.abs();
 	}
 
-	public BigDecimal transfersOut() {
+	public Money transfersOut() {
 		return sum(movements.stream()
 				.filter(Movement::isSuperTransferOut)
 				.map(Movement::amount))
@@ -74,15 +75,15 @@ public record SuperannuationAccount(String name, String fullName, BigDecimal bal
 	}
 
 	public boolean isClosed() {
-		return balance.compareTo(BigDecimal.ZERO) == 0;
+		return balance.compareTo(Money.ZERO) == 0;
 	}
 
 	public BigDecimal yearlyReturn() {
 		BigDecimal yearsOpen = BigDecimal.valueOf((closingDate.toEpochDay() - openingDate.toEpochDay() + 364) / 365);
-		BigDecimal adjustedBalance = openingBalance().add(contributions());
-		BigDecimal closingBalance = isClosed() ? transfersOut() : balance();
+		Money adjustedBalance = openingBalance().add(contributions());
+		Money closingBalance = isClosed() ? transfersOut() : balance();
 
-		if (adjustedBalance.compareTo(BigDecimal.ZERO) == 0) {
+		if (adjustedBalance.compareTo(Money.ZERO) == 0) {
 			return BigDecimal.ZERO;
 		}
 

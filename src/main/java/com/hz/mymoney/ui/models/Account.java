@@ -1,10 +1,11 @@
 package com.hz.mymoney.ui.models;
 
-import java.math.BigDecimal;
+import com.hz.mymoney.data.models.Money;
+
 import java.util.Arrays;
 import java.util.List;
 
-public record Account(String name, String fullName, String category, BigDecimal balance, boolean isShares, String note) {
+public record Account(String name, String fullName, String category, Money balance, boolean isShares, String note) {
 
 	public List<String> tokenise(String string) {
 		return Arrays.stream(string.split(":")).toList();

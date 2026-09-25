@@ -1,5 +1,6 @@
 package com.hz.mymoney.ui.models.templates;
 
+import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.ui.models.NetAssetLiabilityPosition;
 
 import java.math.BigDecimal;
@@ -23,39 +24,39 @@ public class NetWorthTemplateData {
 				.orElse(new NetAssetLiabilityPosition(current.getLastYear()));
 	}
 
-	public BigDecimal getCurrentAssetBalance() {
+	public Money getCurrentAssetBalance() {
 		return current.getAssetBalance();
 	}
 
-	public BigDecimal getLastYearAssetBalance() {
+	public Money getLastYearAssetBalance() {
 		return lastYear.getAssetBalance();
 	}
 
-	public BigDecimal getCurrentLiabilityBalance() {
+	public Money getCurrentLiabilityBalance() {
 		return current.getLiabilityBalance();
 	}
 
-	public BigDecimal getLastYearLiabilityBalance() {
+	public Money getLastYearLiabilityBalance() {
 		return lastYear.getLiabilityBalance();
 	}
 
-	public BigDecimal getCurrentNetPosition() {
+	public Money getCurrentNetPosition() {
 		return current.getNetPosition();
 	}
 
-	public BigDecimal getLastYearNetPosition() {
+	public Money getLastYearNetPosition() {
 		return lastYear.getNetPosition();
 	}
 
-	public BigDecimal assetDifference() {
+	public Money assetDifference() {
 		return current.getAssetBalance().subtract(lastYear.getAssetBalance());
 	}
 
-	public BigDecimal liabilityDifference() {
+	public Money liabilityDifference() {
 		return current.getLiabilityBalance().abs().subtract(lastYear.getLiabilityBalance().abs());
 	}
 
-	public BigDecimal netWorthDifference() {
+	public Money netWorthDifference() {
 		return current.getNetPosition().subtract(lastYear.getNetPosition());
 	}
 
@@ -76,24 +77,24 @@ public class NetWorthTemplateData {
 	}
 
 	public List<BigDecimal> yAxisNetValues() {
-		List<BigDecimal> yAxisValues = new ArrayList<>();
+		List<Money> yAxisValues = new ArrayList<>();
 		netAssetLiabilityPositions.forEach(position -> yAxisValues.add(position.getNetPosition()));
 		Collections.reverse(yAxisValues);
-		return yAxisValues;
+		return yAxisValues.stream().map(Money::getAmount).toList();
 	}
 
 	public List<BigDecimal> yAxisAssetValues() {
-		List<BigDecimal> yAxisValues = new ArrayList<>();
+		List<Money> yAxisValues = new ArrayList<>();
 		netAssetLiabilityPositions.forEach(position -> yAxisValues.add(position.getAssetBalance()));
 		Collections.reverse(yAxisValues);
-		return yAxisValues;
+		return yAxisValues.stream().map(Money::getAmount).toList();
 	}
 
 	public List<BigDecimal> yAxisLiabValues() {
-		List<BigDecimal> yAxisValues = new ArrayList<>();
+		List<Money> yAxisValues = new ArrayList<>();
 		netAssetLiabilityPositions.forEach(position -> yAxisValues.add(position.getLiabilityBalance()));
 		Collections.reverse(yAxisValues);
-		return yAxisValues;
+		return yAxisValues.stream().map(Money::getAmount).toList();
 	}
 
 }
