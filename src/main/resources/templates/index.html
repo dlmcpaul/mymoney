@@ -63,21 +63,11 @@
             });
         });
 
-        document.body.addEventListener('htmx:timeout', function () {
+        document.body.addEventListener('htmx:error', function (event) {
             $.toast({
                 class: 'error',
-                title: 'Network',
-                message: 'Request timed out',
-                showProgress: 'bottom',
-                classProgress: 'black'
-            });
-        });
-
-        document.body.addEventListener('htmx:sendError', function () {
-            $.toast({
-                class: 'error',
-                title: 'Network',
-                message: 'Could not connect to server',
+                title: 'HTMX Error',
+                message: event.detail.error,
                 showProgress: 'bottom',
                 classProgress: 'black'
             });

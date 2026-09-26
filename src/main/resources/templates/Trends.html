@@ -44,7 +44,7 @@
         maximumFractionDigits: 2, // Causes 2500.99 to be printed as $2,501
     });
 
-    document.body.addEventListener('htmx:afterSwap', function (event) {
+    document.body.addEventListener('htmx:after:swap', function (event) {
 
         let chartStatus = Chart.getChart("trendsGraphCanvas"); // <canvas> id
         if (chartStatus != undefined) {

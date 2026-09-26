@@ -1,6 +1,5 @@
 package com.hz.mymoney.ui.controllers;
 
-import com.hz.mymoney.configuration.AccountConstants;
 import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.services.PrefillLogicService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
@@ -16,6 +15,8 @@ import org.springframework.web.servlet.view.FragmentsRendering;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.hz.mymoney.configuration.AccountConstants.SHARE_ACCOUNTS;
 
 @Controller
 @RequestMapping("/search")
@@ -75,7 +76,10 @@ public class SearchController {
 	@HxRequest
 	public View investmentSearch(Model model, @RequestParam(name = "accounts") String searchValue, @RequestParam String id, @RequestParam String label) {
 		try {
-			List<String> investmentAccounts = uiModelBuilderService.searchAccounts(AccountConstants.SHARE_ACCOUNTS + searchValue);
+			if (searchValue.startsWith(SHARE_ACCOUNTS)) {
+				searchValue = searchValue.substring(SHARE_ACCOUNTS.length());
+			}
+			List<String> investmentAccounts = uiModelBuilderService.searchAccounts(SHARE_ACCOUNTS + searchValue);
 
 			if (investmentAccounts.size() == 1) {
 				searchValue = investmentAccounts.getFirst();

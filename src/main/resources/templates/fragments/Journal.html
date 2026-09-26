@@ -7,7 +7,7 @@
            th:attr="hx-get=|@{/search/investment}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
            th:value="${value}"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-           hx-swap="morph:outerHTML focus-scroll:true" type="search"
+           hx-swap="outerMorph focus-scroll:true" type="search"
     >
     <i class="dropdown icon"></i>
 </div>
@@ -17,7 +17,7 @@
            th:attr="hx-get=|@{/search/account}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
            th:value="${value}"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-           hx-swap="morph:outerHTML focus-scroll:true" type="search"
+           hx-swap="outerMorph focus-scroll:true" type="search"
     >
     <i class="dropdown icon"></i>
 </div>
@@ -49,7 +49,7 @@
                th:attr="hx-get=|@{/search/description}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
                hx-select-oob="#from-account,#to-account"
                hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-               hx-swap="morph:outerHTML focus-scroll:true"
+               hx-swap="outerMorph focus-scroll:true" type="search"
                th:value="${value}"
         >
         <i class="dropdown icon"></i>

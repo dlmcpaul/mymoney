@@ -14,9 +14,8 @@
     <script type="text/javascript" th:src="@{/webjars/chart.js/dist/chart.umd.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js}"></script>
-    <script type="text/javascript" th:src="@{/webjars/idiomorph/dist/idiomorph-ext.min.js}"></script>
 </head>
-<body hx-ext="morph" th:attr="onload=${scripts != null} ? 'onPageLoad()' : _">
+<body th:attr="onload=${scripts != null} ? 'onPageLoad()' : _">
 <div class="ui wide container">
     <div th:replace="~{fragments/Common :: Banner}"></div>
     <th:block th:replace="${header}"/>

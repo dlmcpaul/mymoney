@@ -12,7 +12,7 @@
     <script type="text/javascript" th:src="@{/_static/fomantic-ui-css/2.9.4/semantic.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.js}"></script>
 </head>
-<body hx-ext="morph" th:attr="onload=${scripts != null} ? 'onPageLoad()' : _">
+<body th:attr="onload=${scripts != null} ? 'onPageLoad()' : _">
 <div class="ui wide container">
     <div th:replace="~{fragments/Common :: Banner}"></div>
     <th:block th:replace="${content}"/>
