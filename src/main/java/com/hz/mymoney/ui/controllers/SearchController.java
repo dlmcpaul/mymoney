@@ -2,6 +2,7 @@ package com.hz.mymoney.ui.controllers;
 
 import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.services.PrefillLogicService;
+import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,7 +29,7 @@ public class SearchController {
 
 	@GetMapping("/description")
 	@HxRequest
-	public View descriptionSearch(Model model, @RequestParam String description, @RequestParam String label, @RequestParam String id) {
+	public View descriptionSearch(Model model, @RequestParam String description, @RequestParam String label, @RequestParam String id, HtmxResponse htmxResponse) {
 		List<PrefillLogicService.JournalResult> prefillResults = uiLogicService.smartPreFill(description);
 		List<PrefillLogicService.JournalResult> prefillExactResults = uiLogicService.smartPreFillExact(description);
 		try {
@@ -55,6 +56,7 @@ public class SearchController {
 				model.addAttribute("debitAccount", prefillExactResults.getFirst().debitAccount());
 				model.addAttribute("creditAccount", prefillExactResults.getFirst().creditAccount());
 			}
+			htmxResponse.addTrigger("updateValue", descriptionValue);
 		} catch (Exception e) {
 			log.error("Description Search Generation Exception {}", e.getMessage(), e);
 		}
@@ -74,7 +76,7 @@ public class SearchController {
 
 	@GetMapping("/investment")
 	@HxRequest
-	public View investmentSearch(Model model, @RequestParam(name = "accounts") String searchValue, @RequestParam String id, @RequestParam String label) {
+	public View investmentSearch(Model model, @RequestParam(name = "accounts") String searchValue, @RequestParam String id, @RequestParam String label, HtmxResponse htmxResponse) {
 		try {
 			if (searchValue.startsWith(SHARE_ACCOUNTS)) {
 				searchValue = searchValue.substring(SHARE_ACCOUNTS.length());
@@ -90,6 +92,7 @@ public class SearchController {
 			model.addAttribute("accounts", investmentAccounts);
 			model.addAttribute("value", searchValue);
 			model.addAttribute("showError", investmentAccounts.isEmpty());
+			htmxResponse.addTrigger("updateValue", searchValue);
 		} catch (Exception e) {
 			log.error("Investment Search Generation Exception {}", e.getMessage(), e);
 		}
@@ -100,7 +103,7 @@ public class SearchController {
 
 	@GetMapping("/account")
 	@HxRequest
-	public View accountSearch(Model model, @RequestParam(name = "accounts") String searchValue, @RequestParam String id, @RequestParam String label) {
+	public View accountSearch(Model model, @RequestParam(name = "accounts") String searchValue, @RequestParam String id, @RequestParam String label, HtmxResponse htmxResponse) {
 		try {
 			boolean showError = false;
 			List<String> predictedAccounts = new ArrayList<>();
@@ -128,6 +131,8 @@ public class SearchController {
 			model.addAttribute("value", searchValue);
 			model.addAttribute("accounts", predictedAccounts);
 			model.addAttribute("showError", showError);
+
+			htmxResponse.addTrigger("updateValue", searchValue);
 		} catch (Exception e) {
 			log.error("Account Search Generation Exception {}", e.getMessage(), e);
 		}

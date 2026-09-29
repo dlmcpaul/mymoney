@@ -39,7 +39,7 @@ public class HomeController {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
 			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);
 			if (message != null) {
-				htmxResponse.addTriggerAfterSettle("showMessage", message);
+				htmxResponse.addTrigger("showMessage", message);
 			}
 		} catch (Exception e) {
 			log.error("index Page Generation Exception {}", e.getMessage(), e);
@@ -53,7 +53,7 @@ public class HomeController {
 		try {
 			Optional<Schedule> schedule = uiModelBuilderService.getSchedule(scheduleDescription);
 			schedule.ifPresent(value -> model.addAttribute("schedule", value));
-			htmxResponse.addTriggerAfterSwap("showScheduleModal");
+			htmxResponse.addTrigger("showScheduleModal");
 			return FragmentsRendering
 					.fragment("fragments/Modals :: ScheduleModal")
 					.build();
