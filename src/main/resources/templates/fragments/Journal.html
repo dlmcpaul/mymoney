@@ -6,7 +6,6 @@
     <input th:id="|${id}-input|" name="accounts" placeholder="Code"
            th:attr="hx-get=|@{/search/investment}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
            th:value="${value}"
-           hx-preserve
            hx-on="updateValue -> this.value = value"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
            hx-swap="outerMorph" type="search"
@@ -18,7 +17,6 @@
     <input th:id="|${id}-input|" name="accounts" placeholder="Account"
            th:attr="hx-get=|@{/search/account}?id=${id}&label=${label}|, hx-target=|#${id}|, list=|${id}-list|"
            th:value="${value}"
-           hx-preserve
            hx-on="updateValue -> this.value = value"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
            hx-swap="outerMorph" type="search"
@@ -53,7 +51,6 @@
                th:attr="hx-get=|@{/search/description}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
                hx-select-oob="#from-account,#to-account"
                hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-               hx-preserve
                hx-on="updateValue -> this.value = value"
                hx-swap="outerMorph" type="search"
                th:value="${value}"
