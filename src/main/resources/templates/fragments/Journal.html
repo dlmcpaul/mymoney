@@ -152,7 +152,7 @@
     </button>
 </form>
 
-<div id="JournalTabs" th:fragment="JournalTabs (entryDate)">
+<div id="JournalTabs" th:fragment="JournalTabs (entryDate)" th:remove="tag">
     <div class="ui bottom attached active tab segment" data-tab="one">
         <div class="ui padded basic segment">
             <div th:replace="~{fragments/Journal :: BasicJournal (${entryDate})}"></div>
