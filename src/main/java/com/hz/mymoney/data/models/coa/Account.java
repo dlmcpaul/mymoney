@@ -203,7 +203,7 @@ public class Account implements Comparable<Account> {
 				// Option not share?
 				return getTotalAmount().getAmount() + " options (" + getCode() + ") for " + getCode().substring(0,3);
 			}
-			;
+
 			return new DecimalFormat("#.##").format(getTotalAmount().getAmount()) + " shares in " + simpleName;
 		} else if (isManagedFund()) {
 			return simpleName + " Fund";
