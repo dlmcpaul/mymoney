@@ -45,6 +45,7 @@ public class JournalController {
 		try {
 			if (basicJournalInput.isValid()) {
 				uiDataUpdateService.addNewTransaction(basicJournalInput);
+				htmxResponse.addTrigger("resetForm");
 				htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "Journal Entry Saved Successfully" ));
 			} else {
 				log.error("Invalid Journal Entry {}", basicJournalInput);
@@ -74,6 +75,7 @@ public class JournalController {
 		try {
 			if (dividendInputJournal.isValid()) {
 				uiDataUpdateService.addNewTransaction(dividendInputJournal);
+				htmxResponse.addTrigger("resetForm");
 				htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "Dividend Entry Saved Successfully" ));
 			} else {
 				log.error("Invalid Dividend Entry {}", dividendInputJournal);
@@ -103,6 +105,7 @@ public class JournalController {
 		try {
 			if (distributionInputTransaction.isValid()) {
 				uiDataUpdateService.addNewTransaction(distributionInputTransaction);
+				htmxResponse.addTrigger("resetForm");
 				htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "Fund Distribution Entry Saved Successfully" ));
 			} else {
 				log.error("Invalid Fund Distribution Entry {}", distributionInputTransaction);

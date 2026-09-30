@@ -28,7 +28,7 @@
                 <td th:if="${elem.isDebit()}" class="right aligned two wide"></td>
                 <td th:text="${elem.sourceAccount()}" class="four wide"></td>
                 <td th:if="${showRunningTotal}" class="right aligned two wide"
-                    th:text="${elem.isShares} ? ${runningTotal} : ${runningTotal.formatCurrency()}"></td>
+                    th:text="${elem.isShares} ? ${runningTotal.getAmount()} : ${runningTotal.formatCurrency()}"></td>
             </tr>
             <tr th:each="elem, stats : ${transactions}"
                 th:with="runningTotal = ${totaler.calculateTotal(stats.count, transactions)}" th:if="${isAmountOnly}">
@@ -37,7 +37,7 @@
                 <td th:text="${elem.amount.abs().formatCurrency()}" class="right aligned two wide"></td>
                 <td th:text="${elem.sourceAccount()}" class="five wide"></td>
                 <td th:if="${showRunningTotal}" class="right aligned two wide"
-                    th:text="${elem.isShares} ? ${runningTotal} : ${runningTotal.formatCurrency()}"></td>
+                    th:text="${elem.isShares} ? ${runningTotal.getAmount()} : ${runningTotal.formatCurrency()}"></td>
             </tr>
             </tbody>
         </table>

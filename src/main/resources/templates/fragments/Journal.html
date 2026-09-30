@@ -15,11 +15,11 @@
 
 <div th:fragment="StandardAccountInput (id, label, value)" class="ui input right icon">
     <input th:id="|${id}-input|" name="accounts" placeholder="Account"
-           th:attr="hx-get=|@{/search/account}?id=${id}&label=${label}|, hx-target=|#${id}|, list=|${id}-list|"
+           th:attr="hx-get=|@{/search/account}?id=${id}&label=${label}|, hx-target=|#${id}-list|, list=|${id}-list|"
            th:value="${value}"
            hx-on="updateValue -> this.value = value"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-           hx-swap="outerMorph" type="search"
+           hx-swap="innerHTML" type="search"
     >
     <i class="dropdown icon"></i>
 </div>
@@ -95,7 +95,7 @@
 
 <form th:fragment="BasicJournal (defaultDate)" class="ui form"
       th:attr="hx-post=|@{/journal/basic}|" hx-swap="outerHTML"
-      hx-on:htmx:after:request="this.reset()"
+      hx-on="resetForm -> this.reset()"
       hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
       id="NewJournalForm">
     <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
@@ -114,7 +114,7 @@
 <form th:fragment="DividendJournal (defaultDate)" class="ui form"
       th:attr="hx-post=|@{/journal/dividend}|" hx-swap="outerHTML"
       hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
-      hx-on:htmx:after:request="this.reset()"
+      hx-on="resetForm -> this.reset()"
       id="NewDividendForm">
     <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
     <div class="two fields">
@@ -122,12 +122,12 @@
         <div th:replace="~{fragments/Journal :: AmountInputField ('Franked Dividend', true)}"></div>
     </div>
     <div class="two fields">
-        <div th:replace="~{fragments/Journal :: AccountInputField ('brokerage-account', 'Brokerage Account', '', null, false)}"></div>
+        <div th:replace="~{fragments/Journal :: AccountInputField ('dividend-disb', 'Deposit Account', '', null, false)}"></div>
         <div th:replace="~{fragments/Journal :: AmountInputField ('Unfranked Dividend', true)}"></div>
     </div>
     <div class="two fields">
-        <div th:replace="~{fragments/Journal :: AccountInputField ('dividend-disb', 'Disbursement Account', '', null, false)}"></div>
-        <div th:replace="~{fragments/Journal :: AmountInputField ('Imputation Credit', true)}"></div>
+        <div class="ten wide field"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('Franking Credit', true)}"></div>
     </div>
     <button type="submit" class="ui right floated compact primary submit button"><i class="comment dollar icon"></i>Post
     </button>
@@ -135,7 +135,7 @@
 
 <form th:fragment="DistributionJournal (defaultDate, activeButton)" class="ui form"
       th:attr="hx-post=|@{/journal/distribution}|" hx-swap="outerHTML"
-      hx-on:htmx:after:request="this.reset()"
+      hx-on="resetForm -> this.reset()"
       hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
       id="NewFundIncomeForm">
     <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
