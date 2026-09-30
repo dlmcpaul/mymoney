@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MoneyTests {
+class MoneyTests {
 	@Test
 	void testSymbol() {
 		assertEquals("$", MoneyParser.MONEY_SYMBOL);

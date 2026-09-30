@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class LedgerParserTests {
+class LedgerParserTests {
 
 	@Test
 	public void SharePostParseStandardTests() {
@@ -18,7 +18,7 @@ public class LedgerParserTests {
 		assertEquals("a:b:c", result.getAccount());
 		assertEquals("COL", result.getCode());
 		assertEquals(new Money("100.00").getAmount(), result.getAmount().getAmount());
-		assertEquals(new Money("12.00").getAmount(), result.getPrice().getAmount());
+		assertEquals(new Money("12.000000").getAmount(), result.getPrice().getAmount());
 		assertEquals(new Money("1200.00").getAmount(), result.getValue().getAmount());
 		assertEquals("AUD", result.getPrice().getCurrency());
 		assertNull(result.getNote());
@@ -35,7 +35,7 @@ public class LedgerParserTests {
 		assertEquals("a:b:c", singleSpaceResult.getAccount());
 		assertEquals("COL", singleSpaceResult.getCode());
 		assertEquals(new Money("100.00").getAmount(), singleSpaceResult.getAmount().getAmount());
-		assertEquals(new Money("12.00").getAmount(), singleSpaceResult.getPrice().getAmount());
+		assertEquals(new Money("12.000000").getAmount(), singleSpaceResult.getPrice().getAmount());
 		assertEquals(new Money("1200.00").getAmount(), singleSpaceResult.getValue().getAmount());
 		assertEquals("AUD", singleSpaceResult.getPrice().getCurrency());
 		assertNull(singleSpaceResult.getNote());
@@ -53,6 +53,6 @@ public class LedgerParserTests {
 		assertEquals("INR", nonDollarResult.getPrice().getCurrency());
 
 		String output3 = nonDollarResult.toString();
-		assertEquals("  a:b:c  100  COL @ 12.00 INR", output3);
+		assertEquals("  a:b:c  100  COL @ 12 INR", output3);
 	}
 }

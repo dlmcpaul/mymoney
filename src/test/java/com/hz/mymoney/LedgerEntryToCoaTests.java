@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LedgerEntryToCoaTests {
+class LedgerEntryToCoaTests {
 
 	private static final BigDecimal AMOUNT = new BigDecimal("100.00");
 	private static final BigDecimal HALF_AMOUNT = new BigDecimal("50.00");
