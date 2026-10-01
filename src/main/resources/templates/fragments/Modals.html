@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <body>
 <div th:fragment="ScheduleModal (schedule)" id="scheduleModal" class="ui tiny modal" hx-include:inherited="#amounts">
-    <div th:unless="${schedule} eq null" class="header" th:text="|Post Journal for ${schedule.ledgerEntry.description} as at ${#temporals.format(schedule.ledgerEntry.date,'dd MMM yyyy', #locale)}|">Header</div>
+    <div th:unless="${schedule} eq null" class="header" th:text="|Post Today Journal for ${schedule.ledgerEntry.description} Due ${#temporals.format(schedule.ledgerEntry.date,'dd MMM yyyy', #locale)}|">Header</div>
     <div th:unless="${schedule} eq null" class="content">
         <div class="ui compact grid">
             <div th:each="posting : ${schedule.ledgerEntry.postings}" class="middle aligned row">
