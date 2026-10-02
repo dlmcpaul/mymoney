@@ -10,7 +10,7 @@ public class DividendJournalInput extends JournalInput implements JournalInputVa
 	@Override
 	public boolean isValid() {
 		return super.isValid()
-				&& this.accounts.size() == 2 && this.amounts.size() == 3
+				&& this.accounts.size() == 3 && this.amounts.size() == 3
 				&& noNulls(this.amounts)
 				&& noNulls(this.accounts);
 	}

@@ -91,7 +91,8 @@ public class FileUpdateService {
 		log.info("New Dividend Journal Request {}", dividendInputJournal);
 		Ledger ledger = ledgerServices.getLedger();
 		String shareAccount = dividendInputJournal.getAccounts().getFirst();
-		String destinationAccount = dividendInputJournal.getAccounts().getLast();
+		String destinationAccount = dividendInputJournal.getAccounts().get(1);
+		String imputationAccount =  dividendInputJournal.getAccounts().getLast();
 
 		BigDecimal frankedAmount = dividendInputJournal.getAmounts().getFirst();
 		BigDecimal unfrankedAmount = dividendInputJournal.getAmounts().get(1);
@@ -104,12 +105,12 @@ public class FileUpdateService {
 
 		// If there is a franked amount then there must be an imputation amount
 		if (imputationAmount.compareTo(BigDecimal.ZERO) == 0 && frankedAmount.compareTo(BigDecimal.ZERO) != 0) {
-			throw new ValidationException("Franked Amount with no Imputation Credit");
+			throw new ValidationException("Franked Amount with no Franking Credit");
 		}
 
 		// If there is no franked amount then there can be no imputation credit
 		if (frankedAmount.compareTo(BigDecimal.ZERO) == 0 && imputationAmount.compareTo(BigDecimal.ZERO) != 0) {
-			throw new ValidationException("Imputation Credit with no Franked Amount");
+			throw new ValidationException("Franking Credit with no Franked Amount");
 		}
 
 		// Post the income
@@ -117,7 +118,7 @@ public class FileUpdateService {
 
 		postings.add(new Posting(destinationAccount, cashAmount));
 		if (imputationAmount.compareTo(BigDecimal.ZERO) > 0) {
-			postings.add(new Posting(IMPUTATION_ACCOUNT, imputationAmount, imputationNote));
+			postings.add(new Posting(imputationAccount, imputationAmount, imputationNote));
 		}
 		if (frankedAmount.compareTo(BigDecimal.ZERO) > 0) {
 			postings.add(new Posting(FRANKED_DIVIDEND, frankedAmount.negate(), "Franked Dividend from " + code));

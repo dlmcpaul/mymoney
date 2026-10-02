@@ -15,11 +15,11 @@
 
 <div th:fragment="StandardAccountInput (id, label, value)" class="ui input right icon">
     <input th:id="|${id}-input|" name="accounts" placeholder="Account"
-           th:attr="hx-get=|@{/search/account}?id=${id}&label=${label}|, hx-target=|#${id}-list|, list=|${id}-list|"
+           th:attr="hx-get=|@{/search/account}?id=${id}&label=${label}|, hx-target=|#${id}-list|, hx-select=|#${id}-list|, list=|${id}-list|"
            th:value="${value}"
            hx-on="updateValue -> this.value = value"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-           hx-swap="innerHTML" type="search"
+           hx-swap="outerHTML" type="search"
     >
     <i class="dropdown icon"></i>
 </div>
@@ -111,7 +111,7 @@
     </button>
 </form>
 
-<form th:fragment="DividendJournal (defaultDate)" class="ui form"
+<form th:fragment="DividendJournal (defaultDate, defaultFrankingAccount)" class="ui form"
       th:attr="hx-post=|@{/journal/dividend}|" hx-swap="outerHTML"
       hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
       hx-on="resetForm -> this.reset()"
@@ -126,10 +126,11 @@
         <div th:replace="~{fragments/Journal :: AmountInputField ('Unfranked Dividend', true)}"></div>
     </div>
     <div class="two fields">
-        <div class="ten wide field"></div>
+        <div th:replace="~{fragments/Journal :: AccountInputField ('franking-credit', 'Franking Credit Account', ${defaultFrankingAccount}, null, false)}"></div>
         <div th:replace="~{fragments/Journal :: AmountInputField ('Franking Credit', true)}"></div>
     </div>
-    <button type="submit" class="ui right floated compact primary submit button"><i class="comment dollar icon"></i>Post
+    <button type="submit" class="ui right floated compact primary submit button">
+        <i class="comment dollar icon"></i>Post
     </button>
 </form>
 
@@ -152,7 +153,7 @@
     </button>
 </form>
 
-<div id="JournalTabs" th:fragment="JournalTabs (entryDate)" th:remove="tag">
+<div id="JournalTabs" th:fragment="JournalTabs (entryDate, defaultFrankingAccount)" th:remove="tag">
     <div class="ui bottom attached active tab segment" data-tab="one">
         <div class="ui padded basic segment">
             <div th:replace="~{fragments/Journal :: BasicJournal (${entryDate})}"></div>
@@ -160,7 +161,7 @@
     </div>
     <div class="ui bottom attached tab segment" data-tab="two">
         <div class="ui padded basic segment">
-            <div th:replace="~{fragments/Journal :: DividendJournal (${entryDate})}"></div>
+            <div th:replace="~{fragments/Journal :: DividendJournal (${entryDate}, ${defaultFrankingAccount})}"></div>
         </div>
     </div>
     <div class="ui bottom attached tab segment" data-tab="three">
@@ -170,13 +171,13 @@
     </div>
 </div>
 
-<div id="JournalForms" th:fragment="JournalForms (entryDate)" class="ui basic fitted segment">
+<div id="JournalForms" th:fragment="JournalForms (entryDate, defaultFrankingAccount)" class="ui basic fitted segment">
     <div class="ui top attached tabular menu" id="journal-tabs">
         <div class="active item" data-tab="one" id="journal-tab-item-1">Journal Entry</div>
         <div class="center item" data-tab="two" id="journal-tab-item-2">Dividend Income</div>
         <div class="item" data-tab="three" id="journal-tab-item-3">Fund Income</div>
     </div>
-    <div th:replace="~{fragments/Journal :: JournalTabs (${entryDate})}"></div>
+    <div th:replace="~{fragments/Journal :: JournalTabs (${entryDate}, ${defaultFrankingAccount})}"></div>
 </div>
 
 </body>

@@ -7,6 +7,8 @@ import org.springframework.ui.Model;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.hz.mymoney.configuration.AccountConstants.IMPUTATION_ACCOUNT;
+
 public final class PageSupport {
 	private static final List<Menu> menuList = List.of(new Menu("Home","","Dashboard"),
 			new Menu("Accounts","accounts","Accounts"),
@@ -48,6 +50,7 @@ public final class PageSupport {
 	public static void populateDefaultModelData(Model model, String version) {
 		model.addAttribute("releaseVersion", version);
 		model.addAttribute("today", LocalDate.now());
+		model.addAttribute("defaultFrankingAccount", IMPUTATION_ACCOUNT);
 		model.addAttribute("menuList", menuList);
 	}
 }
