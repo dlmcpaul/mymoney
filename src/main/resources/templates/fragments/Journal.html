@@ -4,11 +4,11 @@
 
 <div th:fragment="InvestmentAccountInput (id, label, value)" class="ui input right icon">
     <input th:id="|${id}-input|" name="accounts" placeholder="Code"
-           th:attr="hx-get=|@{/search/investment}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
+           th:attr="hx-get=|@{/search/investment}?id=${id}&label=${label}|, hx-target=|#${id}-list|, hx-select=|#${id}-list|, list=|${id}-list|"
            th:value="${value}"
            hx-on="updateValue -> this.value = value"
            hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-           hx-swap="outerMorph" type="search"
+           hx-swap="outerHTML" type="search"
     >
     <i class="dropdown icon"></i>
 </div>
@@ -48,12 +48,12 @@
     <label th:for="|${id}-input|" for="desc-id" th:text="${label}">Why</label>
     <div class="ui input right icon">
         <input id="desc-id" th:id="|${id}-input|" name="description" placeholder="Description"
-               th:attr="hx-get=|@{/search/description}?id=${id}&label=${label}|, hx-target='#' + ${id}, list=${id} + '-list'"
+               th:attr="hx-get=|@{/search/description}?id=${id}&label=${label}|, hx-target=|#${id}-list|, hx-select=|#${id}-list|, list=|${id}-list|"
+               th:value="${value}"
                hx-select-oob="#from-account,#to-account"
                hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
                hx-on="updateValue -> this.value = value"
-               hx-swap="outerMorph" type="search"
-               th:value="${value}"
+               hx-swap="outerHTML" type="search"
         >
         <i class="dropdown icon"></i>
     </div>
@@ -72,12 +72,12 @@
     </div>
 </div>
 
-<div th:fragment="AmountInputField (label, isRequired)" class="six wide field"
+<div th:fragment="AmountInputField (id, label, isRequired)" class="six wide field"
      th:attrprepend="class=${isRequired} ? 'required ' : _">
     <label th:text="${label}">Amount</label>
     <div class="ui labeled input">
-        <label for="debit-amount" class="ui label">$</label>
-        <input name="amounts" type="number" step="any" placeholder="100.00" id="debit-amount">
+        <label th:for="${id}" class="ui label">$</label>
+        <input name="amounts" type="number" step="any" placeholder="100.00" th:id="${id}">
     </div>
 </div>
 
@@ -102,7 +102,7 @@
     <div th:replace="~{fragments/Journal :: DescriptionInputField ('journal-desc', 'Why', '', null, false)}"></div>
     <div class="two fields">
         <div th:replace="~{fragments/Journal :: AccountInputField ('from-account', 'From Account', '', null, false)}"></div>
-        <div th:replace="~{fragments/Journal :: AmountInputField ('Amount', true)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('basic-amount', 'Amount', true)}"></div>
     </div>
     <div class="fields">
         <div th:replace="~{fragments/Journal :: AccountInputField ('to-account', 'To Account', '', null, false)}"></div>
@@ -119,15 +119,15 @@
     <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
     <div class="two fields">
         <div th:replace="~{fragments/Journal :: InvestmentAccountInputField ('investment', 'Investment', '', null, false)}"></div>
-        <div th:replace="~{fragments/Journal :: AmountInputField ('Franked Dividend', true)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('franked-amount','Franked Dividend', true)}"></div>
     </div>
     <div class="two fields">
         <div th:replace="~{fragments/Journal :: AccountInputField ('dividend-disb', 'Deposit Account', '', null, false)}"></div>
-        <div th:replace="~{fragments/Journal :: AmountInputField ('Unfranked Dividend', true)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('unfranked-amount','Unfranked Dividend', true)}"></div>
     </div>
     <div class="two fields">
         <div th:replace="~{fragments/Journal :: AccountInputField ('franking-credit', 'Franking Credit Account', ${defaultFrankingAccount}, null, false)}"></div>
-        <div th:replace="~{fragments/Journal :: AmountInputField ('Franking Credit', true)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('franked-credit-amount','Franking Credit', true)}"></div>
     </div>
     <button type="submit" class="ui right floated compact primary submit button">
         <i class="comment dollar icon"></i>Post
@@ -143,7 +143,7 @@
     <div th:replace="~{fragments/Journal :: DistributionButtons (${activeButton})}"></div>
     <div class="two fields">
         <div th:replace="~{fragments/Journal :: AccountInputField ('fund-distribution', 'Fund Account', '', null, false)}"></div>
-        <div th:replace="~{fragments/Journal :: AmountInputField ('Amount', true)}"></div>
+        <div th:replace="~{fragments/Journal :: AmountInputField ('distribution-amount','Amount', true)}"></div>
     </div>
     <div class="fields">
         <div th:replace="~{fragments/Journal :: AccountInputField ('fund-income-disb', 'Disbursement Account', '', null, false)}"></div>

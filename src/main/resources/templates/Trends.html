@@ -4,7 +4,7 @@
       lang="en">
 <body>
 <main>
-    <form class="ui form" hx-include="#trend-account-input"
+    <form class="ui form" hx-include:inherited="#trend-account-input"
           th:attr="hx-get=|@{/trends/account}|"
           hx-trigger="focusout[event.target.matches('input')] from:body" hx-select-oob="#TrendsGraph,#trendsTotal"
           hx-target="#trendPeriodButtons">
@@ -23,8 +23,8 @@
             </div>
         </div>
     </form>
-    <div id="TrendsGraph" class="ui raised segment">
-        <canvas id="trendsGraphCanvas" style="height: 100px;width: 100%"
+    <div id="TrendsGraph" class="ui raised segment" style="position: relative; height:50%; width:100%">
+        <canvas id="trendsGraphCanvas"
              th:attr="data-trend-chart=${trendsData.dataSetAsJson()}">
         </canvas>
     </div>
@@ -63,7 +63,7 @@
                         {
                             label: account,
                             backgroundColor: '#00FF00',
-                            data: data.map(row => row.value)
+                            data: data.map(row => row.value.amount)
                         }]
                 },
             });
