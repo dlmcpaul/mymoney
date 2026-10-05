@@ -71,6 +71,8 @@ public class SearchController {
 
 		return FragmentsRendering
 				.fragment("fragments/Journal :: DescriptionInputField")
+				.fragment("fragments/Journal :: AccountInputField (id='from-account', label='From Account', value='', accounts=null, showError=false)")
+				.fragment("fragments/Journal :: AccountInputField (id='to-account', label='To Account', value='', accounts=null, showError=false)")
 				.build();
 	}
 
