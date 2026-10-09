@@ -38,7 +38,7 @@
 		<chart.js.datalabels.version>2.2.0</chart.js.datalabels.version>
 		<jquery.version>4.0.0</jquery.version>
 		<htmx.version>4.0.0</htmx.version>
-		<htmx-spring-boot-thymeleaf.version>5.1.0</htmx-spring-boot-thymeleaf.version>
+		<htmx-spring-boot-thymeleaf.version>5.2.0</htmx-spring-boot-thymeleaf.version>
 	</properties>
 	<dependencies>
 		<dependency>
