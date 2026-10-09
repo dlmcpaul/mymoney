@@ -48,12 +48,11 @@
     <label th:for="|${id}-input|" for="desc-id" th:text="${label}">Why</label>
     <div class="ui input right icon">
         <input id="desc-id" th:id="|${id}-input|" name="description" placeholder="Description"
-               th:attr="hx-get=|@{/search/description}?id=${id}&label=${label}|, hx-target=|#${id}-list|, hx-select=|#${id}-list|, list=|${id}-list|"
+               th:attr="hx-get=|@{/search/description}?id=${id}&label=${label}|, hx-target=|#${id}|, hx-select=|#${id}|, list=|${id}-list|, hx-on=|updateValue -> this.value = '${value}'|"
                th:value="${value}"
                hx-select-oob="#from-account,#to-account"
                hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
-               hx-on="updateValue -> this.value = value"
-               hx-swap="outerHTML" type="search"
+               hx-swap="outerMorph" type="search"
         >
         <i class="dropdown icon"></i>
     </div>
@@ -96,7 +95,7 @@
 <form th:fragment="BasicJournal (defaultDate)" class="ui form"
       th:attr="hx-post=|@{/journal/basic}|" hx-swap="outerHTML"
       hx-on="resetForm -> this.reset()"
-      hx-target="this" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
+      hx-target="#NewJournalForm" hx-select-oob="#BalanceSheet,#IncomeExpenseHeader,#IncomeExpenseBody"
       id="NewJournalForm">
     <div th:replace="~{fragments/Journal :: DateInputField (${defaultDate})}"></div>
     <div th:replace="~{fragments/Journal :: DescriptionInputField ('journal-desc', 'Why', '', null, false)}"></div>
