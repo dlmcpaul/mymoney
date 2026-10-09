@@ -30,45 +30,48 @@ public class SearchController {
 	@GetMapping("/description")
 	@HxRequest
 	public View descriptionSearch(Model model, @RequestParam String description, @RequestParam String label, @RequestParam String id, HtmxResponse htmxResponse) {
-		List<PrefillLogicService.JournalResult> prefillResults = uiLogicService.smartPreFill(description);
-		List<PrefillLogicService.JournalResult> prefillExactResults = uiLogicService.smartPreFillExact(description);
-		try {
-			List<String> descriptions = prefillResults.stream()
-					.map(PrefillLogicService.JournalResult::description)
-					.sorted()
-					.toList();
-			String descriptionValue = descriptions.size() != 1 ? description : descriptions.getFirst();
 
-			model.addAttribute("id", id);
-			model.addAttribute("label", label);
-			model.addAttribute("value", descriptionValue);
-			model.addAttribute("descriptions", descriptions);
-			model.addAttribute("showError", descriptions.isEmpty());
+		model.addAttribute("id", id);
+		model.addAttribute("label", label);
+		if (description != null && description.isEmpty() == false) {
 
-			if (prefillResults.size() == 2) {
-				prefillResults.forEach(log::info);
+			List<PrefillLogicService.JournalResult> prefillResults = uiLogicService.smartPreFill(description);
+			List<PrefillLogicService.JournalResult> prefillExactResults = uiLogicService.smartPreFillExact(description);
+			try {
+				List<String> descriptions = prefillResults.stream()
+						.map(PrefillLogicService.JournalResult::description)
+						.sorted()
+						.toList();
+				String descriptionValue = descriptions.size() != 1 ? description : descriptions.getFirst();
+
+				model.addAttribute("value", descriptionValue);
+				model.addAttribute("descriptions", descriptions);
+				model.addAttribute("showError", descriptions.isEmpty());
+
+				if (prefillResults.size() == 2) {
+					prefillResults.forEach(log::info);
+				}
+
+				if (prefillResults.size() == 1) {
+					model.addAttribute("debitAccount", prefillResults.getFirst().debitAccount());
+					model.addAttribute("creditAccount", prefillResults.getFirst().creditAccount());
+				} else if (prefillExactResults.size() == 1) {
+					model.addAttribute("debitAccount", prefillExactResults.getFirst().debitAccount());
+					model.addAttribute("creditAccount", prefillExactResults.getFirst().creditAccount());
+				}
+				htmxResponse.addTrigger("updateValue", descriptionValue);
+			} catch (Exception e) {
+				log.error("Description Search Generation Exception {}", e.getMessage(), e);
 			}
 
-			if (prefillResults.size() == 1) {
-				model.addAttribute("debitAccount", prefillResults.getFirst().debitAccount());
-				model.addAttribute("creditAccount", prefillResults.getFirst().creditAccount());
-			} else if (prefillExactResults.size() == 1) {
-				model.addAttribute("debitAccount", prefillExactResults.getFirst().debitAccount());
-				model.addAttribute("creditAccount", prefillExactResults.getFirst().creditAccount());
+			if (prefillResults.size() == 1 || prefillExactResults.size() == 1) {
+				return FragmentsRendering
+						.fragment("fragments/Journal :: DescriptionInputField")
+						.fragment("fragments/Journal :: AccountInputField (id='from-account', label='From Account', value=${debitAccount}, accounts=null, showError=false)")
+						.fragment("fragments/Journal :: AccountInputField (id='to-account', label='To Account', value=${creditAccount}, accounts=null, showError=false)")
+						.build();
 			}
-			htmxResponse.addTrigger("updateValue", descriptionValue);
-		} catch (Exception e) {
-			log.error("Description Search Generation Exception {}", e.getMessage(), e);
 		}
-
-		if (prefillResults.size() == 1 || prefillExactResults.size() == 1) {
-			return FragmentsRendering
-					.fragment("fragments/Journal :: DescriptionInputField")
-					.fragment("fragments/Journal :: AccountInputField (id='from-account', label='From Account', value=${debitAccount}, accounts=null, showError=false)")
-					.fragment("fragments/Journal :: AccountInputField (id='to-account', label='To Account', value=${creditAccount}, accounts=null, showError=false)")
-					.build();
-		}
-
 		return FragmentsRendering
 				.fragment("fragments/Journal :: DescriptionInputField")
 				.fragment("fragments/Journal :: AccountInputField (id='from-account', label='From Account', value='', accounts=null, showError=false)")
