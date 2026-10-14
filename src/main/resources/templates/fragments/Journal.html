@@ -85,7 +85,7 @@
 
 <div th:fragment="AmountInputField (id, label, isRequired)" class="six wide field"
      th:attrprepend="class=${isRequired} ? 'required ' : _">
-    <label th:text="${label}">Amount</label>
+    <label th:for="${id}" th:text="${label}">Amount</label>
     <div class="ui labeled input">
         <label th:for="${id}" class="ui label">$</label>
         <input name="amounts" type="number" step="any" placeholder="100.00" th:id="${id}">
