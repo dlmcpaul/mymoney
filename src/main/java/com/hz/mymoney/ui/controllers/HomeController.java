@@ -117,7 +117,6 @@ public class HomeController {
 		}
 		return FragmentsRendering
 				.fragment("fragments/Common :: RefreshButton")
-				.fragment("fragments/Common :: DashboardHeader")
 				.fragment("fragments/Account :: BalanceSheet")
 				.fragment("fragments/Schedules :: ScheduleList (schedules=${scheduledTransactions})")
 				.fragment("fragments/Journal :: JournalTabs (entryDate=${today})")
