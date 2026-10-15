@@ -9,7 +9,7 @@ import java.util.Locale;
 
 public final class MoneyParser {
 	// Hard coded to AU for the moment.  How to support other symbols?
-	public static final String MONEY_SYMBOL = Currency.getInstance(Locale.of("en", "au")).getSymbol();
+	public static final String MONEY_SYMBOL = Currency.getInstance(Locale.of("en", "AU")).getSymbol();
 
 	private MoneyParser() {}
 
