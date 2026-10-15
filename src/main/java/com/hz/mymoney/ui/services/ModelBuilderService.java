@@ -357,7 +357,7 @@ public class ModelBuilderService {
 			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getTotalAmount().multiply(shareValue).setScale(2, RoundingMode.HALF_UP), account.isShareAccount(), includeNote ? getNextInvestmentIncomeNote(account.getCode()) : null);
 		}
 
-		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getBalance(asAt, shareValueService.getInvestmentHistory()), false, null);
+		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), account.getBalance(asAt, shareValueService.getInvestmentHistory()), false, includeNote ? getLastTransactionNote(account) : null);
 	}
 
 	private Account mapAccount(com.hz.mymoney.data.models.coa.Account account, List<Transaction> transactions, LocalDate asAt) {
@@ -370,7 +370,13 @@ public class ModelBuilderService {
 			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), total.multiply(shareValue).setScale(2, RoundingMode.HALF_UP), account.isShareAccount(), getNextInvestmentIncomeNote(account.getCode()));
 		}
 
-		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), total, account.isShareAccount(), null);
+		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), total, false, getLastTransactionNote(account));
+	}
+
+	private String getLastTransactionNote(com.hz.mymoney.data.models.coa.Account account) {
+		Movement lastMovement = account.getLastMovement();
+
+		return "Last Txn on " + lastMovement.date().format(DateTimeFormatter.ISO_LOCAL_DATE) + " for " + lastMovement.description() + "  " + lastMovement.amount().formatCurrency();
 	}
 
 	private String getNextInvestmentIncomeNote(String code) {
