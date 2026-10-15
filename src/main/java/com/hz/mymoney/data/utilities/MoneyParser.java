@@ -4,12 +4,10 @@ import com.hz.mymoney.data.models.Money;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Currency;
-import java.util.Locale;
 
 public final class MoneyParser {
-	// Hard coded to AU for the moment.  How to support other symbols?
-	public static final String MONEY_SYMBOL = Currency.getInstance(Locale.of("en", "AU")).getSymbol();
+	// Hard coded to $ for the moment.  How to support other symbols?
+	public static final String MONEY_SYMBOL = "$";
 
 	private MoneyParser() {}
 
