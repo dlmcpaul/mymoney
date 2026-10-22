@@ -36,7 +36,7 @@ public class FileUpdateService {
 	public void addNewTransaction(BasicJournalInput basicJournalInput) {
 		Money amount = new Money(basicJournalInput.getAmounts().getFirst() != null ? basicJournalInput.getAmounts().getFirst() : basicJournalInput.getAmounts().getLast());
 
-		log.info("New Simple Journal {} {} {}", basicJournalInput.getJournalDate(), basicJournalInput.getAccounts(), amount);
+		log.info("New Simple Journal {} {} {} {}", basicJournalInput.getJournalDate(),basicJournalInput.getDescription(), basicJournalInput.getAccounts(), amount);
 
 		Ledger ledger = ledgerServices.getLedger();
 		ledger.add(basicJournalInput.getJournalDate(),
@@ -155,7 +155,7 @@ public class FileUpdateService {
 				throw new ValidationException("Override amounts counts do not match postings");
 			} else {
 				LocalDate today = LocalDate.now();
-				log.info("Posting Scheduled Journal @ {}", today);
+				log.info("Posting Scheduled Journal @ {} {}", today, schedule.ledgerEntry.getDescription());
 				schedule.ledgerEntry.getPostings().forEach(posting -> {
 					posting.setAmount(new Money(amountOverrides.get(schedule.ledgerEntry.getPostings().indexOf(posting))));
 					log.info("  {} {}", posting.getAccount(), posting.getAmount());
