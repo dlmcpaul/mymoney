@@ -49,3 +49,5 @@
         width: 100% !important;
     }
 }
+
+@media print { .noprint  { display: none; } }
