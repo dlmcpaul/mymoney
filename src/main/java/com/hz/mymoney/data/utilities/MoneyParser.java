@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 public final class MoneyParser {
 	// Hard coded to $ for the moment.  How to support other symbols?
 	public static final String MONEY_SYMBOL = "$";
+	public static final String DEFAULT_CURRENCY = "AUD";
 
 	private MoneyParser() {}
 
@@ -16,7 +17,7 @@ public final class MoneyParser {
 	}
 
 	public static Money parseMoney(String amount, int scale) {
-		String currency = "AUD";
+		String currency = DEFAULT_CURRENCY;
 
 		if (amount.startsWith(" ") || amount.endsWith(" ")) {
 			return parseMoney(amount.trim(), scale);
