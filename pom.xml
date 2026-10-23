@@ -28,7 +28,6 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
-		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<build.number>development</build.number>
 		<build.source>SNAPSHOT</build.source>
 		<revision>${build.number}-${build.source}</revision>
@@ -149,6 +148,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<outputTimestamp>${maven.build.timestamp}</outputTimestamp>
 				</configuration>
 			</plugin>
 		</plugins>
