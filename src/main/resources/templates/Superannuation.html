@@ -10,7 +10,7 @@
         <div class="ui segment">
             <a th:attr="class=${open ? 'ui green ribbon label' : 'ui gray ribbon label'}"
                th:text="${open ? 'Open Super Account' : 'Closed Super Account'}"
-               th:href="|@{/Accounts/}${#uris.escapePathSegment(account.fullName)}|">Super Account</a>
+               th:href="|@{/accounts/}${#uris.escapePathSegment(account.fullName)}|">Super Account</a>
             <div class="ui very compact grid">
                 <div th:if="${open}" class="ten wide column"><span
                         th:text="|${account.name()} (${#temporals.format(account.openingDate(), 'MMM yyyy')})|"></span>
