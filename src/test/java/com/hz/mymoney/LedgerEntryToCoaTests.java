@@ -172,4 +172,29 @@ class LedgerEntryToCoaTests {
 		assertEquals(5, coa.totalAccounts());
 	}
 
+	@Test
+	void testComplexBalancedLedgerEntryToCoa() {
+		/*
+		 2025/01/01 * Opening Balances
+            assets:checking  $2500.00
+            assets:savings  $5000.00
+            assets:investments  $10000.00
+            liabilities:creditcard  -$500.00
+            equity:opening  -$17000.00
+		 */
+		ChartOfAccounts coa = new ChartOfAccounts(LocalDate.now());
+		LedgerServices ledgerServices = new LedgerServices(null, null);
+
+		Posting account1 = new Posting("assets:checking", new BigDecimal("2500.00"));
+		Posting account2 = new Posting("assets:savings", new BigDecimal("5000.00"));
+		Posting account3 = new Posting("assets:investments", new BigDecimal("10000.00"));
+		Posting sourceAccount1 = new Posting("liabilities:creditcard", new BigDecimal("-500.00"));
+		Posting sourceAccount2 = new Posting("equity:opening", new BigDecimal("-17000.00"));
+
+		LedgerEntry unbalancedLedgerEntry = new LedgerEntry(LocalDate.now(), "Opening Balances", List.of(account1, account2, account3, sourceAccount1, sourceAccount2));
+
+		ledgerServices.mapLedgerEntryToPostings(coa, unbalancedLedgerEntry);
+		assertEquals(5, coa.totalAccounts());
+	}
+
 }

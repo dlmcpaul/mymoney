@@ -97,7 +97,7 @@ public class LedgerServices implements ApplicationRunner {
 		return postings.stream().filter(p -> p.getAmount().equals(posting.getAmount().negate())).findFirst();
 	}
 
-	private List<IPosting> findBalancedPostings(LedgerEntry entry) {
+	private List<IPosting> findMatchingPostings(LedgerEntry entry) {
 		for (IPosting posting : entry.getPostings()) {
 			Optional<IPosting> matched = findMatching(entry.getPostings(), posting);
 			if (matched.isPresent()) {
@@ -107,8 +107,8 @@ public class LedgerServices implements ApplicationRunner {
 		return new ArrayList<>();
 	}
 
-	private void mapLedgerEntryToPostingsUnBalanced(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
-		List<IPosting> matchedPostings = findBalancedPostings(entry);
+	private void mapLedgerEntryToPostingsUnMatched(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
+		List<IPosting> matchedPostings = findMatchingPostings(entry);
 		if (matchedPostings.size() == 2) {
 			// Process the balanced entries and retry remaining?
 			coa.addPosting(matchedPostings.getFirst(), entry.getDate(), entry.getDescription(), matchedPostings.getLast().getAccount(), commission);
@@ -124,11 +124,20 @@ public class LedgerServices implements ApplicationRunner {
 				log.error("Could not determine positive source posting {}", entry);
 			}
 		} else {
-			log.error("Unhandled Unbalanced Ledger Entry with {} postings {}", entry.getPostings().size(), entry);
+			// Let's just match to the largest negative account similar to the single negative amount
+			List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
+
+			if (sortedPostings.getFirst().getAmount().compareTo(Money.ZERO) < 0) {
+				IPosting sourcePosting = sortedPostings.getFirst();
+				coa.addPosting(sourcePosting, entry.getDate(), entry.getDescription(), entry.getNonSourcePosting(sourcePosting.getAccount()).getAccount(), commission);
+				sortedPostings.subList(1, sortedPostings.size()).forEach(p -> coa.addPosting(p, entry.getDate(), entry.getDescription(), sourcePosting.getAccount(), commission));
+			} else {
+				log.error("Could not determine negative source posting {}", entry);
+			}
 		}
 	}
 
-	private void mapLedgerEntryToPostingsBalanced(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
+	private void mapLedgerEntryToPostingsMatched(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
 		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
 		List<IPosting> negativeAmounts = LedgerEntrySupport.splitAndReturnFirst(sortedPostings);
 		List<IPosting> positiveAmounts = LedgerEntrySupport.splitAndReturnLast(sortedPostings);
@@ -185,9 +194,9 @@ public class LedgerServices implements ApplicationRunner {
 				mapLedgerEntryToPostingsSinglePositive(coa, entry, commission);
 			} else if (entry.canMatchPostings()) {
 				// Complex case where there are multiple sources but for now we assume it is balanced (equal + and - amounts that match)
-				mapLedgerEntryToPostingsBalanced(coa, entry, commission);
+				mapLedgerEntryToPostingsMatched(coa, entry, commission);
 			} else {
-				mapLedgerEntryToPostingsUnBalanced(coa, entry, commission);
+				mapLedgerEntryToPostingsUnMatched(coa, entry, commission);
 			}
 		} else {
 			log.error("Unhandled Ledger Entry with {} postings", postings.size());
