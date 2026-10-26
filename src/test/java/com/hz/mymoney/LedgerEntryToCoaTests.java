@@ -116,7 +116,7 @@ class LedgerEntryToCoaTests {
 
 		assertTrue(complexBalancedLedgerEntry.canMatchPostings());
 
-		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(complexBalancedLedgerEntry.getPostings());
+		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(complexBalancedLedgerEntry.getNonRawPostings());
 		List<IPosting> negativeAmounts = LedgerEntrySupport.splitAndReturnFirst(sortedPostings);
 		List<IPosting> positiveAmounts = LedgerEntrySupport.splitAndReturnLast(sortedPostings);
 

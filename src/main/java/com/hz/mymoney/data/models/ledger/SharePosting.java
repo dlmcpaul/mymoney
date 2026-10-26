@@ -4,22 +4,19 @@ import com.hz.mymoney.data.models.Money;
 
 import java.math.RoundingMode;
 
-public class SharePosting extends Posting implements IPosting {
+public class SharePosting extends FundPosting implements IPosting {
 	protected final Money price;
-	protected final String code;
 	protected final boolean split;      // Stock Split occurred
 
 	public SharePosting(String account, Money amount, Money price, String code, String note) {
-		super(account, amount, note);
+		super(account, amount, code, note);
 		this.price = price;
-		this.code = code;
 		this.split = false;
 	}
 
 	public SharePosting(String account, Money amount, Money price, String code, boolean split, String note) {
-		super(account, amount, note);
+		super(account, amount, code, note);
 		this.price = price;
-		this.code = code;
 		this.split = split;
 	}
 
@@ -37,7 +34,7 @@ public class SharePosting extends Posting implements IPosting {
 				+ this.account
 				+ splitPosting()
 				+ (this.amount != null ? "  " + this.amount.stripTrailingZeros().toPlainString() : "")
-				+ (this.code != null ? "  " + this.code : "")
+				+ (getCode() != null ? "  " + getCode() : "")
 				+ (showPrice() ? " @ " + this.price : "")
 				+ (this.note != null ? "  ;" + this.note : "");
 	}
@@ -50,11 +47,6 @@ public class SharePosting extends Posting implements IPosting {
 	@Override
 	public Money getPrice() {
 		return price;
-	}
-
-	@Override
-	public String getCode() {
-		return code;
 	}
 
 	@Override

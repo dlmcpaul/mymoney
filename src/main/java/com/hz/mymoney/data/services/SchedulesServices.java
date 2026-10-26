@@ -56,7 +56,7 @@ public class SchedulesServices implements ApplicationRunner {
 				convertLedgerToSchedules(scheduleLedger);
 			} finally {
 				assert scheduleLedger != null : "scheduleLedger is null";
-				log.info("Successfully loaded {} Schedules from file {} with {} errors", scheduleLedger.getLedgerEntries().size(), path.toString(), scheduleLedger.getLoadErrorCount());
+				log.info("Successfully loaded {} Schedules from file {} with {} errors", scheduleLedger.getEntries().size(), path.toString(), scheduleLedger.getLoadErrorCount());
 			}
 		} else {
 			log.error("Unable to load schedules from file {}", fileName);
@@ -78,7 +78,7 @@ public class SchedulesServices implements ApplicationRunner {
 
 	private void convertLedgerToSchedules(Ledger scheduleLedger) {
 		// Convert to List<Schedule>
-		this.scheduledTransactions = scheduleLedger.getLedgerEntries()
+		this.scheduledTransactions = scheduleLedger.getOnlyLedgerEntries()
 				.stream()
 				.map(ledgerEntry -> createSchedule(ledgerEntry.getNote(), ledgerEntry))
 				.sorted()

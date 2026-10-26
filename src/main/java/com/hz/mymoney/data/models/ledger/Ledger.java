@@ -12,11 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Ledger {
 	private int loadErrorCount = 0;
-	private List<String> metaData = new ArrayList<>();
-	private List<LedgerEntry> ledgerEntries = new ArrayList<>();
+	private List<Entry> entries = new ArrayList<>();
 
 	private void addAll(List<LedgerEntry> ledgerEntries) {
-		this.ledgerEntries.addAll(ledgerEntries);
+		this.entries.addAll(ledgerEntries);
 	}
 
 	private void add(LocalDate date, String description, Money amount, Money price, String code, String to, String from) {
@@ -32,12 +31,16 @@ public class Ledger {
 		}
 	}
 
-	public void add(LedgerEntry ledgerEntry) {
-		ledgerEntries.add(ledgerEntry);
+	public void add(Entry entry) {
+		entries.add(entry);
 	}
 
 	public void add(LocalDate date, String description, List<IPosting> postings) {
 		this.add(new LedgerEntry(date, description, postings));
+	}
+
+	public void add(String line) {
+		this.add(new RawEntry(line));
 	}
 
 	public void add(LocalDate date, String description, Money amount, String to, String from) {
@@ -46,8 +49,17 @@ public class Ledger {
 		this.add(date, description, List.of(toAccount, fromAccount));
 	}
 
+	public List<LedgerEntry> getOnlyLedgerEntries() {
+		return entries.stream()
+				.filter(entry -> entry instanceof LedgerEntry)
+				.map(entry -> (LedgerEntry) entry)
+				.toList();
+	}
+
 	public boolean hasLedgerEntry(LedgerEntry ledgerEntry) {
-		return ledgerEntries.stream().anyMatch(t -> t.isEquivalent(ledgerEntry));
+		return entries.stream()
+				.filter(entry -> entry instanceof LedgerEntry)
+				.anyMatch(t -> ((LedgerEntry)t).isEquivalent(ledgerEntry));
 	}
 
 	public void addErrorCount() {
@@ -56,9 +68,5 @@ public class Ledger {
 
 	public boolean isReadOnly() {
 		return loadErrorCount != 0;
-	}
-
-	public void addMetaData(String metaLine) {
-		metaData.add(metaLine);
 	}
 }

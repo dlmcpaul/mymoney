@@ -5,44 +5,68 @@ import com.hz.mymoney.data.models.Money;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import static com.hz.mymoney.data.models.Money.DOLLAR_SYMBOL;
+import static com.hz.mymoney.data.models.Money.EURO_SYMBOL;
+
 public final class MoneyParser {
-	// Hard coded to $ for the moment.  How to support other symbols?
-	public static final String MONEY_SYMBOL = "$";
+	// Defaults to AUD for the moment.  How to support other currencies better?
 	public static final String DEFAULT_CURRENCY = "AUD";
 
 	private MoneyParser() {}
 
-	public static boolean isMoney(String value) {
-		return value.startsWith(MoneyParser.MONEY_SYMBOL);
+	public static boolean hasCurrencySymbol(String value) {
+		return value.startsWith(DOLLAR_SYMBOL) || value.startsWith(EURO_SYMBOL);
 	}
 
-	public static Money parseMoney(String amount, int scale) {
-		String currency = DEFAULT_CURRENCY;
+	public static Money parseMoney(String value) {
 
-		if (amount.startsWith(" ") || amount.endsWith(" ")) {
-			return parseMoney(amount.trim(), scale);
-		} else if (amount.startsWith(MONEY_SYMBOL + "-") || amount.startsWith("-" + MONEY_SYMBOL)) {
-			// special case 1
-			return parseMoney(amount.substring(2), scale).negate();
-		} else if (amount.startsWith(MONEY_SYMBOL + " -")) {
-			// special case 2
-			return parseMoney(amount.substring(3), scale).negate();
-		} else if (amount.contains(".") == false) {
-			// special case 3
-			return parseMoney(amount + ".00", scale);
-		} else if (amount.startsWith(MONEY_SYMBOL + " ")) {
-			// special case 4
-			return parseMoney(amount.substring(2), scale);
-		} else if (amount.startsWith(MONEY_SYMBOL)) {
-			// special case 5
-			return parseMoney(amount.substring(1), scale);
-		} else if (amount.contains(" ")) {
-			// likely amount currency
-			currency = amount.substring(amount.indexOf(" ") + 1);
-			amount = amount.substring(0, amount.indexOf(" "));
+		// Basic cleanup
+		if (value.startsWith(" ") || value.endsWith(" ")) {
+			return parseMoney(value.trim());
 		}
 
-		return new Money(new BigDecimal(amount.replace(",","")).setScale(scale, RoundingMode.HALF_UP), currency);
+		// Strip + symbol as well
+		if (value.contains("+")) {
+			return parseMoney(value.replace("+", ""));
+		}
+
+		if (value.contains("-")) {
+			return parseMoney(value.replace("-", "")).negate();
+		}
+
+		boolean hasCurrency = value.matches(".*\\d\\s+[A-Z]+");
+		boolean hasCurrencySymbol = hasCurrencySymbol(value);
+
+		String currency = "";
+		String currencySymbol = "";
+
+		if (hasCurrency) {
+			currency = value.substring(value.indexOf(" ") + 1);
+			value = value.substring(0, value.indexOf(" "));
+		}
+
+		if (hasCurrencySymbol) {
+			currencySymbol = String.valueOf(value.charAt(0));
+			value = value.substring(1).trim();
+		}
+
+		return parseMoney(value, currency, currencySymbol);
+	}
+
+	private static Money parseMoney(String value, String currency, String currencySymbol) {
+		int decimalPlace = value.indexOf(".");
+		if (decimalPlace != -1) {
+			// determine how many decimal places to use
+			return parseMoney(value, value.length() - decimalPlace - 1, currency, currencySymbol);
+		}
+		if (currency.length() >= 0 || currencySymbol.length() >= 0) {
+			return parseMoney(value, 2, currency, currencySymbol);
+		}
+		return parseMoney(value, 0, currency, currencySymbol);
+	}
+
+	private static Money parseMoney(String value, int scale, String currency, String currencySymbol) {
+		return new Money(new BigDecimal(value.replace(",","")).setScale(scale, RoundingMode.HALF_UP), currency, currencySymbol);
 	}
 
 }

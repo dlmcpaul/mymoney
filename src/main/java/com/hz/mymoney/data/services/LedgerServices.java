@@ -4,10 +4,7 @@ import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.Account;
 import com.hz.mymoney.data.models.coa.ChartOfAccounts;
 import com.hz.mymoney.data.models.coa.Movement;
-import com.hz.mymoney.data.models.ledger.IPosting;
-import com.hz.mymoney.data.models.ledger.Ledger;
-import com.hz.mymoney.data.models.ledger.LedgerEntry;
-import com.hz.mymoney.data.models.ledger.SharePosting;
+import com.hz.mymoney.data.models.ledger.*;
 import com.hz.mymoney.data.utilities.LedgerEntrySupport;
 import com.hz.mymoney.data.utilities.LedgerParser;
 import lombok.Getter;
@@ -57,7 +54,7 @@ public class LedgerServices implements ApplicationRunner {
 			this.loadLedgerFromClassPath("test.ledger");
 		}
 
-		ledger.getLedgerEntries()
+		ledger.getEntries()
 			.forEach(this::updateShareValues);
 
 		makeChartOfAccounts(ledger);
@@ -79,17 +76,19 @@ public class LedgerServices implements ApplicationRunner {
 		}
 	}
 
-	private void updateShareValues(LedgerEntry entry) {
-		SharePosting posting = entry.getSharePosting();
-		if (posting != null) {
-			shareValueService.updateFromJournal(entry.getDate(), posting.getCode(), posting.getPrice());
+	private void updateShareValues(Entry entry) {
+		if (Objects.requireNonNull(entry) instanceof LedgerEntry ledgerEntry) {
+			SharePosting posting = ledgerEntry.getSharePosting();
+			if (posting != null) {
+				shareValueService.updateFromJournal(ledgerEntry.getDate(), posting.getCode(), posting.getPrice());
+			}
 		}
 	}
 
 	public void makeChartOfAccounts(Ledger ledger) {
 		// Convert to Chart of Accounts
 		this.coa = new ChartOfAccounts(LocalDate.now().plusDays(1));
-		ledger.getLedgerEntries()
+		ledger.getOnlyLedgerEntries()
 			.forEach(entry -> mapLedgerEntryToPostings(coa, entry));
 	}
 
@@ -114,7 +113,7 @@ public class LedgerServices implements ApplicationRunner {
 			coa.addPosting(matchedPostings.getFirst(), entry.getDate(), entry.getDescription(), matchedPostings.getLast().getAccount(), commission);
 			coa.addPosting(matchedPostings.getLast(), entry.getDate(), entry.getDescription(), matchedPostings.getFirst().getAccount(), commission);
 
-			List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.removePostings(entry.getPostings(), matchedPostings.getFirst(), matchedPostings.getLast()));
+			List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.removePostings(entry.getNonRawPostings(), matchedPostings.getFirst(), matchedPostings.getLast()));
 
 			if (sortedPostings.getLast().getAmount().compareTo(Money.ZERO) > 0) {
 				IPosting sourcePosting = sortedPostings.getLast();
@@ -125,7 +124,7 @@ public class LedgerServices implements ApplicationRunner {
 			}
 		} else {
 			// Let's just match to the largest negative account similar to the single negative amount
-			List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
+			List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getNonRawPostings());
 
 			if (sortedPostings.getFirst().getAmount().compareTo(Money.ZERO) < 0) {
 				IPosting sourcePosting = sortedPostings.getFirst();
@@ -138,7 +137,7 @@ public class LedgerServices implements ApplicationRunner {
 	}
 
 	private void mapLedgerEntryToPostingsMatched(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
-		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
+		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getNonRawPostings());
 		List<IPosting> negativeAmounts = LedgerEntrySupport.splitAndReturnFirst(sortedPostings);
 		List<IPosting> positiveAmounts = LedgerEntrySupport.splitAndReturnLast(sortedPostings);
 
@@ -149,14 +148,14 @@ public class LedgerServices implements ApplicationRunner {
 				coa.addPosting(posting, entry.getDate(), entry.getDescription(), positiveAmounts.get(i).getAccount(), commission);
 				coa.addPosting(positiveAmounts.get(i), entry.getDate(), entry.getDescription(), posting.getAccount(), commission);
 			} else {
-				log.error("Unhandled Ledger Entry with {} postings and multiple negative sources {}", entry.getPostings().size(), entry);
+				log.error("Unhandled Ledger Entry with {} postings and multiple negative sources {}", entry.getNonRawPostings().size(), entry);
 			}
 			i--;
 		}
 	}
 
 	private void mapLedgerEntryToPostingsSingleNegative(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
-		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
+		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getNonRawPostings());
 
 		if (sortedPostings.getFirst().getAmount().compareTo(Money.ZERO) < 0) {
 			IPosting sourcePosting = sortedPostings.getFirst();
@@ -168,7 +167,7 @@ public class LedgerServices implements ApplicationRunner {
 	}
 
 	private void mapLedgerEntryToPostingsSinglePositive(ChartOfAccounts coa, LedgerEntry entry, Money commission) {
-		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getPostings());
+		List<IPosting> sortedPostings = LedgerEntrySupport.sortByAmount(entry.getNonRawPostings());
 
 		if (sortedPostings.getLast().getAmount().compareTo(Money.ZERO) > 0) {
 			IPosting sourcePosting = sortedPostings.getLast();
@@ -221,10 +220,7 @@ public class LedgerServices implements ApplicationRunner {
 			Path path = Path.of(ledgerFileName);
 			log.info("Saving Ledger to file {}", path);
 			try (var out = new BufferedWriter(new FileWriter(path.toFile()))) {
-				for (String metaLine : ledger.getMetaData()) {
-					out.write(metaLine);
-				}
-				for (LedgerEntry entry : ledger.getLedgerEntries()) {
+				for (Entry entry : ledger.getEntries()) {
 					out.write(entry.toString());
 				}
 				log.info("Ledger saved successfully");
@@ -242,7 +238,7 @@ public class LedgerServices implements ApplicationRunner {
 		if (Files.isReadable(path)) {
 			ledgerFileName = path.toString();
 			ledger = ledgerParser.loadLedger(path);
-			log.info("{}oaded {} Ledger Entries from file {} with {} errors", ledger.isReadOnly() ? "L" : "Successfully l", ledger.getLedgerEntries().size(), ledgerFileName, ledger.getLoadErrorCount());
+			log.info("{}oaded {} Ledger Entries from file {} with {} errors", ledger.isReadOnly() ? "L" : "Successfully l", ledger.getEntries().size(), ledgerFileName, ledger.getLoadErrorCount());
 		} else {
 			log.error("Unable to load Ledger from file {}", fileName);
 			throw new FileNotFoundException("Unable to load Ledger from file " + fileName);

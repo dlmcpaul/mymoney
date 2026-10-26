@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +23,10 @@ public class PrefillLogicService {
 		final Ledger ledger = dataLoaderService.getLedger();
 		final LocalDate lastYear = LocalDate.now().minusYears(1);
 
-		return ledger.getLedgerEntries().stream()
+		return ledger.getOnlyLedgerEntries().stream()
 				.filter(ledgerEntry -> ledgerEntry.getDate().isAfter(lastYear))
 				.filter(ledgerEntry -> ledgerEntry.getDescription().equalsIgnoreCase(description))
-				.map(ledgerEntry -> new JournalResult(ledgerEntry.getDescription(), ledgerEntry.getFirstNegativePosting().getAccount(), ledgerEntry.getFirstPositivePosting().getAccount()))
+				.map(ledgerEntry -> new JournalResult(ledgerEntry.getDescription(), Objects.requireNonNull(ledgerEntry.getFirstNegativePosting()).getAccount(), ledgerEntry.getFirstPositivePosting().getAccount()))
 				.distinct()
 				.toList();
 	}
@@ -34,11 +35,11 @@ public class PrefillLogicService {
 		final Ledger ledger = dataLoaderService.getLedger();
 		final LocalDate lastYear = LocalDate.now().minusYears(1);
 
-		return ledger.getLedgerEntries().stream()
+		return ledger.getOnlyLedgerEntries().stream()
 				.filter(ledgerEntry -> ledgerEntry.getDate().isAfter(lastYear))
 				.filter(ledgerEntry -> ledgerEntry.getDescription().length() >= description.length())
 				.filter(ledgerEntry -> ledgerEntry.getDescription().substring(0, description.length()).equalsIgnoreCase(description))
-				.map(ledgerEntry -> new JournalResult(ledgerEntry.getDescription(), ledgerEntry.getFirstNegativePosting().getAccount(), ledgerEntry.getFirstPositivePosting().getAccount()))
+				.map(ledgerEntry -> new JournalResult(ledgerEntry.getDescription(), Objects.requireNonNull(ledgerEntry.getFirstNegativePosting()).getAccount(), ledgerEntry.getFirstPositivePosting().getAccount()))
 				.distinct()
 				.toList();
 	}

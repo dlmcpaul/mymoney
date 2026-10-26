@@ -25,7 +25,7 @@ public class LedgerParser {
 	private static final Pattern LINE_STARTS_WITH_DATE = Pattern.compile("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\s.*");
 
 	public enum LedgerEntryState {
-		COMMENT,
+		COMMENT_POSTING,
 		EMPTY,
 		UNKNOWN,
 		ENTRY_START,
@@ -41,14 +41,13 @@ public class LedgerParser {
 
 		try (InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
 			try (BufferedReader br = new BufferedReader(isr)) {
-				final String lastLine = readMetaData(ledger, br);
-				if (lastLine != null) {
-					readLedgerEntries(ledger, br, lastLine);
-				}
+				readLedgerEntries(ledger, br);
 			} catch (IOException e) {
+				ledger.addErrorCount();
 				log.error(e.getMessage(), e);
 			}
 		} catch (IOException e) {
+			ledger.addErrorCount();
 			log.error(e.getMessage(), e);
 		}
 
@@ -59,37 +58,24 @@ public class LedgerParser {
 		Ledger ledger = new Ledger();
 
 		try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-			final String lastLine = readMetaData(ledger, br);
-			if (lastLine != null) {
-				readLedgerEntries(ledger, br, lastLine);
-			}
+			readLedgerEntries(ledger, br);
 		} catch (IOException e) {
+			ledger.addErrorCount();
 			log.error(e.getMessage(), e);
 		}
 		return ledger;
 	}
 
-	private String readMetaData(Ledger ledger, BufferedReader br) throws IOException {
-		String line = br.readLine();
-		while (line != null && isLedgerEntryStart(line) == false) {
-			ledger.addMetaData(line);
-			line = br.readLine();
-		}
-		return line;
-	}
-
-	private void readLedgerEntries(Ledger ledger, BufferedReader br, String lastLine) throws IOException {
-		// lastLine should be the start of a ledgerEntry
-		String line = lastLine;
+	private void readLedgerEntries(Ledger ledger, BufferedReader br) throws IOException {
+		String line = "";
 		try {
 			LedgerEntry ledgerEntry = null;
-			while (line != null) {
+			while (	(line = br.readLine()) != null) {
 				switch (scanLine(line)) {
 					case ENTRY_START -> {
 						addLedgerEntry(ledger, ledgerEntry);
 						ledgerEntry = newLedgerEntry(line);
 					}
-					case EMPTY -> {}
 					case CASH_POSTING -> {
 						assert ledgerEntry != null : "ledgerEntry is null";
 						addPosting(ledgerEntry, parseCashPosting(line));
@@ -110,12 +96,14 @@ public class LedgerParser {
 						assert ledgerEntry != null : "ledgerEntry is null";
 						addPosting(ledgerEntry, parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
 					}
-					default -> {
-						ledger.addErrorCount();
-						log.error("Unsupported entry '{}'", line);
+					case COMMENT_POSTING -> {
+						assert ledgerEntry != null : "ledgerEntry is null";
+						addRawPosting(ledgerEntry, line);
+					}
+					case UNKNOWN, EMPTY -> {
+						ledger.add(new RawEntry(line));
 					}
 				}
-				line = br.readLine();
 			}
 			addLedgerEntry(ledger, ledgerEntry);
 		} catch (Exception e) {
@@ -132,7 +120,7 @@ public class LedgerParser {
 	private void addLedgerEntry(Ledger ledger, LedgerEntry ledgerEntry) {
 		if (ledgerEntry != null) {
 			if (ledgerEntry.isBalanced()) {
-				ledger.getLedgerEntries().add(ledgerEntry);
+				ledger.add(ledgerEntry);
 			} else {
 				ledger.addErrorCount();
 				log.error("Ledger Entry is not balanced {}", ledgerEntry);
@@ -162,18 +150,21 @@ public class LedgerParser {
 		return new LedgerEntry(date, status, description, note, new ArrayList<>());
 	}
 
+	private void addRawPosting(LedgerEntry ledgerEntry, String line) {
+		ledgerEntry.getPostings().add(new RawPosting(line));
+	}
+
 	public IPosting parseCashPosting(String line) {
 		// Account  Amount [Currency]
 		List<String> tokens = tokenize(line);
 		String account = tokens.getFirst().trim();
 		String amount = tokens.getLast().trim();
-		String currency = "AUD";
 
 		if (amount.isEmpty()) {
 			log.warn("For cash line '{}' amount needs to be calculated", line);
 		}
 
-		return new Posting(account, MoneyParser.parseMoney(amount, 2), getNote(line));
+		return new Posting(account, MoneyParser.parseMoney(amount), getNote(line));
 	}
 
 	public IPosting parseRemainderPosting(String line, Money remainder) {
@@ -205,7 +196,8 @@ public class LedgerParser {
 			List<String> tokens = Arrays.stream(ONE_OR_MORE_SPACES.split(misformed))
 					.map(String::trim)
 					.filter(s -> s.isEmpty() == false)
-					.filter(s -> s.equals(MoneyParser.MONEY_SYMBOL) == false)
+					.filter(s -> s.equals(Money.DOLLAR_SYMBOL) == false)
+					.filter(s -> s.equals(Money.EURO_SYMBOL) == false)
 					.toList();
 			amount = tokens.getFirst();
 			code = tokens.get(1);
@@ -219,9 +211,9 @@ public class LedgerParser {
 		}
 
 		if (hasCosting) {
-			return new SharePosting(account, MoneyParser.parseMoney(amount, 2), MoneyParser.parseMoney(cost, 6), code, getNote(line));
+			return new SharePosting(account, MoneyParser.parseMoney(amount), MoneyParser.parseMoney(cost), code, getNote(line));
 		}
-		return new SharePosting(account, MoneyParser.parseMoney(amount, 2), Money.ZERO, code, getNote(line));
+		return new SharePosting(account, MoneyParser.parseMoney(amount), Money.ZERO, code, getNote(line));
 	}
 
 	public IPosting parseShareResetPosting(String line) {
@@ -229,7 +221,7 @@ public class LedgerParser {
 		String amount = tokenize(line).get(2).trim();
 		String shareCode = tokenize(line).getLast().trim();
 
-		return new SharePosting(account, MoneyParser.parseMoney(amount, 2), Money.ZERO, shareCode, true, getNote(line));
+		return new SharePosting(account, MoneyParser.parseMoney(amount), Money.ZERO, shareCode, true, getNote(line));
 	}
 
 	public IPosting parseFundPosting(String line) {
@@ -240,31 +232,37 @@ public class LedgerParser {
 			log.warn("For fund line '{}' amount needs to be calculated", line);
 		}
 
-		return new FundPosting(account, MoneyParser.parseMoney(amount, 2), getNote(line));
+		return new FundPosting(account, MoneyParser.parseMoney(amount), getNote(line));
+	}
+
+	private boolean isIndented(String line) {
+		return line.startsWith("  ") || line.startsWith("\t");
 	}
 
 	public LedgerEntryState scanLine(String line) {
-		if (isLedgerEntryStart(line)) {
-			return LedgerEntryState.ENTRY_START;
-		} else if (isCommentLine(line)) {
-			return LedgerEntryState.COMMENT;
-		} else if (line.contains("@")) {
-			return LedgerEntryState.SHARE_POSTING;
-		} else if (line.contains(":Fund:")) {
-			// Quirk for my files
-			return LedgerEntryState.FUND_POSTING;
-		} else if (line.isEmpty()) {
-			return LedgerEntryState.EMPTY;
-		}
 
-		if (countTokens(line) == 1) {
-			return LedgerEntryState.REMAINDER_POSTING;
-		} else if (countTokens(line) == 2) {
-			return LedgerEntryState.CASH_POSTING;
-		} else if (countTokens(line) == 3) {
-			return LedgerEntryState.SHARE_POSTING;
-		} else if (countTokens(line) == 4) {
-			return LedgerEntryState.SHARE_RESET_POSTING;
+		if (isIndented(line)) {
+			// Must be a Posting Line
+			if (line.contains("@")) {
+				return LedgerEntryState.SHARE_POSTING;
+			} else if (line.contains(":Fund:")) {
+				// Quirk for my files
+				return LedgerEntryState.FUND_POSTING;
+			} else if (line.trim().startsWith(";")) {
+				return LedgerEntryState.COMMENT_POSTING;
+			} else if (countTokens(line) == 1) {
+				return LedgerEntryState.REMAINDER_POSTING;
+			} else if (countTokens(line) == 2) {
+				return LedgerEntryState.CASH_POSTING;
+			} else if (countTokens(line) == 3) {
+				return LedgerEntryState.SHARE_POSTING;
+			} else if (countTokens(line) == 4) {
+				return LedgerEntryState.SHARE_RESET_POSTING;
+			}
+		} else if (line.isBlank()) {
+			return LedgerEntryState.EMPTY;
+		} else if (isLedgerEntryStart(line)) {
+			return LedgerEntryState.ENTRY_START;
 		}
 
 		return LedgerEntryState.UNKNOWN;
@@ -314,7 +312,8 @@ public class LedgerParser {
 		return Arrays.stream(TWO_SPACES.split(line))
 				.map(String::trim)
 				.filter(s -> s.isEmpty() == false)
-				.filter(s -> s.equals(MoneyParser.MONEY_SYMBOL) == false)
+				.filter(s -> s.equals(Money.DOLLAR_SYMBOL) == false)
+				.filter(s -> s.equals(Money.EURO_SYMBOL) == false)
 				.toList();
 	}
 

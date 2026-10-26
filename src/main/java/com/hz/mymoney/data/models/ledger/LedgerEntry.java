@@ -10,7 +10,7 @@ import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 @Data
-public class LedgerEntry {
+public final class LedgerEntry implements Entry {
 	private LocalDate date;
 	private String status;
 	private String description;
@@ -43,12 +43,18 @@ public class LedgerEntry {
 		this.date = this.date.plus(amount, unit);
 	}
 
+	public List<IPosting> getNonRawPostings() {
+		return postings.stream()
+				.filter(posting -> posting instanceof RawPosting == false)
+				.toList();
+	}
+
 	// Basic check for balanced transaction (debits == credits)
 	public boolean isBalanced() {
-		if (postings.size() < 2) {
+		if (getNonRawPostings().size() < 2) {
 			return false;
 		}
-		Money total = postings.stream()
+		Money total = getNonRawPostings().stream()
 				.map(IPosting::getValue)
 				.reduce(Money.ZERO, Money::add);
 		// Financial calculations should always balance
@@ -57,7 +63,7 @@ public class LedgerEntry {
 
 	public Money getRemainingBalance() {
 		Money total = Money.ZERO;
-		for (IPosting p : postings) {
+		for (IPosting p : getNonRawPostings()) {
 			total = total.add(p.getValue());
 		}
 		return total.multiply(Money.valueOf(-1)).setScale(2, RoundingMode.HALF_UP);
@@ -91,13 +97,13 @@ public class LedgerEntry {
 	}
 
 	public long totalNegativePostings() {
-		return postings.stream()
+		return getNonRawPostings().stream()
 				.filter(iPosting -> iPosting.getAmount().compareTo(Money.ZERO) < 0)
 				.count();
 	}
 
 	public long totalPositivePostings() {
-		return postings.stream()
+		return getNonRawPostings().stream()
 				.filter(iPosting -> iPosting.getAmount().compareTo(Money.ZERO) > 0)
 				.count();
 	}
@@ -120,7 +126,7 @@ public class LedgerEntry {
 	}
 
 	public IPosting getNonSourcePosting(String account) {
-		for (IPosting p : postings) {
+		for (IPosting p : getNonRawPostings()) {
 			if (p.getAccount().equalsIgnoreCase(account) == false) {
 				return p;
 			}
@@ -130,7 +136,7 @@ public class LedgerEntry {
 	}
 
 	public IPosting getFirstNegativePosting() {
-		for (IPosting p : postings) {
+		for (IPosting p : getNonRawPostings()) {
 			if (p.getAmount().compareTo(Money.ZERO) < 0) {
 				return p;
 			}
@@ -139,7 +145,7 @@ public class LedgerEntry {
 	}
 
 	public IPosting getFirstPositivePosting() {
-		for (IPosting p : postings) {
+		for (IPosting p : getNonRawPostings()) {
 			if (p.getAmount().compareTo(Money.ZERO) > 0) {
 				return p;
 			}
@@ -148,22 +154,22 @@ public class LedgerEntry {
 	}
 
 	public IPosting getFirstPosting() {
-		return this.postings.getFirst();
+		return this.getNonRawPostings().getFirst();
 	}
 
 	public IPosting getLastPosting() {
-		return this.postings.get(postings.size() - 1);
+		return this.getNonRawPostings().get(postings.size() - 1);
 	}
 
 	public Money getFirstAmount() {
-		return postings.stream()
+		return getNonRawPostings().stream()
 				.findFirst()
 				.orElseGet(() -> new Posting("Empty"))
 				.getAmount();
 	}
 
 	public IPosting getPostingWithAmount(Money amount) {
-		return postings.stream()
+		return getNonRawPostings().stream()
 				.filter(t -> t.getAmount().equals(amount))
 				.findFirst().orElse(null);
 	}

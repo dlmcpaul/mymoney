@@ -10,9 +10,9 @@ public class FundPosting extends Posting implements IPosting {
 		this.code = account.substring(account.lastIndexOf(":") + 1);
 	}
 
-	public FundPosting(String account, Money amount) {
-		super(account, amount, null);
-		this.code = account.substring(account.lastIndexOf(":") + 1);
+	public FundPosting(String account, Money amount, String code, String note) {
+		super(account, amount, note);
+		this.code = code;
 	}
 
 	@Override

@@ -188,8 +188,8 @@ public class SharePriceServices implements ApplicationRunner {
 	}
 
 	private Money parseBigDecimal(String value) {
-		if (MoneyParser.isMoney(value)) {
-			return MoneyParser.parseMoney(value, 2);
+		if (MoneyParser.hasCurrencySymbol(value)) {
+			return MoneyParser.parseMoney(value);
 		}
 		return new Money(new BigDecimal(value));
 	}
