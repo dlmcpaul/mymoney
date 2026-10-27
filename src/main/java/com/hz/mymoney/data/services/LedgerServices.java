@@ -7,6 +7,7 @@ import com.hz.mymoney.data.models.coa.Movement;
 import com.hz.mymoney.data.models.ledger.*;
 import com.hz.mymoney.data.utilities.LedgerEntrySupport;
 import com.hz.mymoney.data.utilities.LedgerParser;
+import com.hz.mymoney.exceptions.FileSaveFailedException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,6 +29,8 @@ import java.util.*;
 
 import static com.hz.mymoney.configuration.AccountConstants.FUND_ACCOUNTS;
 import static com.hz.mymoney.configuration.AccountConstants.IMPUTATION_ACCOUNT;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 @Service
@@ -214,19 +217,32 @@ public class LedgerServices implements ApplicationRunner {
 	}
 
 	public void saveLedger() {
-		if (ledgerFileName == null || ledgerFileName.startsWith(CLASSPATH_URL_PREFIX) || ledger.isReadOnly()) {
-			log.error("Cannot Save Ledger");
-		} else {
-			Path path = Path.of(ledgerFileName);
-			log.info("Saving Ledger to file {}", path);
-			try (var out = new BufferedWriter(new FileWriter(path.toFile()))) {
-				for (Entry entry : ledger.getEntries()) {
-					out.write(entry.toString());
-				}
-				log.info("Ledger saved successfully");
-			} catch (IOException e) {
-				log.error("Failed to Save Ledger", e);
+		if (ledgerFileName == null || ledgerFileName.startsWith(CLASSPATH_URL_PREFIX)) {
+			log.error("Cannot Save Ledger as filename is missing or invalid");
+			throw new FileSaveFailedException("Failed to Save Ledger " + ledgerFileName == null ? "NO FILENAME SET" : ledgerFileName);
+		}
+
+		if (ledger.isReadOnly()) {
+			log.error("Cannot Save a Read Only Ledger");
+			throw new FileSaveFailedException("Failed to Save Ledger as it is read-only");
+		}
+
+		Path path = Path.of(ledgerFileName + ".tmp");
+		log.info("Saving Ledger to temporary file {}", path);
+		try (var out = new BufferedWriter(new FileWriter(path.toFile()))) {
+			for (Entry entry : ledger.getEntries()) {
+				out.write(entry.toString());
 			}
+		} catch (IOException e) {
+			log.error("Failed to Save Temp Ledger", e);
+			throw new FileSaveFailedException("Failed to Save Temp Ledger " + e.getMessage(), e);
+		}
+		try {
+			Files.move(path, Path.of(ledgerFileName), ATOMIC_MOVE, REPLACE_EXISTING);
+			log.info("Ledger saved successfully");
+		} catch (IOException e) {
+			log.error("Failed to rename Temp Ledger to Real Ledger", e);
+			throw new FileSaveFailedException("Failed to rename Temp Ledger to Real Ledger " + e.getMessage(), e);
 		}
 	}
 

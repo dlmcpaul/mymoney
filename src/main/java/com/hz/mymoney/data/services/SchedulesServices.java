@@ -4,6 +4,7 @@ import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;
 import com.hz.mymoney.data.utilities.LedgerParser;
+import com.hz.mymoney.exceptions.FileSaveFailedException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +22,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 @Service
@@ -99,18 +102,32 @@ public class SchedulesServices implements ApplicationRunner {
 	}
 
 	public void saveSchedules() {
-		if (schedulesFileName == null || schedulesFileName.startsWith(CLASSPATH_URL_PREFIX) || scheduleLedger.isReadOnly()) {
-			log.error("Cannot Save Schedules");
-		} else {
-			Path path = Path.of(schedulesFileName);
-			log.info("Saving Schedules to file {}", path);
-			try (var out = new BufferedWriter(new FileWriter(path.toFile()))) {
-				for (Schedule entry : scheduledTransactions) {
-					out.write(entry.ledgerEntry.toString());
-				}
-			} catch (IOException e) {
-				log.error("Failed to Save Schedules", e);
+		if (schedulesFileName == null || schedulesFileName.startsWith(CLASSPATH_URL_PREFIX)) {
+			log.error("Cannot Save Schedules as filename is missing or invalid");
+			throw new FileSaveFailedException("Failed to Save Schedules " + schedulesFileName == null ? "NO FILENAME SET" : schedulesFileName);
+		}
+
+		if (scheduleLedger.isReadOnly()) {
+			log.error("Cannot Save a Read Only Schedules");
+			throw new FileSaveFailedException("Failed to Save Schedules as it is read-only");
+		}
+
+		Path path = Path.of(schedulesFileName + ".tmp");
+		log.info("Saving Schedules to file {}", path);
+		try (var out = new BufferedWriter(new FileWriter(path.toFile()))) {
+			for (Schedule entry : scheduledTransactions) {
+				out.write(entry.ledgerEntry.toString());
 			}
+		} catch (IOException e) {
+			log.error("Failed to Save Schedules", e);
+			throw new FileSaveFailedException("Failed to Save Schedules " + e.getMessage(), e);
+		}
+		try {
+			Files.move(path, Path.of(schedulesFileName), ATOMIC_MOVE, REPLACE_EXISTING);
+			log.info("Schedules saved successfully");
+		} catch (IOException e) {
+			log.error("Failed to rename Temp Schedules to Real Schedules", e);
+			throw new FileSaveFailedException("Failed to rename Temp Schedules to Real Schedules " + e.getMessage(), e);
 		}
 	}
 

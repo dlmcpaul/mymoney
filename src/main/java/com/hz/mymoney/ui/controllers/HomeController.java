@@ -89,7 +89,7 @@ public class HomeController {
 			htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "All Data Saved Successfully" ));
 		} catch (Exception e) {
 			log.error("Save Ledger Exception {}", e.getMessage(), e);
-			htmxResponse.addTrigger("showMessage", new Toast("error", "Failed", "Failed to Save All Data - Files may be corrupt" ));
+			htmxResponse.addTrigger("showMessage", new Toast("error", "Failed", "Failed to Save - Files may be corrupt (" + e.getMessage() + ")" ));
 		}
 		return FragmentsRendering
 				.fragment("fragments/Common :: SaveButton")
