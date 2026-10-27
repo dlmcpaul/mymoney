@@ -9,9 +9,6 @@ import static com.hz.mymoney.data.models.Money.DOLLAR_SYMBOL;
 import static com.hz.mymoney.data.models.Money.EURO_SYMBOL;
 
 public final class MoneyParser {
-	// Defaults to AUD for the moment.  How to support other currencies better?
-	public static final String DEFAULT_CURRENCY = "AUD";
-
 	private MoneyParser() {}
 
 	public static boolean hasCurrencySymbol(String value) {
