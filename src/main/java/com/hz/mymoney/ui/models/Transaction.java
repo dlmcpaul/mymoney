@@ -26,7 +26,7 @@ public record Transaction (
 
 	private String formattedAmount(Money money) {
 		if (isShares) {
-			return money.getAmount().stripTrailingZeros().toPlainString();
+			return money.formatShares();
 		}
 		return money.formatCurrency();
 	}

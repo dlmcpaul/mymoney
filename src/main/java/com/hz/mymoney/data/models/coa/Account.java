@@ -7,7 +7,6 @@ import lombok.extern.log4j.Log4j2;
 import org.jspecify.annotations.NonNull;
 
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -196,15 +195,15 @@ public class Account implements Comparable<Account> {
 
 		if (isShareAccount) {
 			if (getCode().equals("CPXXMV")) {
-				return getTotalAmount().getAmount() + " " + simpleName + " warrants";
+				return getTotalAmount().formatShares() + " " + simpleName + " warrants";
 			}
 
 			if ((getCode().length() == 4 && getCode().charAt(3) == 'O')) {
 				// Option not share?
-				return getTotalAmount().getAmount() + " options (" + getCode() + ") for " + getCode().substring(0,3);
+				return getTotalAmount().formatShares() + " options (" + getCode() + ") for " + getCode().substring(0,3);
 			}
 
-			return new DecimalFormat("#.##").format(getTotalAmount().getAmount()) + " shares in " + simpleName;
+			return getTotalAmount().formatShares() + " shares in " + simpleName;
 		} else if (isManagedFund()) {
 			return simpleName + " Fund";
 		}

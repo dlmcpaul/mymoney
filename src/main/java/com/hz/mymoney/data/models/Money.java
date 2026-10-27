@@ -1,14 +1,14 @@
 package com.hz.mymoney.data.models;
 
-import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Objects;
 
-@Data
 public class Money implements Comparable<Money> {
 	public static final String DOLLAR_SYMBOL = "$";
 	public static final String EURO_SYMBOL = "€";
@@ -20,8 +20,11 @@ public class Money implements Comparable<Money> {
 	public static final String USA = "USD";
 	public static final String EURO = "EUR";
 
-	private BigDecimal amount;
+	@Getter
+	private final BigDecimal amount;
+	@Getter
 	private final String currencySymbol;
+	@Getter
 	private final String currency;
 
 	public Money(BigDecimal amount) {
@@ -92,16 +95,12 @@ public class Money implements Comparable<Money> {
 		return amount.compareTo(money.amount);
 	}
 
-	public boolean equals(Money money) {
-		return amount.compareTo(money.amount) == 0;
-	}
-
-	public int hashCode() {
-		return amount.hashCode();
-	}
-
 	public static Money valueOf(int amount) {
 		return new Money(BigDecimal.valueOf(amount), AUSTRALIAN, DOLLAR_SYMBOL);
+	}
+
+	public String formatShares() {
+		return amount.stripTrailingZeros().toPlainString();
 	}
 
 	// Used by front end to display currency values
@@ -125,4 +124,14 @@ public class Money implements Comparable<Money> {
 		return new DecimalFormat(format).format(amount.stripTrailingZeros());
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Money money)) return false;
+		return amount.compareTo(money.amount) == 0 && Objects.equals(currencySymbol, money.currencySymbol) && Objects.equals(currency, money.currency);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(amount.stripTrailingZeros().toPlainString(), currencySymbol, currency);
+	}
 }
