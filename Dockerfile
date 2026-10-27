@@ -36,7 +36,7 @@ FROM package AS extract-dev
 WORKDIR /build
 
 # unpack the uber jar into it's components
-RUN java -Djarmode=layertools -jar target/app.jar extract --destination target/extracted
+RUN java -Djarmode=tools -jar target/app.jar extract --layers --destination target/extracted
 
 # if prod is passed as RELEASE argument then extract and generate release.properties file
 FROM package AS extract-prod
