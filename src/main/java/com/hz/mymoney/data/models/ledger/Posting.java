@@ -43,6 +43,12 @@ public class Posting implements IPosting {
 		this.note = note;
 	}
 
+	public Posting(IPosting posting, Money amount) {
+		this.account = posting.getAccount();
+		this.amount = amount;
+		this.note = posting.getNote();
+	}
+
 	public boolean isSameAccount(String account) {
 		return this.account.equals(account);
 	}

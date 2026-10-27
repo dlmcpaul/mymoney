@@ -155,16 +155,17 @@ public class FileUpdateService {
 				throw new ValidationException("Override amounts counts do not match postings");
 			} else {
 				LocalDate today = LocalDate.now();
-				log.info("Posting Scheduled Journal @ {} {}", today, schedule.ledgerEntry.getDescription());
+				LedgerEntry newLedgerEntry = new LedgerEntry(today, schedule.ledgerEntry.getDescription(), new ArrayList<>());
+				log.info("Posting Scheduled Journal @ {} {}", newLedgerEntry.getDate(), newLedgerEntry.getDescription());
+
 				schedule.ledgerEntry.getPostings().forEach(posting -> {
-					posting.setAmount(new Money(amountOverrides.get(schedule.ledgerEntry.getPostings().indexOf(posting))));
-					log.info("  {} {}", posting.getAccount(), posting.getAmount());
+					newLedgerEntry.getPostings().add(new Posting(posting, new Money(amountOverrides.get(schedule.ledgerEntry.getPostings().indexOf(posting)))));
+					log.info("  {} {}", newLedgerEntry.getLastPosting().getAccount(), newLedgerEntry.getLastPosting().getAmount());
 				});
 
 				if (schedule.isValid()) {
 					Ledger ledger = ledgerServices.getLedger();
-					// Need to clone the ledger entry
-					ledger.add(new LedgerEntry(today, schedule.ledgerEntry.getDescription(), schedule.ledgerEntry.getPostings()));
+					ledger.add(newLedgerEntry);
 					schedulesServices.scheduleRollForward(schedule);
 
 					ledgerServices.makeChartOfAccounts(ledger);
