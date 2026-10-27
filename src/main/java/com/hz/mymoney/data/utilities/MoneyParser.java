@@ -59,7 +59,7 @@ public final class MoneyParser {
 			// determine how many decimal places to use
 			return parseMoney(value, value.length() - decimalPlace - 1, currency, currencySymbol);
 		}
-		if (currency.length() >= 0 || currencySymbol.length() >= 0) {
+		if (currency.length() > 0 || currencySymbol.length() > 0) {
 			return parseMoney(value, 2, currency, currencySymbol);
 		}
 		return parseMoney(value, 0, currency, currencySymbol);

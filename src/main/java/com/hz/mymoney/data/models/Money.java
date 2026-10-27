@@ -57,8 +57,7 @@ public class Money implements Comparable<Money> {
 	}
 
 	public Money setScale(int scale, RoundingMode mode) {
-		amount = amount.setScale(scale, mode);
-		return this;
+		return new Money(amount.setScale(scale, mode), currency, currencySymbol);
 	}
 
 	public BigDecimal stripTrailingZeros() {
@@ -94,7 +93,7 @@ public class Money implements Comparable<Money> {
 	}
 
 	public boolean equals(Money money) {
-		return amount.equals(money.amount);
+		return amount.compareTo(money.amount) == 0;
 	}
 
 	public int hashCode() {
@@ -102,7 +101,7 @@ public class Money implements Comparable<Money> {
 	}
 
 	public static Money valueOf(int amount) {
-		return new Money(BigDecimal.valueOf(amount), "", DOLLAR_SYMBOL);
+		return new Money(BigDecimal.valueOf(amount), AUSTRALIAN, DOLLAR_SYMBOL);
 	}
 
 	// Used by front end to display currency values
@@ -122,7 +121,7 @@ public class Money implements Comparable<Money> {
 			return amount.stripTrailingZeros().toPlainString();
 		}
 
-		String format = currencySymbol + "#0.00####" + (currency.isEmpty() ? "" : " " + currency);
+		String format = currencySymbol + "#0.00####" + (currency.isEmpty() || currency.equalsIgnoreCase(AUSTRALIAN) ? "" : " " + currency);
 		return new DecimalFormat(format).format(amount.stripTrailingZeros());
 	}
 
