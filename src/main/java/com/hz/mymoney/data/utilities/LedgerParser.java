@@ -2,6 +2,7 @@ package com.hz.mymoney.data.utilities;
 
 import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.ledger.*;
+import com.hz.mymoney.exceptions.UnexpectedDataException;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.BufferedReader;
@@ -68,36 +69,50 @@ public class LedgerParser {
 
 	private void readLedgerEntries(Ledger ledger, BufferedReader br) throws IOException {
 		String line = "";
+		int lineNo = 0;
 		try {
 			LedgerEntry ledgerEntry = null;
 			while (	(line = br.readLine()) != null) {
+				lineNo++;
 				switch (scanLine(line)) {
 					case ENTRY_START -> {
 						addLedgerEntry(ledger, ledgerEntry);
 						ledgerEntry = newLedgerEntry(line);
 					}
 					case CASH_POSTING -> {
-						assert ledgerEntry != null : "ledgerEntry is null";
+						if (ledgerEntry == null) {
+							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " cash posting has no header (" + line + ")");
+						}
 						addPosting(ledgerEntry, parseCashPosting(line));
 					}
 					case FUND_POSTING -> {
-						assert ledgerEntry != null : "ledgerEntry is null";
+						if (ledgerEntry == null) {
+							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " fund posting has no header (" + line + ")");
+						}
 						addPosting(ledgerEntry, parseFundPosting(line));
 					}
 					case SHARE_POSTING -> {
-						assert ledgerEntry != null : "ledgerEntry is null";
+						if (ledgerEntry == null) {
+							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " share posting has no header (" + line + ")");
+						}
 						addPosting(ledgerEntry, parseSharePosting(line));
 					}
 					case SHARE_RESET_POSTING -> {
-						assert ledgerEntry != null : "ledgerEntry is null";
+						if (ledgerEntry == null) {
+							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " share reset posting has no header (" + line + ")");
+						}
 						addPosting(ledgerEntry, parseShareResetPosting(line));
 					}
 					case REMAINDER_POSTING -> {
-						assert ledgerEntry != null : "ledgerEntry is null";
+						if (ledgerEntry == null) {
+							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " cash remainder posting has no header (" + line + ")");
+						}
 						addPosting(ledgerEntry, parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
 					}
 					case COMMENT_POSTING -> {
-						assert ledgerEntry != null : "ledgerEntry is null";
+						if (ledgerEntry == null) {
+							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " comment posting has no header (" + line + ")");
+						}
 						addRawPosting(ledgerEntry, line);
 					}
 					case UNKNOWN, EMPTY -> {
@@ -268,18 +283,20 @@ public class LedgerParser {
 		return LedgerEntryState.UNKNOWN;
 	}
 
-	private boolean isCommandLine(String line) {
-		return LINE_STARTS_WITH_DATE.matcher(line).find()
-				&& (line.split(" ")[1].contains("open")
-				|| line.split(" ")[1].contains("balance")
-				|| line.split(" ")[1].contains("custom")
-				|| line.split(" ")[1].contains("query")
-				|| line.split(" ")[1].contains("commodity"));
+	private boolean isBeanCountCommandLine(String line) {
+//		return LINE_STARTS_WITH_DATE.matcher(line).find()
+//				&& (line.split(" ")[1].equalsIgnoreCase("open")
+//				|| line.split(" ")[1].equalsIgnoreCase("balance")
+//				|| line.split(" ")[1].equalsIgnoreCase("custom")
+//				|| line.split(" ")[1].equalsIgnoreCase("query")
+//				|| line.split(" ")[1].equalsIgnoreCase("commodity"));
+		return false;   // Too painful to support right now
+		// Beancount command lines clash too much with standard ledger entries
 	}
 
 	// test for date at start of line - line starts with yyyy/MM/dd or yyyy-MM-dd
 	private boolean isLedgerEntryStart(String line) {
-		return (LINE_STARTS_WITH_DATE.matcher(line).find()) && isCommandLine(line) == false;
+		return (LINE_STARTS_WITH_DATE.matcher(line).find()) && isBeanCountCommandLine(line) == false;
 	}
 
 	private boolean isCommentLine(String line) {
@@ -287,8 +304,7 @@ public class LedgerParser {
 				|| line.startsWith("#")
 				|| line.startsWith("*")
 				|| line.startsWith("%")
-				|| line.startsWith("|")
-				|| isCommandLine(line);     // Treat commands as comments for now
+				|| line.startsWith("|");
 	}
 
 	private String getNote(String line) {
