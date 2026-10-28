@@ -5,6 +5,7 @@ import com.hz.mymoney.data.models.coa.Account;
 import com.hz.mymoney.data.models.coa.ChartOfAccounts;
 import com.hz.mymoney.data.models.coa.Movement;
 import com.hz.mymoney.data.models.ledger.*;
+import com.hz.mymoney.data.utilities.FileSupport;
 import com.hz.mymoney.data.utilities.LedgerEntrySupport;
 import com.hz.mymoney.data.utilities.LedgerParser;
 import com.hz.mymoney.exceptions.FileSaveFailedException;
@@ -18,9 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,8 +28,6 @@ import java.util.*;
 
 import static com.hz.mymoney.configuration.AccountConstants.FUND_ACCOUNTS;
 import static com.hz.mymoney.configuration.AccountConstants.IMPUTATION_ACCOUNT;
-import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 @Service
@@ -217,9 +214,14 @@ public class LedgerServices implements ApplicationRunner {
 	}
 
 	public void saveLedger() {
-		if (ledgerFileName == null || ledgerFileName.startsWith(CLASSPATH_URL_PREFIX)) {
-			log.error("Cannot Save Ledger as filename is missing or invalid");
-			throw new FileSaveFailedException("Failed to Save Ledger " + ledgerFileName == null ? "NO FILENAME SET" : ledgerFileName);
+		if (ledgerFileName == null) {
+			log.error("Cannot Save Ledger as filename is missing");
+			throw new FileSaveFailedException("Failed to Save Ledger due to missing filename");
+		}
+
+		if (ledgerFileName.startsWith(CLASSPATH_URL_PREFIX)) {
+			log.error("Cannot Save Ledger as filename is internal");
+			throw new FileSaveFailedException("Failed to Save Ledger file " + ledgerFileName);
 		}
 
 		if (ledger.isReadOnly()) {
@@ -227,23 +229,8 @@ public class LedgerServices implements ApplicationRunner {
 			throw new FileSaveFailedException("Failed to Save Ledger as it is read-only");
 		}
 
-		Path path = Path.of(ledgerFileName + ".tmp");
-		log.info("Saving Ledger to temporary file {}", path);
-		try (var out = new BufferedWriter(new FileWriter(path.toFile()))) {
-			for (Entry entry : ledger.getEntries()) {
-				out.write(entry.toString());
-			}
-		} catch (IOException e) {
-			log.error("Failed to Save Temp Ledger", e);
-			throw new FileSaveFailedException("Failed to Save Temp Ledger " + e.getMessage(), e);
-		}
-		try {
-			Files.move(path, Path.of(ledgerFileName), ATOMIC_MOVE, REPLACE_EXISTING);
-			log.info("Ledger saved successfully");
-		} catch (IOException e) {
-			log.error("Failed to rename Temp Ledger to Real Ledger", e);
-			throw new FileSaveFailedException("Failed to rename Temp Ledger to Real Ledger " + e.getMessage(), e);
-		}
+		FileSupport.writeTempFile(ledgerFileName, "Ledger", ledger.getEntries());
+		FileSupport.renameTempFile(ledgerFileName, "Ledger");
 	}
 
 	private void loadLedgerFromArgs(String fileName) throws IOException {

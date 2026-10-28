@@ -53,4 +53,9 @@ public class Schedule implements Comparable<Schedule> {
 	public int compareTo(Schedule o) {
 		return this.ledgerEntry.getDate().compareTo(o.ledgerEntry.getDate());
 	}
+
+	@Override
+	public String toString() {
+		return this.ledgerEntry.toString();
+	}
 }
