@@ -39,7 +39,7 @@ public final class DateParser {
 
 	public static LocalDate parseDate(String dateString) {
 		try {
-			// Dates formatted to 10 characters delimted by - or / can be fast parsed
+			// Dates formatted to 10 characters delimited by - or / can be fast parsed
 			if (dateString.length() == 10 && (dateString.charAt(4) == '-' || dateString.charAt(4) == '/') && (dateString.charAt(7) == '-' || dateString.charAt(7) == '/')) {
 				return fastParseDate(dateString);
 			}
