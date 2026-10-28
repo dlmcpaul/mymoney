@@ -1,8 +1,10 @@
 package com.hz.mymoney.data.models.ledger;
 
-public final record RawEntry(String line) implements Entry {
+import org.jetbrains.annotations.NotNull;
+
+public record RawEntry(String line) implements Entry {
 	@Override
-	public String toString() {
+	public @NotNull String toString() {
 		return line;
 	}
 }

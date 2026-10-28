@@ -117,7 +117,13 @@
 			<artifactId>chartjs-plugin-datalabels</artifactId>
 			<version>${chart.js.datalabels.version}</version>
 		</dependency>
-		<!-- End chart.js jars -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.0.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- End chart.js jars -->
 	</dependencies>
 
 	<build>
