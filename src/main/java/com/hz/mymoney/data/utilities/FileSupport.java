@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -17,13 +18,30 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class FileSupport {
 	private FileSupport() {}
 
-	public static void writeTempFile(String target, String contentType, List<?> contents) {
-		Path path = Path.of(target + ".tmp");
-		log.info("Saving {} to temporary file {}", contentType, path);
-		try (var out = new BufferedWriter(new FileWriter(path.toFile()))) {
+	private static void renameFile(String source, String target, String contentType) {
+		try {
+			Files.move(Path.of(source), Path.of(target), ATOMIC_MOVE, REPLACE_EXISTING);
+			log.info("{} saved successfully", contentType);
+		} catch (IOException e) {
+			log.error("Failed to rename {} to {}", source, target, e);
+			throw new FileSaveFailedException("Failed to Rename " + source + " to " + target + " exception is :" + e.getMessage(), e);
+		}
+	}
+
+	public static void writeBuffer(Writer writer, List<?> contents) throws IOException {
+		try (var out = new BufferedWriter(writer)) {
 			for (Object entry : contents) {
 				out.write(entry.toString());
 			}
+		}
+	}
+
+	public static void writeTempFile(String target, String contentType, List<?> contents) {
+		Path path = Path.of(target + ".tmp");
+		log.info("Saving {} to temporary file {}", contentType, path);
+		try {
+			writeBuffer(new FileWriter(path.toFile()), contents);
+			log.info("Writing {} to temporary file {}", contentType, path);
 		} catch (IOException e) {
 			log.error("Failed to Save {}", path, e);
 			throw new FileSaveFailedException("Failed to Save " + contentType + " exception is :" + e.getMessage(), e);
@@ -34,13 +52,8 @@ public class FileSupport {
 		renameFile(target + ".tmp", target, contentType);
 	}
 
-	public static void renameFile(String source, String target, String contentType) {
-		try {
-			Files.move(Path.of(source), Path.of(target), ATOMIC_MOVE, REPLACE_EXISTING);
-			log.info("{} saved successfully", contentType);
-		} catch (IOException e) {
-			log.error("Failed to rename {} to {}", source, target, e);
-			throw new FileSaveFailedException("Failed to Rename " + source + " to " + target + " exception is :" + e.getMessage(), e);
-		}
+	public static void writeFile(String target, String contentType, List<?> contents) {
+		writeTempFile(target, contentType, contents);
+		renameFile(target, contentType, contentType);
 	}
 }

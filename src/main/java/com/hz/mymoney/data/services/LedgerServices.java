@@ -26,8 +26,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.hz.mymoney.configuration.AccountConstants.FUND_ACCOUNTS;
-import static com.hz.mymoney.configuration.AccountConstants.IMPUTATION_ACCOUNT;
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 @Service
@@ -58,22 +56,6 @@ public class LedgerServices implements ApplicationRunner {
 			.forEach(this::updateShareValues);
 
 		makeChartOfAccounts(ledger);
-
-		if (args.containsOption("testing")) {
-			log.info("COA contains {} accounts", coa.totalAccounts());
-			log.info("Assets:Cash:NAB Savings = {}", coa.getBalanceForAccount("Assets:Cash:NAB Savings", shareValueService.getInvestmentHistory()));
-			log.info("Assets:Stock:IAG Shares = {}", coa.getBalanceForAccount("Assets:Stock:IAG Shares", shareValueService.getInvestmentHistory()));
-			log.info("Imputation Account Source {}", coa.getAccountsOfType(IMPUTATION_ACCOUNT, false).getFirst().getFirstMovement().sourceAccount());
-			log.info("Total Fund Accounts {}", coa.getZeroBalanceAccountsOfType(FUND_ACCOUNTS).size());
-			log.info("Expenses:Cash:Household = {}", coa.getBalanceForAccount("Expenses:Cash:Household", shareValueService.getInvestmentHistory()));
-
-			logEmptyCodeMovements("Income:Investment:Dividends:Franked");
-			logEmptyCodeMovements("Income:Investment:Dividends:Unfranked");
-			logEmptyCodeMovements("Income:Investment:MiscIncome");
-			logEmptyCodeMovements("Income:Investment:Capital Gains");
-			logEmptyCodeMovements("Income:Investment:Capital Return");
-			logEmptyCodeMovements("Expenses:Investment:Capital Losses");
-		}
 	}
 
 	private void updateShareValues(Entry entry) {
@@ -229,8 +211,7 @@ public class LedgerServices implements ApplicationRunner {
 			throw new FileSaveFailedException("Failed to Save Ledger as it is read-only");
 		}
 
-		FileSupport.writeTempFile(ledgerFileName, "Ledger", ledger.getEntries());
-		FileSupport.renameTempFile(ledgerFileName, "Ledger");
+		FileSupport.writeFile(ledgerFileName, "Ledger", ledger.getEntries());
 	}
 
 	private void loadLedgerFromArgs(String fileName) throws IOException {
