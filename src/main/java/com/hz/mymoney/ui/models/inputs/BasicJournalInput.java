@@ -15,4 +15,12 @@ public class BasicJournalInput extends JournalInput implements JournalInputValid
 				&& this.accounts.size() >= 2
 				&& (this.amounts.getFirst() != null || this.amounts.getLast() != null);
 	}
+
+	@Override
+	public String toString() {
+		return "BasicJournalInput{" +
+				"description='" + description + "' " +
+				super.toString() +
+				'}';
+	}
 }

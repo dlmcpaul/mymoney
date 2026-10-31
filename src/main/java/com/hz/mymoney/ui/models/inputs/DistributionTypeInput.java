@@ -19,4 +19,12 @@ public class DistributionTypeInput extends JournalInput implements JournalInputV
 					|| distributionType.equals("distribution")
 					|| distributionType.equals("capital-return"));
 	}
+
+	@Override
+	public String toString() {
+		return "DistributionTypeInput{" +
+				"distributionType='" + distributionType + '\'' +
+				super.toString() +
+				'}';
+	}
 }

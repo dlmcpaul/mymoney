@@ -14,4 +14,11 @@ public class DividendJournalInput extends JournalInput implements JournalInputVa
 				&& noNulls(this.amounts)
 				&& noNulls(this.accounts);
 	}
+
+	@Override
+	public String toString() {
+		return "DividendJournalInput{" +
+				super.toString() +
+				"}";
+	}
 }

@@ -21,7 +21,7 @@ public class JournalInput implements JournalInputValidation {
 	}
 
 	public String toString() {
-		return journalDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+		return (journalDate == null ? "Null Journal Date" : journalDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
 				+ " "
 				+ accounts.toString()
 				+ amounts.toString();
