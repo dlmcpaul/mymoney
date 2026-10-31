@@ -5,13 +5,12 @@ import com.hz.mymoney.data.models.coa.InvestmentHistory;
 import com.hz.mymoney.data.models.coa.InvestmentHistoryEntry;
 import com.hz.mymoney.data.utilities.DateParser;
 import com.hz.mymoney.data.utilities.MoneyParser;
-import com.hz.mymoney.exceptions.ValidationException;
+import com.hz.mymoney.exceptions.FileLoadFailedException;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +24,16 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
-@Order(1)
+@RequiredArgsConstructor
 @Log4j2
-public class SharePriceServices implements ApplicationRunner {
+public class PriceHistoryServices {
 
 	private static final Pattern whitespace = Pattern.compile("\\s+");
 	private static final Pattern single_space = Pattern.compile("\\s");
 	private static final Pattern comma_delimited = Pattern.compile(", ");
 
-	private String commodityOption;
-	private String commodityFileName;
+	private String historyType;
+	private String historyFileName;
 	private boolean loadSuccess;
 	private FileTime lastModified;
 
@@ -42,10 +41,6 @@ public class SharePriceServices implements ApplicationRunner {
 
 	@Getter
 	private InvestmentHistory investmentHistory;
-
-	public SharePriceServices(ResourceLoader resourceLoader) {
-		this.resourceLoader = resourceLoader;
-	}
 
 	public Money getInvestmentValue(String code, LocalDate asAt) {
 		return investmentHistory.getInvestmentValue(code, asAt);
@@ -55,39 +50,27 @@ public class SharePriceServices implements ApplicationRunner {
 		return investmentHistory.getPreviousInvestmentValue(code, asAt);
 	}
 
-	@Override
-	public void run(@NonNull ApplicationArguments args) throws Exception {
-		if (args.containsOption("commodities")) {
-			commodityOption = "commodities";
-			commodityFileName = Objects.requireNonNull(args.getOptionValues("commodities")).getFirst();
-		} else if (args.containsOption("quicken")) {
-			commodityOption = "quicken";
-			commodityFileName = Objects.requireNonNull(args.getOptionValues("quicken")).getFirst();
-		} else {
-			commodityOption = "internal";
-			commodityFileName = "classpath:test.commodities";
-		}
+	public void startUp(@NonNull String historyType, @NotNull String historyFileName) {
+		this.historyType = historyType;
+		this.historyFileName = historyFileName;
 
-		if (commodityOption.isEmpty()) {
-			log.error("No commodities option provided");
-		} else {
-			lastModified = null;
-			reloadCommodities();
-		}
+		lastModified = null;
 	}
 
-	// If internal commodity map then allow updates from journal load
+	// For when Journals contain Price History entries
+	public void updateFromJournal(String line) {
+		parseLine(investmentHistory.commodityMap(), line);
+	}
+
+	// To include BUY/SELL entries from the journal
 	public void updateFromJournal(LocalDate effective, String code, Money price) {
-		if (commodityOption.equals("internal")) {
-			log.info("Adding investment history entry {} {} {}", effective, code, price);
-			addEntry(investmentHistory.commodityMap(), code, effective, price);
-		}
+		addEntry(investmentHistory.commodityMap(), code, effective, price);
 	}
 
 	public void reloadCommodities() throws IOException {
 		loadSuccess = false;
 
-		switch (commodityOption) {
+		switch (historyType) {
 			case "internal" -> {
 				// Don't reload test data
 				if (investmentHistory == null || investmentHistory.commodityMap().isEmpty()) {
@@ -96,13 +79,13 @@ public class SharePriceServices implements ApplicationRunner {
 			}
 			case "commodities" -> loadCommoditiesFromArgs();
 			case "quicken" -> loadCommoditiesFromQuickenFile();
-			default -> throw new IllegalStateException("Unexpected value: " + commodityOption);
+			default -> throw new IllegalStateException("Unexpected value: " + historyType);
 		}
 		if (loadSuccess) {
-			switch (commodityOption) {
-				case "internal" -> log.info("Successfully loaded {} Commodities from TEST file {}", investmentHistory.commodityMap().size(), commodityFileName);
-				case "quicken" -> log.info("Successfully loaded {} Commodities from Quicken file {}", investmentHistory.commodityMap().size(), commodityFileName);
-				case "commodities" -> log.info("Successfully loaded {} Commodities from PTA file {}", investmentHistory.commodityMap().size(), commodityFileName);
+			switch (historyType) {
+				case "internal" -> log.info("Successfully loaded {} Commodities from TEST file {}", investmentHistory.commodityMap().size(), historyFileName);
+				case "quicken" -> log.info("Successfully loaded {} Commodities from Quicken file {}", investmentHistory.commodityMap().size(), historyFileName);
+				case "commodities" -> log.info("Successfully loaded {} Commodities from PTA file {}", investmentHistory.commodityMap().size(), historyFileName);
 			}
 		}
 	}
@@ -111,7 +94,7 @@ public class SharePriceServices implements ApplicationRunner {
 	// Basic CSV with format of Code, Value, date (dd/MM/yy)
 	// VDHG, 74, 16/4/26
 	private void loadCommoditiesFromQuickenFile() throws IOException {
-		Path path = Path.of(commodityFileName);
+		Path path = Path.of(historyFileName);
 
 		if (Files.isReadable(path)) {
 			if (lastModified == null || lastModified.compareTo(Files.getLastModifiedTime(path)) != 0) {
@@ -135,7 +118,8 @@ public class SharePriceServices implements ApplicationRunner {
 				}
 			}
 		} else {
-			log.error("Unable to load Quicken Commodities from file {}", commodityFileName);
+			log.error("Unable to load Quicken Commodities from file {}", historyFileName);
+			throw new FileLoadFailedException("Unable to load Quicken Commodities from " + historyFileName);
 		}
 	}
 
@@ -143,11 +127,11 @@ public class SharePriceServices implements ApplicationRunner {
 	private void loadCommoditiesFromArgs() throws IOException {
 		Map<String, SortedSet<InvestmentHistoryEntry>> entries = new HashMap<>();
 		try {
-			if (commodityFileName.startsWith("classpath:")) {
+			if (historyFileName.startsWith("classpath:")) {
 				investmentHistory = new InvestmentHistory(entries);
-				loadCommodities(resourceLoader.getResource(commodityFileName).getInputStream(), entries);
+				loadCommodities(resourceLoader.getResource(historyFileName).getInputStream(), entries);
 			} else {
-				Path path = Path.of(commodityFileName);
+				Path path = Path.of(historyFileName);
 
 				if (Files.isReadable(path)) {
 					if (lastModified == null || lastModified.compareTo(Files.getLastModifiedTime(path)) != 0) {
@@ -157,34 +141,35 @@ public class SharePriceServices implements ApplicationRunner {
 						loadCommodities(Files.newInputStream(path), entries);
 					}
 				} else {
-					throw new ValidationException("Unable to load Commodities from " + commodityFileName);
+					throw new FileLoadFailedException("Unable to load Commodities from " + historyFileName);
 				}
 			}
-		} catch (ValidationException e) {
+		} catch (FileLoadFailedException e) {
 			log.error(e.getMessage(), e);
 		}
 	}
 
 	private void loadCommodities(InputStream inputStream, Map<String, SortedSet<InvestmentHistoryEntry>> entries) {
 		String line = "";
-		String[] tokens;
 		try (final BufferedInputStream ledgerImportStream = new BufferedInputStream(inputStream)) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(ledgerImportStream));
-			line = reader.readLine();
-			while (line != null) {
-				// Parse as P 2025-01-01 NSC 150,25 USD
-				// P date commodity value currency
-				if (line.startsWith("P")) {
-					tokens = line.split(" ");
-					addEntry(entries, tokens[2], DateParser.parseDate(tokens[1]), parseBigDecimal(tokens[3]));
-				}
-				line = reader.readLine();
+			while ((line = reader.readLine()) != null) {
+				parseLine(entries, line);
 			}
 		} catch (RuntimeException | IOException e) {
 			log.error(e.getMessage(), e);
-			throw new ValidationException("Failed to parse line '" + line + "'");
+			throw new FileLoadFailedException("Failed to parse line '" + line + "'");
 		}
 		loadSuccess = true;
+	}
+
+	private void parseLine(Map<String, SortedSet<InvestmentHistoryEntry>> entries, String line) {
+		// Parse as P 2025-01-01 NSC 150,25 USD
+		// P date commodity value currency
+		if (line.startsWith("P")) {
+			String[] tokens = line.split(" ");
+			addEntry(entries, tokens[2], DateParser.parseDate(tokens[1]), parseBigDecimal(tokens[3]));
+		}
 	}
 
 	private Money parseBigDecimal(String value) {

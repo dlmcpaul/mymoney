@@ -1,10 +1,11 @@
 package com.hz.mymoney.data.services;
 
 import com.hz.mymoney.data.models.Money;
-import com.hz.mymoney.data.models.coa.Account;
 import com.hz.mymoney.data.models.coa.ChartOfAccounts;
-import com.hz.mymoney.data.models.coa.Movement;
-import com.hz.mymoney.data.models.ledger.*;
+import com.hz.mymoney.data.models.ledger.IPosting;
+import com.hz.mymoney.data.models.ledger.Ledger;
+import com.hz.mymoney.data.models.ledger.LedgerEntry;
+import com.hz.mymoney.data.models.ledger.Posting;
 import com.hz.mymoney.data.utilities.FileSupport;
 import com.hz.mymoney.data.utilities.LedgerEntrySupport;
 import com.hz.mymoney.data.utilities.LedgerParser;
@@ -13,8 +14,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jspecify.annotations.NonNull;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -24,16 +23,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 @Service
-@Log4j2
 @RequiredArgsConstructor
-public class LedgerServices implements ApplicationRunner {
+@Log4j2
+public class LedgerServices {
 	private final ResourceLoader resourceLoader;
-	private final SharePriceServices shareValueService;
 
 	private String ledgerFileName;
 
@@ -43,28 +43,8 @@ public class LedgerServices implements ApplicationRunner {
 	@Getter
 	private ChartOfAccounts coa;
 
-	@Override
-	public void run(@NonNull ApplicationArguments args) throws Exception {
-
-		if (args.containsOption("ledger")) {
-			loadLedgerFromArgs(Objects.requireNonNull(args.getOptionValues("ledger")).getFirst());
-		} else {
-			this.loadLedgerFromClassPath("test.ledger");
-		}
-
-		ledger.getEntries()
-			.forEach(this::updateShareValues);
-
-		makeChartOfAccounts(ledger);
-	}
-
-	private void updateShareValues(Entry entry) {
-		if (Objects.requireNonNull(entry) instanceof LedgerEntry ledgerEntry) {
-			SharePosting posting = ledgerEntry.getSharePosting();
-			if (posting != null) {
-				shareValueService.updateFromJournal(ledgerEntry.getDate(), posting.getCode(), posting.getPrice());
-			}
-		}
+	public void startUp(@NonNull String ledgerFileName) {
+		this.ledgerFileName = ledgerFileName;
 	}
 
 	public void makeChartOfAccounts(Ledger ledger) {
@@ -184,17 +164,6 @@ public class LedgerServices implements ApplicationRunner {
 		}
 	}
 
-	private void logEmptyCodeMovements(String accountName) {
-		Optional<Account> fd = coa.findAccount(accountName);
-		if (fd.isPresent()) {
-			PriorityQueue<Movement> movements = fd.get().getMovementsForCode("");
-			if (movements.size() > 0) {
-				log.info("Account {} has {} movements with no code", accountName, movements.size());
-				movements.forEach(log::info);
-			}
-		}
-	}
-
 	public void saveLedger() {
 		if (ledgerFileName == null) {
 			log.error("Cannot Save Ledger as filename is missing");
@@ -220,7 +189,6 @@ public class LedgerServices implements ApplicationRunner {
 		Path path = Path.of(fileName);
 
 		if (Files.isReadable(path)) {
-			ledgerFileName = path.toString();
 			ledger = ledgerParser.loadLedger(path);
 			log.info("{}oaded {} Ledger Entries from file {} with {} errors", ledger.isReadOnly() ? "L" : "Successfully l", ledger.getEntries().size(), ledgerFileName, ledger.getLoadErrorCount());
 		} else {
@@ -233,7 +201,6 @@ public class LedgerServices implements ApplicationRunner {
 		LedgerParser ledgerParser = new LedgerParser();
 
 		try {
-			ledgerFileName = CLASSPATH_URL_PREFIX + fileName;
 			Resource resource = resourceLoader.getResource(ledgerFileName);
 			ledger = ledgerParser.loadLedger(resource.getInputStream());
 		} finally {
@@ -243,10 +210,28 @@ public class LedgerServices implements ApplicationRunner {
 
 	public void reloadLedger() throws IOException {
 		if (ledgerFileName.startsWith(CLASSPATH_URL_PREFIX)) {
-			this.loadLedgerFromClassPath(ledgerFileName.replace(CLASSPATH_URL_PREFIX, ""));
+			this.loadLedgerFromClassPath(ledgerFileName);
 		} else {
 			this.loadLedgerFromArgs(ledgerFileName);
 		}
+		log.info("Building Chart of Accounts");
 		makeChartOfAccounts(ledger);
 	}
+
+	public void addLedgerEntry(LedgerEntry entry) {
+		ledger.add(entry);
+		this.saveLedger();
+		this.makeChartOfAccounts(ledger);
+	}
+
+	public void addLedgerEntry(LocalDate date, String description, List<IPosting> postings) {
+		this.addLedgerEntry(new LedgerEntry(date, description, postings));
+	}
+
+	public void addLedgerEntry(LocalDate date, String description, Money amount, String to, String from) {
+		Posting fromAccount = new Posting(from, amount);
+		Posting toAccount = new Posting(to, amount.negate());
+		this.addLedgerEntry(date, description, List.of(toAccount, fromAccount));
+	}
+
 }

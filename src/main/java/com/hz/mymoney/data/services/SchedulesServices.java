@@ -9,8 +9,6 @@ import com.hz.mymoney.exceptions.FileSaveFailedException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -18,15 +16,18 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 @Service
-@Log4j2
 @RequiredArgsConstructor
-public class SchedulesServices implements ApplicationRunner {
+@Log4j2
+public class SchedulesServices {
 	private final ResourceLoader resourceLoader;
 	private String schedulesFileName;
 
@@ -35,13 +36,8 @@ public class SchedulesServices implements ApplicationRunner {
 
 	private Ledger scheduleLedger;
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		if (args.containsOption("schedules")) {
-			loadSchedulesFromArgs(Objects.requireNonNull(args.getOptionValues("schedules")).getFirst());
-		} else {
-			this.loadSchedulesFromClassPath("test-schedules.ledger");
-		}
+	public void startUp(String schedulesFileName) {
+		this.schedulesFileName = schedulesFileName;
 	}
 
 	private void loadSchedulesFromArgs(String fileName) {
@@ -50,7 +46,6 @@ public class SchedulesServices implements ApplicationRunner {
 		Path path = Path.of(fileName);
 
 		if (Files.isReadable(path)) {
-			schedulesFileName = path.toString();
 			try {
 				scheduleLedger = ledgerParser.loadLedger(path);
 				convertLedgerToSchedules(scheduleLedger);
@@ -67,7 +62,6 @@ public class SchedulesServices implements ApplicationRunner {
 		LedgerParser ledgerParser = new LedgerParser();
 
 		try {
-			schedulesFileName = CLASSPATH_URL_PREFIX + fileName;
 			Resource resource = resourceLoader.getResource(schedulesFileName);
 			scheduleLedger = ledgerParser.loadLedger(resource.getInputStream());
 			convertLedgerToSchedules(scheduleLedger);
@@ -114,13 +108,12 @@ public class SchedulesServices implements ApplicationRunner {
 			throw new FileSaveFailedException("Failed to Save Schedules as it is read-only");
 		}
 
-		FileSupport.writeTempFile(schedulesFileName, "schedules", scheduledTransactions);
-		FileSupport.renameTempFile(schedulesFileName, "schedules");
+		FileSupport.writeFile(schedulesFileName, "Schedules", scheduledTransactions);
 	}
 
 	public void reloadSchedules() throws IOException {
 		if (schedulesFileName.contains(CLASSPATH_URL_PREFIX)) {
-			this.loadSchedulesFromClassPath(schedulesFileName.replace(CLASSPATH_URL_PREFIX, ""));
+			this.loadSchedulesFromClassPath(schedulesFileName);
 		} else {
 			this.loadSchedulesFromArgs(schedulesFileName);
 		}
