@@ -15,11 +15,12 @@ import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @Log4j2
-public class FileSupport {
+public final class FileSupport {
 	private FileSupport() {}
 
 	private static void renameFile(String source, String target, String contentType) {
 		try {
+			log.info("Renaming {} from temporary file {} to {}", contentType, source, target);
 			Files.move(Path.of(source), Path.of(target), ATOMIC_MOVE, REPLACE_EXISTING);
 			log.info("{} saved successfully", contentType);
 		} catch (IOException e) {
@@ -38,10 +39,9 @@ public class FileSupport {
 
 	public static void writeTempFile(String target, String contentType, List<?> contents) {
 		Path path = Path.of(target + ".tmp");
-		log.info("Saving {} to temporary file {}", contentType, path);
 		try {
-			writeBuffer(new FileWriter(path.toFile()), contents);
 			log.info("Writing {} to temporary file {}", contentType, path);
+			writeBuffer(new FileWriter(path.toFile()), contents);
 		} catch (IOException e) {
 			log.error("Failed to Save {}", path, e);
 			throw new FileSaveFailedException("Failed to Save " + contentType + " exception is :" + e.getMessage(), e);
@@ -54,6 +54,6 @@ public class FileSupport {
 
 	public static void writeFile(String target, String contentType, List<?> contents) {
 		writeTempFile(target, contentType, contents);
-		renameFile(target, contentType, contentType);
+		renameTempFile(target, contentType);
 	}
 }
