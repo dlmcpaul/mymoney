@@ -90,8 +90,8 @@
                 <tr th:if="${elem.isShares}">
                     <td th:text="${#temporals.format(elem.asAt,'dd MMM yyyy', #locale)}">Date</td>
                     <td th:text="${elem.description}">Description</td>
-                    <td th:text="${elem.amount().getAmount() ge 0} ? ${elem.amount().getAmount()} : ''">On</td>
-                    <td th:text="${elem.amount().getAmount() lt 0} ? ${elem.amount().getAmount()} : ''">Off</td>
+                    <td th:text="${elem.amount().amount() ge 0} ? ${elem.amount().formatShares()} : ''">On</td>
+                    <td th:text="${elem.amount().amount() lt 0} ? ${elem.amount().formatShares()} : ''">Off</td>
                     <td th:text="${elem.sharePrice().formatCurrency()}">Price</td>
                 </tr>
             </th:block>

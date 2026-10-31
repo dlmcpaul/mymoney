@@ -11,12 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,8 +29,8 @@ class MoneyValueSemanticsTests {
 
 		Money scaled = original.setScale(2, RoundingMode.HALF_UP);
 
-		assertEquals(new BigDecimal("1.005"), original.getAmount(), "setScale changed the original Money");
-		assertEquals(new BigDecimal("1.01"), scaled.getAmount());
+		assertEquals(new BigDecimal("1.005"), original.amount(), "setScale changed the original Money");
+		assertEquals(new BigDecimal("1.01"), scaled.amount());
 	}
 
 	@Test
@@ -51,7 +46,7 @@ class MoneyValueSemanticsTests {
 
 		new Posting("Expenses:Food", callerAmount);
 
-		assertEquals(new BigDecimal("12.345"), callerAmount.getAmount(), "Posting(String, Money) rescaled the argument in place");
+		assertEquals(new BigDecimal("12.345"), callerAmount.amount(), "Posting(String, Money) rescaled the argument in place");
 	}
 
 	@Test
@@ -60,7 +55,7 @@ class MoneyValueSemanticsTests {
 
 		new Posting("Expenses:Food", callerAmount, "note");
 
-		assertEquals(new BigDecimal("12.345"), callerAmount.getAmount());
+		assertEquals(new BigDecimal("12.345"), callerAmount.amount());
 	}
 
 	@Test
@@ -70,7 +65,7 @@ class MoneyValueSemanticsTests {
 
 		posting.setAmount(callerAmount);
 
-		assertEquals(new BigDecimal("7.777"), callerAmount.getAmount());
+		assertEquals(new BigDecimal("7.777"), callerAmount.amount());
 	}
 
 	@Test

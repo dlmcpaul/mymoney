@@ -19,29 +19,29 @@ class MoneyTests {
 	@Test
 	void positiveMoneyTest() {
 		BigDecimal expected = new BigDecimal("201.00");
-		assertEquals(expected, MoneyParser.parseMoney("$201.00").getAmount());
-		assertEquals(expected, MoneyParser.parseMoney("201.00").getAmount());
-		assertEquals(expected, MoneyParser.parseMoney(" $201.00").getAmount());
-		assertEquals(expected, MoneyParser.parseMoney("$ 201.00").getAmount());
-		assertEquals(expected, MoneyParser.parseMoney("$201").getAmount());
+		assertEquals(expected, MoneyParser.parseMoney("$201.00").amount());
+		assertEquals(expected, MoneyParser.parseMoney("201.00").amount());
+		assertEquals(expected, MoneyParser.parseMoney(" $201.00").amount());
+		assertEquals(expected, MoneyParser.parseMoney("$ 201.00").amount());
+		assertEquals(expected, MoneyParser.parseMoney("$201").amount());
 	}
 
 	@Test
 	void negativeMoneyTest() {
 		BigDecimal expected = new BigDecimal("-201.00");
-		assertEquals(expected, MoneyParser.parseMoney("-$201.00").getAmount());
-		assertEquals(expected, MoneyParser.parseMoney("-201.00").getAmount());
-		assertEquals(expected, MoneyParser.parseMoney(" $-201.00").getAmount());
-		assertEquals(expected, MoneyParser.parseMoney("$ -201.00").getAmount());
-		assertEquals(expected, MoneyParser.parseMoney("-$201").getAmount());
+		assertEquals(expected, MoneyParser.parseMoney("-$201.00").amount());
+		assertEquals(expected, MoneyParser.parseMoney("-201.00").amount());
+		assertEquals(expected, MoneyParser.parseMoney(" $-201.00").amount());
+		assertEquals(expected, MoneyParser.parseMoney("$ -201.00").amount());
+		assertEquals(expected, MoneyParser.parseMoney("-$201").amount());
 	}
 
 	@Test
 	void currencyTest() {
-		assertEquals("AUD", MoneyParser.parseMoney("100.00 AUD").getCurrency());
-		assertEquals("", MoneyParser.parseMoney("100.00").getCurrency());
-		assertEquals("USD", MoneyParser.parseMoney("100.00 USD").getCurrency());
-		assertEquals("INR", MoneyParser.parseMoney("100.00 INR").getCurrency());
+		assertEquals("AUD", MoneyParser.parseMoney("100.00 AUD").currency());
+		assertEquals("", MoneyParser.parseMoney("100.00").currency());
+		assertEquals("USD", MoneyParser.parseMoney("100.00 USD").currency());
+		assertEquals("INR", MoneyParser.parseMoney("100.00 INR").currency());
 	}
 
 	@Test
@@ -68,11 +68,11 @@ class MoneyTests {
 	})
 	void parsesQuantityAndCurrency(String text, String quantity, String currency, boolean before) {
 		Money amount = MoneyParser.parseMoney(text);
-		assertQuantity(quantity, amount.getAmount());
+		assertQuantity(quantity, amount.amount());
 		if (before) {
 			assertEquals(currency.charAt(0), amount.abs().toString().charAt(0));
 		} else {
-			assertEquals(currency == null ? "" : currency, amount.getCurrency());
+			assertEquals(currency == null ? "" : currency, amount.currency());
 		}
 		//assertEquals(before, amount.commodityBeforeQuantity());
 	}

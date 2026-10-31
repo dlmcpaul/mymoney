@@ -1,6 +1,6 @@
 package com.hz.mymoney.data.models;
 
-import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,7 +9,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Objects;
 
-public class Money implements Comparable<Money> {
+public record Money(BigDecimal amount, String currency, String currencySymbol) implements Comparable<Money> {
 	public static final String DOLLAR_SYMBOL = "$";
 	public static final String EURO_SYMBOL = "€";
 
@@ -20,39 +20,20 @@ public class Money implements Comparable<Money> {
 	public static final String USA = "USD";
 	public static final String EURO = "EUR";
 
-	@Getter
-	private final BigDecimal amount;
-	@Getter
-	private final String currencySymbol;
-	@Getter
-	private final String currency;
-
 	public Money(BigDecimal amount) {
-		this.amount = amount;
-		this.currency = AUSTRALIAN;
-		this.currencySymbol = DOLLAR_SYMBOL;
+		this(amount, AUSTRALIAN, DOLLAR_SYMBOL);
 	}
 
 	public Money(String amount) {
-		this.amount = new BigDecimal(amount);
-		this.currency = AUSTRALIAN;
-		this.currencySymbol = DOLLAR_SYMBOL;
-	}
-
-	public Money(BigDecimal amount, String currency, String currencySymbol) {
-		this.amount = amount;
-		this.currency = currency;
-		this.currencySymbol = currencySymbol;
+		this(new BigDecimal(amount), AUSTRALIAN, DOLLAR_SYMBOL);
 	}
 
 	public Money(BigDecimal amount, String currency) {
-		this.amount = amount;
-		this.currency = currency;
-		this.currencySymbol = switch (currency) {
+		this(amount, currency, switch (currency) {
 			case AUSTRALIAN, USA -> DOLLAR_SYMBOL;
 			case EURO -> EURO_SYMBOL;
 			default -> "";
-		};
+		});
 	}
 
 	public Money negate() {
@@ -115,7 +96,7 @@ public class Money implements Comparable<Money> {
 
 	// Used when writing to file
 	@Override
-	public String toString() {
+	public @NotNull String toString() {
 		if (currency.isEmpty() && currencySymbol.isEmpty()) {
 			return amount.stripTrailingZeros().toPlainString();
 		}

@@ -80,21 +80,21 @@ public class NetWorthTemplateData {
 		List<Money> yAxisValues = new ArrayList<>();
 		netAssetLiabilityPositions.forEach(position -> yAxisValues.add(position.getNetPosition()));
 		Collections.reverse(yAxisValues);
-		return yAxisValues.stream().map(Money::getAmount).toList();
+		return yAxisValues.stream().map(Money::amount).toList();
 	}
 
 	public List<BigDecimal> yAxisAssetValues() {
 		List<Money> yAxisValues = new ArrayList<>();
 		netAssetLiabilityPositions.forEach(position -> yAxisValues.add(position.getAssetBalance()));
 		Collections.reverse(yAxisValues);
-		return yAxisValues.stream().map(Money::getAmount).toList();
+		return yAxisValues.stream().map(Money::amount).toList();
 	}
 
 	public List<BigDecimal> yAxisLiabValues() {
 		List<Money> yAxisValues = new ArrayList<>();
 		netAssetLiabilityPositions.forEach(position -> yAxisValues.add(position.getLiabilityBalance()));
 		Collections.reverse(yAxisValues);
-		return yAxisValues.stream().map(Money::getAmount).toList();
+		return yAxisValues.stream().map(Money::amount).toList();
 	}
 
 }
