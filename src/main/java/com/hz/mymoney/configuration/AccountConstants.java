@@ -16,7 +16,7 @@ public class AccountConstants {
 	public static final String DIVIDEND_INCOME = INVESTMENT_INCOME + "Dividends";
 	public static final String FRANKED_DIVIDEND = DIVIDEND_INCOME + ":Franked";
 	public static final String UNFRANKED_DIVIDEND = DIVIDEND_INCOME + ":Unfranked";
-	public static final String TAX_CREDIT = INVESTMENT_INCOME + "Tax Credit";
+	public static final String TAX_CREDIT = INCOME_PREFIX + "Imputation:Tax Credit";
 	public static final String DISTRIBUTION_INCOME = "Income:Investment:Distribution";
 	public static final String REINVESTMENT_INCOME = "Income:Investment:Reinvestment";
 	public static final String CAPITAL_GAINS_INCOME = "Income:Investment:Capital Gains";
@@ -42,7 +42,7 @@ public class AccountConstants {
 	public static final String SHARE_ACCOUNTS = "Assets:Shares:";       // Where shares are tracked
 	public static final String STOCKBROKER_ACCOUNTS = "Assets:Broker:"; // Where stockbroker accounts are tracked
 	public static final String FUND_ACCOUNTS = "Assets:Fund:";          // Where Fund accounts are tracked
-	public static final String IMPUTATION_ACCOUNT = "Assets:Tax Credit:Imputation Credit";
+	public static final String IMPUTATION_ACCOUNT = "Assets:Tax:Franking Credit";
 
 	// Opening Balances locations
 	public static final String EQUITY_FUND_OPENING_BALANCE = "Equity:Opening Balances:Fund";

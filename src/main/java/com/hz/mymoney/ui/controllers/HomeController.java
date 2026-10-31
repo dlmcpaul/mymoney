@@ -85,6 +85,7 @@ public class HomeController {
 	@HxRequest
 	public View saveData(HtmxResponse htmxResponse) {
 		try {
+			log.info("Saving Ledger and Schedules");
 			uiDataUpdateService.saveData();
 			htmxResponse.addTrigger("showMessage", new Toast("success", "Success", "All Data Saved Successfully" ));
 		} catch (Exception e) {
@@ -101,6 +102,7 @@ public class HomeController {
 	public View reload(Model model,
 	                   HtmxResponse htmxResponse) {
 		try {
+			log.info("Loading Ledger and Schedules");
 			uiDataUpdateService.reloadFiles();
 
 			PageSupport.populateDefaultPageModelData(model, uiModelBuilderService);

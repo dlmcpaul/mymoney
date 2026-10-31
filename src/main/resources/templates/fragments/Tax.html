@@ -12,6 +12,7 @@
 
 <!--/*@thymesVar id="taxYear" type="com.hz.mymoney.ui.models.templates.TaxYear"*/-->
 <div th:fragment="TaxYear (taxYear, yearType)" class="ui segment">
+    <div class="ui horizontal divider">Income</div>
     <div class="ui three column compact grid">
         <div class="row">
             <div class="five wide column">Earnings from Salary</div>
@@ -20,18 +21,18 @@
         </div>
         <div class="row">
             <div class="five wide column">Earnings from Investments</div>
-            <div class="right aligned eight wide column">Including Franking Credits <span class="ui teal text" th:text="${taxYear.getImputationCreditAmount().formatCurrency()}">$1000</span></div>
+            <div class="right aligned eight wide column">Excluding Franking Credits <span class="ui teal text" th:text="${taxYear.getImputationCreditAmount().formatCurrency()}">$1000</span></div>
             <div th:replace="~{fragments/Tax :: BreakdownLink ('investment', ${yearType}, ${taxYear.getInvestmentIncomeAmount()})}"></div>
         </div>
     </div>
-    <div class="ui horizontal divider">Less Deductions</div>
+    <div class="ui horizontal divider">Deductions</div>
     <div class="ui two column compact grid">
         <div class="thirteen wide column">Tax Deductible Expenses</div>
         <div th:replace="~{fragments/Tax :: BreakdownLink ('tax_expenses', ${yearType}, ${taxYear.getTaxDeductionsAmount()})}"></div>
         <div class="thirteen wide column">Charitable Donations</div>
         <div th:replace="~{fragments/Tax :: BreakdownLink ('donations', ${yearType}, ${taxYear.getDonationsAmount()})}"></div>
     </div>
-    <div class="ui horizontal divider">Less Taxes Already Paid</div>
+    <div class="ui horizontal divider">Taxes Already Paid</div>
     <div class="ui two column compact grid">
         <div class="thirteen wide column">Tax Deducted from Salary</div>
         <div th:replace="~{fragments/Tax :: BreakdownLink ('tax_salary', ${yearType}, ${taxYear.getSalaryTaxPaidAmount()})}"></div>
