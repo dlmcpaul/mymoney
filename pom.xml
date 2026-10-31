@@ -32,7 +32,7 @@
 		<build.source>SNAPSHOT</build.source>
 		<revision>${build.number}-${build.source}</revision>
 		<fomantic-ui.version>2.9.4</fomantic-ui.version>
-		<chart.js.version>4.5.1</chart.js.version>
+		<chart.js.version>4.6.1</chart.js.version>
 		<chart.js.annotation.version>3.1.0</chart.js.annotation.version>
 		<chart.js.datalabels.version>2.2.0</chart.js.datalabels.version>
 		<jquery.version>4.0.0</jquery.version>
