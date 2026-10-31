@@ -6,8 +6,9 @@ import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;
 import com.hz.mymoney.data.models.ledger.Posting;
 import com.hz.mymoney.data.services.LedgerServices;
+import com.hz.mymoney.data.services.PriceHistoryServices;
 import com.hz.mymoney.data.services.SchedulesServices;
-import com.hz.mymoney.data.services.SharePriceServices;
+import com.hz.mymoney.data.services.StartupServices;
 import com.hz.mymoney.ui.services.FileUpdateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  * Regression tests for review item 1.1: posting a schedule must add an independent
@@ -36,12 +37,19 @@ class PostScheduleTests {
 	void setUp() {
 		LedgerServices ledgerServices = mock(LedgerServices.class);
 		SchedulesServices schedulesServices = mock(SchedulesServices.class);
-		SharePriceServices sharePriceServices = mock(SharePriceServices.class);
+		PriceHistoryServices sharePriceServices = mock(PriceHistoryServices.class);
+		StartupServices startupServices = mock(StartupServices.class);
 
 		ledger = new Ledger();
 		when(ledgerServices.getLedger()).thenReturn(ledger);
 
-		fileUpdateService = new FileUpdateService(ledgerServices, schedulesServices, sharePriceServices);
+		doAnswer(invocation -> {
+			LedgerEntry entry = invocation.getArgument(0);
+			ledger.add(entry);
+			return null;
+		}).when(ledgerServices).addLedgerEntry(any(LedgerEntry.class));
+
+		fileUpdateService = new FileUpdateService(ledgerServices, schedulesServices, sharePriceServices, startupServices);
 	}
 
 	private static Schedule electricitySchedule() {
@@ -61,7 +69,7 @@ class PostScheduleTests {
 				.findFirst()
 				.orElseThrow()
 				.getAmount()
-				.getAmount();
+				.amount();
 	}
 
 	@Test
@@ -100,7 +108,7 @@ class PostScheduleTests {
 		List<LedgerEntry> entries = ledger.getOnlyLedgerEntries();
 		assertEquals(2, entries.size());
 
-		LedgerEntry first = entries.get(0);
+		LedgerEntry first = entries.getFirst();
 		assertEquals(0, new BigDecimal("120.00").compareTo(amountFor(first, EXPENSE)),
 				"First posted entry was changed by the second post");
 		assertEquals(0, new BigDecimal("-120.00").compareTo(amountFor(first, BANK)),

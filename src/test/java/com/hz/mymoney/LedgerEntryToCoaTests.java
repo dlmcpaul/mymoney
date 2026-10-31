@@ -24,7 +24,7 @@ class LedgerEntryToCoaTests {
 	@Test
 	void testSimpleLedgerEntryToCoa() {
 		ChartOfAccounts coa = new ChartOfAccounts(LocalDate.now());
-		LedgerServices ledgerServices = new LedgerServices(null, null);
+		LedgerServices ledgerServices = new LedgerServices(null);
 
 		Posting fromAccount = new Posting("fromAccount", AMOUNT);
 		Posting sourceAccount = new Posting("toAccount", AMOUNT.negate());
@@ -48,7 +48,7 @@ class LedgerEntryToCoaTests {
 	@Test
 	void testOneNegativeLedgerEntryToCoa() {
 		ChartOfAccounts coa = new ChartOfAccounts(LocalDate.now());
-		LedgerServices ledgerServices = new LedgerServices(null, null);
+		LedgerServices ledgerServices = new LedgerServices(null);
 
 		Posting account1 = new Posting("fromAccount1", HALF_AMOUNT);
 		Posting account2 = new Posting("fromAccount2", HALF_AMOUNT);
@@ -77,7 +77,7 @@ class LedgerEntryToCoaTests {
 	@Test
 	void testOnePositiveLedgerEntryToCoa() {
 		ChartOfAccounts coa = new ChartOfAccounts(LocalDate.now());
-		LedgerServices ledgerServices = new LedgerServices(null, null);
+		LedgerServices ledgerServices = new LedgerServices(null);
 
 		Posting account1 = new Posting("fromAccount1", HALF_AMOUNT.negate());
 		Posting account2 = new Posting("fromAccount2", HALF_AMOUNT.negate());
@@ -105,7 +105,7 @@ class LedgerEntryToCoaTests {
 	@Test
 	void testComplexLedgerEntryToCoa() {
 		ChartOfAccounts coa = new ChartOfAccounts(LocalDate.now());
-		LedgerServices ledgerServices = new LedgerServices(null, null);
+		LedgerServices ledgerServices = new LedgerServices(null);
 
 		Posting account1 = new Posting("fromAccount1", HALF_AMOUNT);
 		Posting account2 = new Posting("fromAccount2", HALF_AMOUNT);
@@ -121,12 +121,12 @@ class LedgerEntryToCoaTests {
 		List<IPosting> positiveAmounts = LedgerEntrySupport.splitAndReturnLast(sortedPostings);
 
 		assertEquals(2, negativeAmounts.size());
-		assertEquals(HALF_AMOUNT.negate(), negativeAmounts.getFirst().getAmount().getAmount());
-		assertEquals(HALF_AMOUNT.negate(), negativeAmounts.get(1).getAmount().getAmount());
+		assertEquals(HALF_AMOUNT.negate(), negativeAmounts.getFirst().getAmount().amount());
+		assertEquals(HALF_AMOUNT.negate(), negativeAmounts.get(1).getAmount().amount());
 
 		assertEquals(2, positiveAmounts.size());
-		assertEquals(HALF_AMOUNT, positiveAmounts.getFirst().getAmount().getAmount());
-		assertEquals(HALF_AMOUNT, positiveAmounts.get(1).getAmount().getAmount());
+		assertEquals(HALF_AMOUNT, positiveAmounts.getFirst().getAmount().amount());
+		assertEquals(HALF_AMOUNT, positiveAmounts.get(1).getAmount().amount());
 
 		ledgerServices.mapLedgerEntryToPostings(coa, complexBalancedLedgerEntry);
 
@@ -158,7 +158,7 @@ class LedgerEntryToCoaTests {
         */
 
 		ChartOfAccounts coa = new ChartOfAccounts(LocalDate.now());
-		LedgerServices ledgerServices = new LedgerServices(null, null);
+		LedgerServices ledgerServices = new LedgerServices(null);
 
 		Posting account1 = new Posting("fromAccount1", new BigDecimal("682.50"));
 		Posting account2 = new Posting("fromAccount2", new BigDecimal("264.64"));
@@ -183,7 +183,7 @@ class LedgerEntryToCoaTests {
             equity:opening  -$17000.00
 		 */
 		ChartOfAccounts coa = new ChartOfAccounts(LocalDate.now());
-		LedgerServices ledgerServices = new LedgerServices(null, null);
+		LedgerServices ledgerServices = new LedgerServices(null);
 
 		Posting account1 = new Posting("assets:checking", new BigDecimal("2500.00"));
 		Posting account2 = new Posting("assets:savings", new BigDecimal("5000.00"));
