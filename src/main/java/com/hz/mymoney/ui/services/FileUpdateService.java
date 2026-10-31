@@ -3,13 +3,13 @@ package com.hz.mymoney.ui.services;
 import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.Schedule;
 import com.hz.mymoney.data.models.ledger.IPosting;
-import com.hz.mymoney.data.models.ledger.Ledger;
 import com.hz.mymoney.data.models.ledger.LedgerEntry;
 import com.hz.mymoney.data.models.ledger.Posting;
 import com.hz.mymoney.data.services.LedgerServices;
+import com.hz.mymoney.data.services.PriceHistoryServices;
 import com.hz.mymoney.data.services.SchedulesServices;
-import com.hz.mymoney.data.services.SharePriceServices;
-import com.hz.mymoney.exceptions.ValidationException;
+import com.hz.mymoney.data.services.StartupServices;
+import com.hz.mymoney.ui.exceptions.ValidationException;
 import com.hz.mymoney.ui.models.inputs.BasicJournalInput;
 import com.hz.mymoney.ui.models.inputs.DistributionTypeInput;
 import com.hz.mymoney.ui.models.inputs.DividendJournalInput;
@@ -31,26 +31,23 @@ import static com.hz.mymoney.configuration.AccountConstants.*;
 public class FileUpdateService {
 	private final LedgerServices ledgerServices;
 	private final SchedulesServices schedulesServices;
-	private final SharePriceServices sharePriceServices;
+	private final PriceHistoryServices sharePriceServices;
+	private final StartupServices startupServices;
 
 	public void addNewTransaction(BasicJournalInput basicJournalInput) {
 		Money amount = new Money(basicJournalInput.getAmounts().getFirst() != null ? basicJournalInput.getAmounts().getFirst() : basicJournalInput.getAmounts().getLast());
 
 		log.info("New Simple Journal {} {} {} {}", basicJournalInput.getJournalDate(),basicJournalInput.getDescription(), basicJournalInput.getAccounts(), amount);
 
-		Ledger ledger = ledgerServices.getLedger();
-		ledger.add(basicJournalInput.getJournalDate(),
+		ledgerServices.addLedgerEntry(basicJournalInput.getJournalDate(),
 				basicJournalInput.getDescription(),
 				amount,
 				basicJournalInput.getAccounts().getFirst(),
 				basicJournalInput.getAccounts().getLast());
-		ledgerServices.makeChartOfAccounts(ledger);
-		ledgerServices.saveLedger();
 	}
 
 	public void addNewTransaction(DistributionTypeInput distributionInputJournal) {
 		log.info("New Distribution Journal Request {} {} {} {}", distributionInputJournal.getDistributionType(), distributionInputJournal.getJournalDate(), distributionInputJournal.getAccounts().getFirst(), distributionInputJournal.getAmounts().getFirst());
-		Ledger ledger = ledgerServices.getLedger();
 
 		Money amount = new Money(distributionInputJournal.getAmounts().getFirst() != null ? distributionInputJournal.getAmounts().getFirst() : distributionInputJournal.getAmounts().getLast());
 		String shareAccount = distributionInputJournal.getAccounts().getFirst();
@@ -78,18 +75,15 @@ public class FileUpdateService {
 
 		log.info("New Distribution Journal Generated {} {} {} {}", distributionInputJournal.getJournalDate(), description, sourceAccount, destinationAccount);
 
-		ledger.add(distributionInputJournal.getJournalDate(),
+		ledgerServices.addLedgerEntry(distributionInputJournal.getJournalDate(),
 				description,
 				amount,
 				sourceAccount,
 				destinationAccount);
-		ledgerServices.makeChartOfAccounts(ledger);
-		ledgerServices.saveLedger();
 	}
 
 	public void addNewTransaction(DividendJournalInput dividendInputJournal) {
 		log.info("New Dividend Journal Request {}", dividendInputJournal);
-		Ledger ledger = ledgerServices.getLedger();
 		String shareAccount = dividendInputJournal.getAccounts().getFirst();
 		String destinationAccount = dividendInputJournal.getAccounts().get(1);
 		String imputationAccount =  dividendInputJournal.getAccounts().getLast();
@@ -127,12 +121,9 @@ public class FileUpdateService {
 		if (unfrankedAmount.compareTo(BigDecimal.ZERO) > 0) {
 			postings.add(new Posting(UNFRANKED_DIVIDEND, unfrankedAmount.multiply(BigDecimal.valueOf(-1)),"Unfranked Dividend from " + code));
 		}
-		ledger.add(dividendInputJournal.getJournalDate(),
+		ledgerServices.addLedgerEntry(dividendInputJournal.getJournalDate(),
 				description,
 				postings);
-
-		ledgerServices.makeChartOfAccounts(ledger);
-		ledgerServices.saveLedger();
 	}
 
 	public void saveData() {
@@ -164,12 +155,9 @@ public class FileUpdateService {
 				});
 
 				if (schedule.isValid()) {
-					Ledger ledger = ledgerServices.getLedger();
-					ledger.add(newLedgerEntry);
 					schedulesServices.scheduleRollForward(schedule);
-
-					ledgerServices.makeChartOfAccounts(ledger);
-					this.saveData();
+					schedulesServices.saveSchedules();
+					ledgerServices.addLedgerEntry(newLedgerEntry);
 				} else {
 					log.error("Schedule did not validate");
 					throw new ValidationException("Schedule did not validate " + schedule.isValid());
@@ -179,9 +167,7 @@ public class FileUpdateService {
 	}
 
 	public void reloadFiles() throws IOException {
-		sharePriceServices.reloadCommodities();
-		schedulesServices.reloadSchedules();
-		ledgerServices.reloadLedger();
+		startupServices.loadFiles();
 	}
 
 	public void reloadCommodities() throws IOException {

@@ -24,10 +24,10 @@ class LedgerParserTests {
 		var result = ledgerParser.parseSharePosting(line);
 		assertEquals("a:b:c", result.getAccount());
 		assertEquals("COL", result.getCode());
-		assertEquals(new Money("100.00").getAmount(), result.getAmount().getAmount());
-		assertEquals(new Money("12.00").getAmount(), result.getPrice().getAmount());
-		assertEquals(new Money("1200.00").getAmount(), result.getValue().getAmount());
-		assertEquals("$", result.getPrice().getCurrencySymbol());
+		assertEquals(new Money("100.00").amount(), result.getAmount().amount());
+		assertEquals(new Money("12.00").amount(), result.getPrice().amount());
+		assertEquals(new Money("1200.00").amount(), result.getValue().amount());
+		assertEquals("$", result.getPrice().currencySymbol());
 		assertNull(result.getNote());
 
 		String output = result.toString();
@@ -41,24 +41,24 @@ class LedgerParserTests {
 		var singleSpaceResult = ledgerParser.parseSharePosting("  a:b:c  100 COL @ $12.00");
 		assertEquals("a:b:c", singleSpaceResult.getAccount());
 		assertEquals("COL", singleSpaceResult.getCode());
-		assertEquals(new Money("100.00").getAmount(), singleSpaceResult.getAmount().getAmount());
-		assertEquals(new Money("12.00").getAmount(), singleSpaceResult.getPrice().getAmount());
-		assertEquals(new Money("1200.00").getAmount(), singleSpaceResult.getValue().getAmount());
-		assertEquals("$", singleSpaceResult.getPrice().getCurrencySymbol());
+		assertEquals(new Money("100.00").amount(), singleSpaceResult.getAmount().amount());
+		assertEquals(new Money("12.00").amount(), singleSpaceResult.getPrice().amount());
+		assertEquals(new Money("1200.00").amount(), singleSpaceResult.getValue().amount());
+		assertEquals("$", singleSpaceResult.getPrice().currencySymbol());
 		assertNull(singleSpaceResult.getNote());
 
 		String output1 = singleSpaceResult.toString();
 		assertEquals("  a:b:c  100  COL @ $12.00", output1);
 
 		var usDollarResult = ledgerParser.parseSharePosting("  a:b:c  100 COL @ $12.00 USD");
-		assertEquals("USD", usDollarResult.getPrice().getCurrency());
-		assertEquals("$", usDollarResult.getPrice().getCurrencySymbol());
+		assertEquals("USD", usDollarResult.getPrice().currency());
+		assertEquals("$", usDollarResult.getPrice().currencySymbol());
 
 		String output2 = usDollarResult.toString();
 		assertEquals("  a:b:c  100  COL @ $12.00 USD", output2);
 
 		var nonDollarResult = ledgerParser.parseSharePosting("  a:b:c  100 COL @ 12.00 INR");
-		assertEquals("INR", nonDollarResult.getPrice().getCurrency());
+		assertEquals("INR", nonDollarResult.getPrice().currency());
 
 		String output3 = nonDollarResult.toString();
 		assertEquals("  a:b:c  100  COL @ 12.00 INR", output3);
@@ -171,6 +171,21 @@ class LedgerParserTests {
 	}
 
 	@Test
+	void totalCostParseTest() {
+		LedgerEntry e = single("""
+                    2024/01/01 Buy stock
+                        Assets:Brokerage  10  AAPL @@ $1500.00
+                        Assets:Cash       $-1500
+                    """);
+		IPosting p = e.getFirstPosting();
+		assertAmount("10", "", p.getAmount());
+		assertAmount("150", "$", p.getPrice());
+		assertAmount("1500", "$", p.getValue());
+
+		assertEquals("  Assets:Brokerage  10  AAPL @@ $1500.00", p.toString());
+	}
+
+	@Test
 	void fractionalQuantitiesAreMultipliedExactly() {
 		LedgerEntry e = single("""
                     2024/01/01 Buy bitcoin
@@ -195,7 +210,7 @@ class LedgerParserTests {
 	}
 
 	private void assertAmount(String expectedQuantity, String expectedCurrencySymbol, Money actual) {
-		assertQuantity(expectedQuantity, actual.getAmount());
-		assertEquals(expectedCurrencySymbol, actual.getCurrencySymbol());
+		assertQuantity(expectedQuantity, actual.amount());
+		assertEquals(expectedCurrencySymbol, actual.currencySymbol());
 	}
 }

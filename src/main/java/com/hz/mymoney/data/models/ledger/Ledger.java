@@ -56,6 +56,13 @@ public class Ledger {
 				.toList();
 	}
 
+	public List<PriceEntry> getOnlyPriceEntries() {
+		return entries.stream()
+				.filter(entry -> entry instanceof PriceEntry)
+				.map(entry -> (PriceEntry) entry)
+				.toList();
+	}
+
 	public boolean hasLedgerEntry(LedgerEntry ledgerEntry) {
 		return entries.stream()
 				.filter(entry -> entry instanceof LedgerEntry)

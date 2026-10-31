@@ -2,6 +2,7 @@ package com.hz.mymoney.data.utilities;
 
 import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.ledger.*;
+import com.hz.mymoney.exceptions.FileLoadFailedException;
 import com.hz.mymoney.exceptions.UnexpectedDataException;
 import lombok.extern.log4j.Log4j2;
 
@@ -24,17 +25,19 @@ public class LedgerParser {
 	private static final Pattern TWO_SPACES = Pattern.compile(" {2}");
 	private static final Pattern ONE_OR_MORE_SPACES = Pattern.compile("(\\s+)");
 	private static final Pattern LINE_STARTS_WITH_DATE = Pattern.compile("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\s.*");
+	private static final Pattern PRICE_LINE = Pattern.compile("^P\\s\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\s.*");
 
 	public enum LedgerEntryState {
-		COMMENT_POSTING,
-		EMPTY,
 		UNKNOWN,
-		ENTRY_START,
+		LEDGER_START_ENTRY,
+		COMMENT_ENTRY,
+		PRICE_ENTRY,
 		CASH_POSTING,
 		FUND_POSTING,
 		SHARE_POSTING,
 		SHARE_RESET_POSTING,
-		REMAINDER_POSTING
+		REMAINDER_POSTING,
+		COMMENT_POSTING
 	}
 
 	public Ledger loadLedger(InputStream inputStream) {
@@ -63,6 +66,7 @@ public class LedgerParser {
 		} catch (IOException e) {
 			ledger.addErrorCount();
 			log.error(e.getMessage(), e);
+			throw new FileLoadFailedException(e.getMessage(), e);
 		}
 		return ledger;
 	}
@@ -72,58 +76,62 @@ public class LedgerParser {
 		int lineNo = 0;
 		try {
 			LedgerEntry ledgerEntry = null;
-			while (	(line = br.readLine()) != null) {
+			while ((line = br.readLine()) != null) {
 				lineNo++;
 				switch (scanLine(line)) {
-					case ENTRY_START -> {
+					case LEDGER_START_ENTRY -> {
 						addLedgerEntry(ledger, ledgerEntry);
 						ledgerEntry = newLedgerEntry(line);
 					}
+					case PRICE_ENTRY -> {
+						addPriceEntry(ledger, line);
+					}
 					case CASH_POSTING -> {
 						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " cash posting has no header (" + line + ")");
+							throw new UnexpectedDataException("Cash posting has no header");
 						}
 						addPosting(ledgerEntry, parseCashPosting(line));
 					}
 					case FUND_POSTING -> {
 						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " fund posting has no header (" + line + ")");
+							throw new UnexpectedDataException("Fund posting has no header");
 						}
 						addPosting(ledgerEntry, parseFundPosting(line));
 					}
 					case SHARE_POSTING -> {
 						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " share posting has no header (" + line + ")");
+							throw new UnexpectedDataException("Share posting has no header");
 						}
 						addPosting(ledgerEntry, parseSharePosting(line));
 					}
 					case SHARE_RESET_POSTING -> {
 						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " share reset posting has no header (" + line + ")");
+							throw new UnexpectedDataException("Share reset posting has no header");
 						}
 						addPosting(ledgerEntry, parseShareResetPosting(line));
 					}
 					case REMAINDER_POSTING -> {
 						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " cash remainder posting has no header (" + line + ")");
+							throw new UnexpectedDataException("Cash remainder posting has no header");
 						}
 						addPosting(ledgerEntry, parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
 					}
 					case COMMENT_POSTING -> {
 						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Failed to parse file at line " + lineNo + " comment posting has no header (" + line + ")");
+							throw new UnexpectedDataException("Comment posting has no header");
 						}
 						addRawPosting(ledgerEntry, line);
 					}
-					case UNKNOWN, EMPTY -> {
+					case UNKNOWN, COMMENT_ENTRY -> {
+						// Treat Comments as Raw Entries for now
 						ledger.add(new RawEntry(line));
 					}
 				}
 			}
 			addLedgerEntry(ledger, ledgerEntry);
-		} catch (Exception e) {
+		} catch (UnexpectedDataException e) {
 			ledger.addErrorCount();
-			log.error("Error Parsing Line {}", line);
+			log.error("Error Parsing Line No {} text was [{}]\n{}", lineNo, line, e);
 			throw e;
 		}
 	}
@@ -141,6 +149,10 @@ public class LedgerParser {
 				log.error("Ledger Entry is not balanced {}", ledgerEntry);
 			}
 		}
+	}
+
+	private void addPriceEntry(Ledger ledger, String line) {
+		ledger.add(new PriceEntry(line));
 	}
 
 	public LedgerEntry newLedgerEntry(String line) {
@@ -192,19 +204,22 @@ public class LedgerParser {
 		String account = tokenize(line).getFirst().trim();
 		String amount;
 		String code;
-		String cost;
-		boolean hasCosting = line.contains("@");
+		String price;
+		boolean hasPrice = line.contains("@");
+		boolean hasTotalCost = line.contains("@@");
 
 		if (tokenize(line).size() == 3 && tokenize(line).get(2).trim().contains("@")) {
 			// Follows the defined convention of 2 spaces between Account, Amount and Share Definition
-			// Account  Amount  code @ Cost currency
+			// Account  Amount  code @ Price currency
+			// OR
+			// Account  Amount  code @@ TotalCost currency
 			amount = tokenize(line).get(1).trim();
 			String shares = tokenize(line).get(2).trim();
 			code = shares.split(" ")[0];
 			if (shares.split(" ").length > 3) {
-				cost = shares.split(" ")[2] + " " + shares.split(" ")[3];
+				price = shares.split(" ")[2] + " " + shares.split(" ")[3];
 			} else {
-				cost = shares.split(" ")[2];
+				price = shares.split(" ")[2];
 			}
 		} else {
 			String misformed = line.trim().substring(account.length()+1).trim();
@@ -217,16 +232,18 @@ public class LedgerParser {
 			amount = tokens.getFirst();
 			code = tokens.get(1);
 			if (tokens.size() == 2) {
-				cost = "0.00";
+				price = "0.00";
 			} else if (tokens.size() < 5) {
-				cost = tokens.get(3);
+				price = tokens.get(3);
 			} else {
-				cost = tokens.get(3) + " " + tokens.get(4);
+				price = tokens.get(3) + " " + tokens.get(4);
 			}
 		}
 
-		if (hasCosting) {
-			return new SharePosting(account, MoneyParser.parseMoney(amount), MoneyParser.parseMoney(cost), code, getNote(line));
+		if (hasTotalCost) {
+			return new SharePosting(account, MoneyParser.parseMoney(amount), code, MoneyParser.parseMoney(price), getNote(line));
+		} else if (hasPrice) {
+			return new SharePosting(account, MoneyParser.parseMoney(amount), MoneyParser.parseMoney(price), code, getNote(line));
 		}
 		return new SharePosting(account, MoneyParser.parseMoney(amount), Money.ZERO, code, getNote(line));
 	}
@@ -274,29 +291,24 @@ public class LedgerParser {
 			} else if (countTokens(line) == 4) {
 				return LedgerEntryState.SHARE_RESET_POSTING;
 			}
-		} else if (line.isBlank()) {
-			return LedgerEntryState.EMPTY;
+		} else if (line.isBlank() || isCommentLine(line)) {
+			return LedgerEntryState.COMMENT_ENTRY;
+		} else if (isPriceEntry(line)) {
+			return LedgerEntryState.PRICE_ENTRY;
 		} else if (isLedgerEntryStart(line)) {
-			return LedgerEntryState.ENTRY_START;
+			return LedgerEntryState.LEDGER_START_ENTRY;
 		}
 
 		return LedgerEntryState.UNKNOWN;
 	}
 
-	private boolean isBeanCountCommandLine(String line) {
-//		return LINE_STARTS_WITH_DATE.matcher(line).find()
-//				&& (line.split(" ")[1].equalsIgnoreCase("open")
-//				|| line.split(" ")[1].equalsIgnoreCase("balance")
-//				|| line.split(" ")[1].equalsIgnoreCase("custom")
-//				|| line.split(" ")[1].equalsIgnoreCase("query")
-//				|| line.split(" ")[1].equalsIgnoreCase("commodity"));
-		return false;   // Too painful to support right now
-		// Beancount command lines clash too much with standard ledger entries
-	}
-
 	// test for date at start of line - line starts with yyyy/MM/dd or yyyy-MM-dd
 	private boolean isLedgerEntryStart(String line) {
-		return (LINE_STARTS_WITH_DATE.matcher(line).find()) && isBeanCountCommandLine(line) == false;
+		return LINE_STARTS_WITH_DATE.matcher(line).find();
+	}
+
+	private boolean isPriceEntry(String line) {
+		return PRICE_LINE.matcher(line).find();
 	}
 
 	private boolean isCommentLine(String line) {
