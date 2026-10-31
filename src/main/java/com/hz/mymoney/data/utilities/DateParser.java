@@ -49,7 +49,9 @@ public final class DateParser {
 			}
 			return LocalDate.parse(dateString, DATE_FORMATTER_2);
 		} catch (DateTimeParseException e) {
-			throw new UnexpectedDataException("Could not parse date " + dateString + " as either " + DATE_FORMAT_1 + " or " + DATE_FORMAT_2, e);
+			throw new UnexpectedDataException("Could not parse date string '" + dateString + "' as either " + DATE_FORMAT_1 + " or " + DATE_FORMAT_2, e);
+		} catch (Exception e) {
+			throw new UnexpectedDataException("Could not parse date string '" + dateString + "'", e);
 		}
 	}
 
