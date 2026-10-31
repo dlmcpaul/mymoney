@@ -6,18 +6,28 @@ import java.math.RoundingMode;
 
 public class SharePosting extends FundPosting implements IPosting {
 	protected final Money price;
+	protected final Money totalCost;
 	protected final boolean split;      // Stock Split occurred
 
 	public SharePosting(String account, Money amount, Money price, String code, String note) {
 		super(account, amount, code, note);
 		this.price = price;
+		this.totalCost = null;
 		this.split = false;
 	}
 
 	public SharePosting(String account, Money amount, Money price, String code, boolean split, String note) {
 		super(account, amount, code, note);
 		this.price = price;
+		this.totalCost = null;
 		this.split = split;
+	}
+
+	public SharePosting(String account, Money amount, String code, Money totalCost, String note) {
+		super(account, amount, code, note);
+		this.price = totalCost.divide(amount, RoundingMode.HALF_EVEN);
+		this.totalCost = totalCost;
+		this.split = false;
 	}
 
 	private String splitPosting() {
@@ -25,7 +35,11 @@ public class SharePosting extends FundPosting implements IPosting {
 	}
 
 	private boolean showPrice() {
-		return (price != null && price.compareTo(Money.ZERO) != 0 && split == false);
+		return (totalCost == null && price != null && price.compareTo(Money.ZERO) != 0 && split == false);
+	}
+
+	private boolean showTotalCost() {
+		return (totalCost != null && split == false);
 	}
 
 	@Override
@@ -36,6 +50,7 @@ public class SharePosting extends FundPosting implements IPosting {
 				+ (this.amount != null ? "  " + this.amount.stripTrailingZeros().toPlainString() : "")
 				+ (getCode() != null ? "  " + getCode() : "")
 				+ (showPrice() ? " @ " + this.price : "")
+				+ (showTotalCost() ? " @@ " + this.totalCost : "")
 				+ (this.note != null ? "  ;" + this.note : "");
 	}
 

@@ -3,7 +3,6 @@ package com.hz.mymoney.data.models.ledger;
 import com.hz.mymoney.data.models.Money;
 import lombok.Data;
 
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalUnit;
@@ -66,7 +65,7 @@ public final class LedgerEntry implements Entry {
 		for (IPosting p : getNonRawPostings()) {
 			total = total.add(p.getValue());
 		}
-		return total.multiply(Money.valueOf(-1)).setScale(2, RoundingMode.HALF_UP);
+		return total.negate();
 	}
 
 	public boolean hasCommissionPosting() {
