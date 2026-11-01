@@ -1,6 +1,7 @@
 package com.hz.mymoney.data.utilities;
 
 import com.hz.mymoney.data.models.Money;
+import com.hz.mymoney.exceptions.UnexpectedDataException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -63,7 +64,11 @@ public final class MoneyParser {
 	}
 
 	private static Money parseMoney(String value, int scale, String currency, String currencySymbol) {
-		return new Money(new BigDecimal(value.replace(",","")).setScale(scale, RoundingMode.HALF_UP), currency, currencySymbol);
+		try {
+			return new Money(new BigDecimal(value.replace(",", "")).setScale(scale, RoundingMode.HALF_UP), currency, currencySymbol);
+		} catch (NumberFormatException e) {
+			throw new UnexpectedDataException("Unable to parse money value '" + value + "'", e);
+		}
 	}
 
 }
