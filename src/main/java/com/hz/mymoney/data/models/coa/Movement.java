@@ -16,7 +16,7 @@ public record Movement(LocalDate date, String sourceAccount, String description,
                        String code, boolean split, Money commission, String note) implements Comparable<Movement> {
 
 	public Money getValue() {
-		return price.multiply(amount);
+		return amount.multiply(price);
 	}
 
 	public String getNote() {

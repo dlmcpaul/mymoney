@@ -50,7 +50,7 @@ public record ScheduledTransaction(
 
 	public Money totalForYear() {
 		int count = oneYear() / recurrenceAmount;
-		return amount.multiply(Money.valueOf(count));
+		return Money.valueOf(count).multiply(amount);
 	}
 
 	@Override

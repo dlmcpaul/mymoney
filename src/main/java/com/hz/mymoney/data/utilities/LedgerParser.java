@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -241,11 +242,11 @@ public class LedgerParser {
 		}
 
 		if (hasTotalCost) {
-			return new SharePosting(account, MoneyParser.parseMoney(amount), code, MoneyParser.parseMoney(price), getNote(line));
+			return new SharePosting(account, new BigDecimal(amount), code, MoneyParser.parseMoney(price), getNote(line));
 		} else if (hasPrice) {
-			return new SharePosting(account, MoneyParser.parseMoney(amount), MoneyParser.parseMoney(price), code, getNote(line));
+			return new SharePosting(account, new BigDecimal(amount), MoneyParser.parseMoney(price), code, getNote(line));
 		}
-		return new SharePosting(account, MoneyParser.parseMoney(amount), Money.ZERO, code, getNote(line));
+		return new SharePosting(account, new BigDecimal(amount), Money.ZERO, code, getNote(line));
 	}
 
 	public IPosting parseShareResetPosting(String line) {
@@ -253,7 +254,7 @@ public class LedgerParser {
 		String amount = tokenize(line).get(2).trim();
 		String shareCode = tokenize(line).getLast().trim();
 
-		return new SharePosting(account, MoneyParser.parseMoney(amount), Money.ZERO, shareCode, true, getNote(line));
+		return new SharePosting(account, new BigDecimal(amount), Money.ZERO, shareCode, true, getNote(line));
 	}
 
 	public IPosting parseFundPosting(String line) {
@@ -275,13 +276,18 @@ public class LedgerParser {
 
 		if (isIndented(line)) {
 			// Must be a Posting Line
+			if (line.trim().startsWith(";")) {
+				return LedgerEntryState.COMMENT_POSTING;
+			}
+			// Remove any comments for parsing
+			if (line.contains(";")) {
+				line = line.substring(0, line.indexOf(";"));
+			}
 			if (line.contains("@")) {
 				return LedgerEntryState.SHARE_POSTING;
 			} else if (line.contains(":Fund:")) {
 				// Quirk for my files
 				return LedgerEntryState.FUND_POSTING;
-			} else if (line.trim().startsWith(";")) {
-				return LedgerEntryState.COMMENT_POSTING;
 			} else if (countTokens(line) == 1) {
 				return LedgerEntryState.REMAINDER_POSTING;
 			} else if (countTokens(line) == 2) {

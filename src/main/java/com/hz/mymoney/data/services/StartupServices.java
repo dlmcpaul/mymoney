@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.Objects;
 
+import static com.hz.mymoney.data.services.PriceHistoryServices.*;
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 @Service
@@ -44,23 +45,23 @@ public class StartupServices implements ApplicationRunner {
 		String commodityOption;
 		String commodityFileName;
 
-		if (args.containsOption("commodities") || args.containsOption("quicken")) {
-			if (args.containsOption("commodities")) {
-				commodityOption = "commodities";
-				commodityFileName = Objects.requireNonNull(args.getOptionValues("commodities")).getFirst();
-			} else if (args.containsOption("quicken")) {
-				commodityOption = "quicken";
-				commodityFileName = Objects.requireNonNull(args.getOptionValues("quicken")).getFirst();
+		if (args.containsOption(LEDGER_HISTORY_FILE) || args.containsOption(QUICKEN_HISTORY_FILE)) {
+			if (args.containsOption(LEDGER_HISTORY_FILE)) {
+				commodityOption = LEDGER_HISTORY_FILE;
+				commodityFileName = Objects.requireNonNull(args.getOptionValues(LEDGER_HISTORY_FILE)).getFirst();
+			} else if (args.containsOption(QUICKEN_HISTORY_FILE)) {
+				commodityOption = QUICKEN_HISTORY_FILE;
+				commodityFileName = Objects.requireNonNull(args.getOptionValues(QUICKEN_HISTORY_FILE)).getFirst();
 			} else {
-				commodityOption = "internal";
+				commodityOption = DEMO_HISTORY_FILE;
 				commodityFileName = "classpath:test.commodities";
 			}
 		} else {
-			if (fileConfigurationProperties.getPriceHistoryType() == null || fileConfigurationProperties.getPriceHistory() == null) {
-				commodityOption = "internal";
+			if (fileConfigurationProperties.getPriceHistory() == null) {
+				commodityOption = DEMO_HISTORY_FILE;
 				commodityFileName = "classpath:test.commodities";
 			} else {
-				commodityOption = fileConfigurationProperties.getPriceHistoryType();
+				commodityOption = LEDGER_HISTORY_FILE;
 				commodityFileName = fileConfigurationProperties.getPriceHistory();
 			}
 		}

@@ -24,7 +24,7 @@ class LedgerParserTests {
 		var result = ledgerParser.parseSharePosting(line);
 		assertEquals("a:b:c", result.getAccount());
 		assertEquals("COL", result.getCode());
-		assertEquals(new Money("100.00").amount(), result.getAmount().amount());
+		assertEquals(new Money("100").amount(), result.getAmount().amount());
 		assertEquals(new Money("12.00").amount(), result.getPrice().amount());
 		assertEquals(new Money("1200.00").amount(), result.getValue().amount());
 		assertEquals("$", result.getPrice().currencySymbol());
@@ -41,7 +41,7 @@ class LedgerParserTests {
 		var singleSpaceResult = ledgerParser.parseSharePosting("  a:b:c  100 COL @ $12.00");
 		assertEquals("a:b:c", singleSpaceResult.getAccount());
 		assertEquals("COL", singleSpaceResult.getCode());
-		assertEquals(new Money("100.00").amount(), singleSpaceResult.getAmount().amount());
+		assertEquals(new Money("100").amount(), singleSpaceResult.getAmount().amount());
 		assertEquals(new Money("12.00").amount(), singleSpaceResult.getPrice().amount());
 		assertEquals(new Money("1200.00").amount(), singleSpaceResult.getValue().amount());
 		assertEquals("$", singleSpaceResult.getPrice().currencySymbol());
@@ -174,7 +174,7 @@ class LedgerParserTests {
 	void totalCostParseTest() {
 		LedgerEntry e = single("""
                     2024/01/01 Buy stock
-                        Assets:Brokerage  10  AAPL @@ $1500.00
+                        Assets:Brokerage  10  AAPL @@ $1,500.00
                         Assets:Cash       $-1500
                     """);
 		IPosting p = e.getFirstPosting();
@@ -182,7 +182,7 @@ class LedgerParserTests {
 		assertAmount("150", "$", p.getPrice());
 		assertAmount("1500", "$", p.getValue());
 
-		assertEquals("  Assets:Brokerage  10  AAPL @@ $1500.00", p.toString());
+		assertEquals("  Assets:Brokerage  10  AAPL @@ $1,500.00", p.toString());
 	}
 
 	@Test
@@ -193,6 +193,51 @@ class LedgerParserTests {
                         Assets:Cash    $-30000.75
                     """);
 		assertAmount("30000.750", "$", e.getFirstPosting().getValue());
+	}
+
+	@Test
+	void roundingTest() {
+		LedgerEntry e = single("""
+				2013/07/22 Shares Sold
+				  Assets:Shares:EVN  -3119  EVN @ $0.735
+				  Assets:Broker:CommSec  $2,262.52
+				  Expenses:Broker:Commission  $29.95  ;Commission Paid
+				""");
+		assertAmount("29.95", "$", e.getLastPosting().getAmount());
+	}
+
+	@Test
+	void roundTripSharePriceScale3Tests() {
+		String sharePrice = """
+				2013/07/22 Shares Sold
+				  Assets:Shares:EVN  -3119  EVN @ $0.735
+				  Assets:Broker:CommSec  $2,262.52
+				  Expenses:Broker:Commission  $29.95  ;Commission Paid
+				""";
+		LedgerEntry e = single(sharePrice);
+		assertEquals(sharePrice, e.toString());
+	}
+
+	@Test
+	void roundTripSharePriceScaleTests() {
+		String sharePrice = """
+				2013/07/22 Shares Bought
+				  Assets:Shares:EVN  3000  EVN @@ $1,000.00
+				  Assets:Broker:CommSec  -$1,000.00
+				""";
+		LedgerEntry e = single(sharePrice);
+		assertEquals(sharePrice, e.toString());
+	}
+
+	@Test
+	void roundTripBitCoinScaleTests() {
+		String sharePrice = """
+				2013/07/22 Shares Bought
+				  Assets:Shares:BTC  1.05  BTC @ $80,000.00
+				  Assets:Broker:CommSec  -$84,000.00
+				""";
+		LedgerEntry e = single(sharePrice);
+		assertEquals(sharePrice, e.toString());
 	}
 
 	private LedgerEntry single(String text) {

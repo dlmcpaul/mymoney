@@ -3,6 +3,7 @@ package com.hz.mymoney.data.models.ledger;
 import com.hz.mymoney.data.models.Money;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalUnit;
@@ -57,11 +58,11 @@ public final class LedgerEntry implements Entry {
 				.map(IPosting::getValue)
 				.reduce(Money.ZERO, Money::add);
 		// Financial calculations should always balance
-		return total.compareTo(Money.ZERO) == 0;
+		return total.isZero();
 	}
 
 	public Money getRemainingBalance() {
-		Money total = Money.ZERO;
+		Money total = Money.createFrom(BigDecimal.ZERO, getNonRawPostings().getFirst().getValue());
 		for (IPosting p : getNonRawPostings()) {
 			total = total.add(p.getValue());
 		}
@@ -118,10 +119,7 @@ public final class LedgerEntry implements Entry {
 	// Can each posting be matched with its reverse
 	public boolean canMatchPostings() {
 		// basic test first must be equal numbers of positive and negative postings
-		if (totalPositivePostings() == totalNegativePostings()) {
-			return true;
-		}
-		return false;
+		return totalPositivePostings() == totalNegativePostings();
 	}
 
 	public IPosting getNonSourcePosting(String account) {

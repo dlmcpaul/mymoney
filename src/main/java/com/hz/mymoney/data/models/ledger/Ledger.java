@@ -4,6 +4,7 @@ import com.hz.mymoney.data.models.Money;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,9 @@ public class Ledger {
 		this.entries.addAll(ledgerEntries);
 	}
 
-	private void add(LocalDate date, String description, Money amount, Money price, String code, String to, String from) {
-		SharePosting fromAccount = new SharePosting(from, amount, price, code, null);
-		Posting toAccount = new Posting(to, amount.negate());
+	private void add(LocalDate date, String description, BigDecimal totalShares, Money price, String code, String to, String from) {
+		SharePosting fromAccount = new SharePosting(from, totalShares, price, code, null);
+		Posting toAccount = new Posting(to, fromAccount.getValue().negate());
 		LedgerEntry ledgerEntry = new LedgerEntry(date, description, List.of(toAccount, fromAccount));
 		this.add(ledgerEntry);
 	}

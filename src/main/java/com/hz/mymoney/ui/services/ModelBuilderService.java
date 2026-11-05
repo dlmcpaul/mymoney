@@ -307,7 +307,7 @@ public class ModelBuilderService {
 	private InvestmentSummary mapAccountToShareSummary(com.hz.mymoney.data.models.coa.Account account, Money earnings, LocalDate asAt) {
 		Money currentShareValue = account.isShareAccount() ? shareValueService.getInvestmentValue(account.getCode(), asAt) : Money.ZERO;
 		Money yesterdayShareValue = account.isShareAccount() ? shareValueService.getPreviousInvestmentValue(account.getCode(), asAt) : Money.ZERO;
-		Money currentValue = account.getTotalAmount().multiply(currentShareValue).setScale(2, RoundingMode.HALF_UP);
+		Money currentValue = account.getTotalAmount().multiply(currentShareValue);
 		Money netProfitLoss = currentValue.compareTo(Money.ZERO) != 0
 				? currentValue.subtract(account.getCostBase().subtract(earnings).subtract(account.getSales()))
 				: earnings.add(account.getSales()).subtract(account.getCostBase());
@@ -367,7 +367,7 @@ public class ModelBuilderService {
 
 		if (account.isShareAccount()) {
 			Money shareValue = shareValueService.getInvestmentHistory().getInvestmentValue(account.getCode(), asAt);
-			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), total.multiply(shareValue).setScale(2, RoundingMode.HALF_UP), account.isShareAccount(), getNextInvestmentIncomeNote(account.getCode()));
+			return new Account(account.getSimpleName(), account.getName(), account.getCategory(), total.multiply(shareValue), account.isShareAccount(), getNextInvestmentIncomeNote(account.getCode()));
 		}
 
 		return new Account(account.getSimpleName(), account.getName(), account.getCategory(), total, false, getLastTransactionNote(account));

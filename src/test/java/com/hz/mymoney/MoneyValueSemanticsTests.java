@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.hz.mymoney.data.models.Money.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -185,5 +186,18 @@ class MoneyValueSemanticsTests {
 		Money credit = new Money("-75.50");
 
 		assertEquals(debit, credit.negate());
+	}
+
+	@Test
+	void zeroConstantTakesCurrencyOnAdd() {
+		Money zero = Money.zero(EURO, EURO_SYMBOL);
+		Money one = new Money(BigDecimal.ONE, AUSTRALIAN, DOLLAR_SYMBOL);
+
+		// Adding anything to zero constant the sum retains the currency and symbol of the added value
+		Money sum = zero.add(one);
+		assertEquals(one, sum);
+		assertEquals(AUSTRALIAN, sum.currency());
+		assertEquals(DOLLAR_SYMBOL, sum.currencySymbol());
+
 	}
 }

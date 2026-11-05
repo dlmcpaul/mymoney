@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 public class FileConfigurationProperties {
 	private final String ledger;
-	private final String priceHistoryType;
 	private final String priceHistory;
 	private final String schedules;
 }

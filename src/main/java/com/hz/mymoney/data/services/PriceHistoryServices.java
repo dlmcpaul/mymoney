@@ -27,6 +27,9 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Log4j2
 public class PriceHistoryServices {
+	protected static final String LEDGER_HISTORY_FILE = "commodities";
+	protected static final String QUICKEN_HISTORY_FILE = "quicken";
+	protected static final String DEMO_HISTORY_FILE = "demo";
 
 	private static final Pattern whitespace = Pattern.compile("\\s+");
 	private static final Pattern single_space = Pattern.compile("\\s");
@@ -71,21 +74,21 @@ public class PriceHistoryServices {
 		loadSuccess = false;
 
 		switch (historyType) {
-			case "internal" -> {
+			case DEMO_HISTORY_FILE -> {
 				// Don't reload test data
 				if (investmentHistory == null || investmentHistory.commodityMap().isEmpty()) {
 					loadCommoditiesFromArgs();
 				}
 			}
-			case "commodities" -> loadCommoditiesFromArgs();
-			case "quicken" -> loadCommoditiesFromQuickenFile();
+			case LEDGER_HISTORY_FILE -> loadCommoditiesFromArgs();
+			case QUICKEN_HISTORY_FILE -> loadCommoditiesFromQuickenFile();
 			default -> throw new IllegalStateException("Unexpected value: " + historyType);
 		}
 		if (loadSuccess) {
 			switch (historyType) {
-				case "internal" -> log.info("Successfully loaded {} Commodities from TEST file {}", investmentHistory.commodityMap().size(), historyFileName);
-				case "quicken" -> log.info("Successfully loaded {} Commodities from Quicken file {}", investmentHistory.commodityMap().size(), historyFileName);
-				case "commodities" -> log.info("Successfully loaded {} Commodities from PTA file {}", investmentHistory.commodityMap().size(), historyFileName);
+				case DEMO_HISTORY_FILE -> log.info("Successfully loaded {} Commodities from TEST file {}", investmentHistory.commodityMap().size(), historyFileName);
+				case QUICKEN_HISTORY_FILE -> log.info("Successfully loaded {} Commodities from Quicken file {}", investmentHistory.commodityMap().size(), historyFileName);
+				case LEDGER_HISTORY_FILE -> log.info("Successfully loaded {} Commodities from PTA file {}", investmentHistory.commodityMap().size(), historyFileName);
 			}
 		}
 	}
