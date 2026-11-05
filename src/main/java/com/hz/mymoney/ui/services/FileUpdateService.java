@@ -39,7 +39,7 @@ public class FileUpdateService {
 
 		log.info("New Simple Journal {} {} {} {}", basicJournalInput.getJournalDate(),basicJournalInput.getDescription(), basicJournalInput.getAccounts(), amount);
 
-		ledgerServices.addLedgerEntry(basicJournalInput.getJournalDate(),
+		ledgerServices.addLedgerEntryAndSave(basicJournalInput.getJournalDate(),
 				basicJournalInput.getDescription(),
 				amount,
 				basicJournalInput.getAccounts().getFirst(),
@@ -75,7 +75,7 @@ public class FileUpdateService {
 
 		log.info("New Distribution Journal Generated {} {} {} {}", distributionInputJournal.getJournalDate(), description, sourceAccount, destinationAccount);
 
-		ledgerServices.addLedgerEntry(distributionInputJournal.getJournalDate(),
+		ledgerServices.addLedgerEntryAndSave(distributionInputJournal.getJournalDate(),
 				description,
 				amount,
 				sourceAccount,
@@ -121,7 +121,7 @@ public class FileUpdateService {
 		if (unfrankedAmount.compareTo(BigDecimal.ZERO) > 0) {
 			postings.add(new Posting(UNFRANKED_DIVIDEND, unfrankedAmount.multiply(BigDecimal.valueOf(-1)),"Unfranked Dividend from " + code));
 		}
-		ledgerServices.addLedgerEntry(dividendInputJournal.getJournalDate(),
+		ledgerServices.addLedgerEntryAndSave(dividendInputJournal.getJournalDate(),
 				description,
 				postings);
 	}
@@ -154,10 +154,10 @@ public class FileUpdateService {
 					log.info("  {} {}", newLedgerEntry.getLastPosting().getAccount(), newLedgerEntry.getLastPosting().getAmount());
 				});
 
-				if (schedule.isValid()) {
+				if (schedule.isValid() && newLedgerEntry.isBalanced()) {
 					schedulesServices.scheduleRollForward(schedule);
 					schedulesServices.saveSchedules();
-					ledgerServices.addLedgerEntry(newLedgerEntry);
+					ledgerServices.addLedgerEntryAndSave(newLedgerEntry);
 				} else {
 					log.error("Schedule did not validate");
 					throw new ValidationException("Schedule did not validate " + schedule.isValid());

@@ -47,7 +47,7 @@ class PostScheduleTests {
 			LedgerEntry entry = invocation.getArgument(0);
 			ledger.add(entry);
 			return null;
-		}).when(ledgerServices).addLedgerEntry(any(LedgerEntry.class));
+		}).when(ledgerServices).addLedgerEntryAndSave(any(LedgerEntry.class));
 
 		fileUpdateService = new FileUpdateService(ledgerServices, schedulesServices, sharePriceServices, startupServices);
 	}

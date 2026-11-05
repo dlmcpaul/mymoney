@@ -218,20 +218,20 @@ public class LedgerServices {
 		makeChartOfAccounts(ledger);
 	}
 
-	public void addLedgerEntry(LedgerEntry entry) {
+	public void addLedgerEntryAndSave(LedgerEntry entry) {
 		ledger.add(entry);
 		this.saveLedger();
 		this.makeChartOfAccounts(ledger);
 	}
 
-	public void addLedgerEntry(LocalDate date, String description, List<IPosting> postings) {
-		this.addLedgerEntry(new LedgerEntry(date, description, postings));
+	public void addLedgerEntryAndSave(LocalDate date, String description, List<IPosting> postings) {
+		this.addLedgerEntryAndSave(new LedgerEntry(date, description, postings));
 	}
 
-	public void addLedgerEntry(LocalDate date, String description, Money amount, String to, String from) {
+	public void addLedgerEntryAndSave(LocalDate date, String description, Money amount, String to, String from) {
 		Posting fromAccount = new Posting(from, amount);
 		Posting toAccount = new Posting(to, amount.negate());
-		this.addLedgerEntry(date, description, List.of(toAccount, fromAccount));
+		this.addLedgerEntryAndSave(date, description, List.of(toAccount, fromAccount));
 	}
 
 }
