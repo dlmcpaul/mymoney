@@ -169,8 +169,10 @@ public record Money(BigDecimal amount, String currency, String currencySymbol) i
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof Money money)) return false;
-		return amount.compareTo(money.amount) == 0 && Objects.equals(currencySymbol, money.currencySymbol) && Objects.equals(currency, money.currency);
+		if (o instanceof Money money) {
+			return amount.compareTo(money.amount) == 0 && Objects.equals(currencySymbol, money.currencySymbol) && Objects.equals(currency, money.currency);
+		}
+		return false;
 	}
 
 	@Override
