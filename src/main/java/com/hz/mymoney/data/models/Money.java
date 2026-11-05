@@ -24,19 +24,19 @@ public record Money(BigDecimal amount, String currency, String currencySymbol) i
 	public static final Money ONE = new Money(BigDecimal.ONE, AUSTRALIAN, DOLLAR_SYMBOL);
 
 	public Money(BigDecimal amount) {
-		this(amount, AUSTRALIAN, DOLLAR_SYMBOL);
+		this(Objects.requireNonNull(amount), AUSTRALIAN, DOLLAR_SYMBOL);
 	}
 
 	public Money(String amount) {
-		this(new BigDecimal(amount), AUSTRALIAN, DOLLAR_SYMBOL);
+		this(new BigDecimal(Objects.requireNonNull(amount)), AUSTRALIAN, DOLLAR_SYMBOL);
 	}
 
 	public Money(String amount, String currency) {
-		this(new BigDecimal(amount), currency);
+		this(new BigDecimal(Objects.requireNonNull(amount)), Objects.requireNonNull(currency));
 	}
 
 	public Money(BigDecimal amount, String currency) {
-		this(amount, currency, switch (currency) {
+		this(Objects.requireNonNull(amount), Objects.requireNonNull(currency), switch (currency) {
 			case AUSTRALIAN, USA -> DOLLAR_SYMBOL;
 			case EURO -> EURO_SYMBOL;
 			default -> "";
