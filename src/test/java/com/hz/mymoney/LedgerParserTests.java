@@ -222,11 +222,12 @@ class LedgerParserTests {
 	void roundTripSharePriceScaleTests() {
 		String sharePrice = """
 				2013/07/22 Shares Bought
-				  Assets:Shares:EVN  3000  EVN @@ $1,000.00
+				  Assets:Shares:EVN  3000  EVN @@ $1,000.00  ;Big Buy @ 1000 dollars
 				  Assets:Broker:CommSec  -$1,000.00
 				""";
 		LedgerEntry e = single(sharePrice);
 		assertEquals(sharePrice, e.toString());
+		assertEquals("Big Buy @ 1000 dollars", e.getFirstPosting().getNote());
 	}
 
 	@Test

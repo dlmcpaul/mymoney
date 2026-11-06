@@ -206,16 +206,19 @@ public class LedgerParser {
 		String amount;
 		String code;
 		String price;
-		boolean hasPrice = line.contains("@");
-		boolean hasTotalCost = line.contains("@@");
+		String note = getNote(line);
+		String lineWithoutNote = note == null ? line : line.substring(0, line.lastIndexOf(note) - 1);
 
-		if (tokenize(line).size() == 3 && tokenize(line).get(2).trim().contains("@")) {
+		boolean hasPrice = lineWithoutNote.contains("@");
+		boolean hasTotalCost = lineWithoutNote.contains("@@");
+
+		if (tokenize(lineWithoutNote).size() == 3 && tokenize(lineWithoutNote).get(2).trim().contains("@")) {
 			// Follows the defined convention of 2 spaces between Account, Amount and Share Definition
 			// Account  Amount  code @ Price currency
 			// OR
 			// Account  Amount  code @@ TotalCost currency
-			amount = tokenize(line).get(1).trim();
-			String shares = tokenize(line).get(2).trim();
+			amount = tokenize(lineWithoutNote).get(1).trim();
+			String shares = tokenize(lineWithoutNote).get(2).trim();
 			code = shares.split(" ")[0];
 			if (shares.split(" ").length > 3) {
 				price = shares.split(" ")[2] + " " + shares.split(" ")[3];
@@ -223,7 +226,7 @@ public class LedgerParser {
 				price = shares.split(" ")[2];
 			}
 		} else {
-			String misformed = line.trim().substring(account.length()+1).trim();
+			String misformed = lineWithoutNote.trim().substring(account.length()+1).trim();
 			List<String> tokens = Arrays.stream(ONE_OR_MORE_SPACES.split(misformed))
 					.map(String::trim)
 					.filter(s -> s.isEmpty() == false)
@@ -242,11 +245,11 @@ public class LedgerParser {
 		}
 
 		if (hasTotalCost) {
-			return new SharePosting(account, new BigDecimal(amount), code, MoneyParser.parseMoney(price), getNote(line));
+			return new SharePosting(account, new BigDecimal(amount), code, MoneyParser.parseMoney(price), note);
 		} else if (hasPrice) {
-			return new SharePosting(account, new BigDecimal(amount), MoneyParser.parseMoney(price), code, getNote(line));
+			return new SharePosting(account, new BigDecimal(amount), MoneyParser.parseMoney(price), code, note);
 		}
-		return new SharePosting(account, new BigDecimal(amount), Money.ZERO, code, getNote(line));
+		return new SharePosting(account, new BigDecimal(amount), Money.ZERO, code, note);
 	}
 
 	public IPosting parseShareResetPosting(String line) {
