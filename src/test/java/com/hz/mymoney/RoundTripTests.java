@@ -8,8 +8,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,13 +33,12 @@ class RoundTripTests {
 			"test-schedules.ledger"
 	})
 	void testLedgerFileReadWriteMatches(String filename) throws IOException {
+		Path filePath = Files.createTempFile(filename, ".tmp");
+
 		String readFileContent = readFileContent(filename);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		Writer out = new BufferedWriter(new OutputStreamWriter(baos, StandardCharsets.UTF_8));
-
-		FileSupport.writeBuffer(out, readFileAsLedger(filename).getEntries());
-		String writeFileContent = baos.toString(StandardCharsets.UTF_8);
+		FileSupport.writeBuffer(filePath, readFileAsLedger(filename).getEntries());
+		String writeFileContent = Files.readString(filePath);
 
 		assertEquals(readFileContent, writeFileContent);
 	}
