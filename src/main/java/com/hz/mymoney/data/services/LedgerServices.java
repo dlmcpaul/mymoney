@@ -180,7 +180,17 @@ public class LedgerServices {
 			throw new FileSaveFailedException("Failed to Save Ledger as it is read-only");
 		}
 
-		FileSupport.writeFile(ledgerFileName, "Ledger", ledger.getEntries());
+		try {
+			if (ledger.fileChanged(Files.getLastModifiedTime(Path.of(ledgerFileName)))) {
+				log.error("File {} has changed", ledgerFileName);
+				throw new FileSaveFailedException("Failed to Save Ledger as it has been updated");
+			}
+			ledger.setLedgerFileStamp(FileSupport.writeFile(ledgerFileName, "Ledger", ledger.getEntries()));
+		} catch (IOException e) {
+			log.error(e.getMessage());
+			throw new FileSaveFailedException("Failed to Save Ledger - " + e.getMessage(), e);
+		}
+
 	}
 
 	private void loadLedgerFromArgs(String fileName) throws IOException {

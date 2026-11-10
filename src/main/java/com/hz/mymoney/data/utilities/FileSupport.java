@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
@@ -29,7 +30,7 @@ public final class FileSupport {
 	}
 
 	public static void writeBuffer(Path file, List<?> contents) throws IOException {
-		try (var out = Files.newBufferedWriter(file, StandardCharsets.UTF_8, StandardOpenOption.SYNC)) {
+		try (var out = Files.newBufferedWriter(file, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.SYNC)) {
 			for (Object entry : contents) {
 				out.write(entry.toString());
 			}
@@ -51,8 +52,9 @@ public final class FileSupport {
 		renameFile(target + ".tmp", target, contentType);
 	}
 
-	public static void writeFile(String target, String contentType, List<?> contents) {
+	public static FileTime writeFile(String target, String contentType, List<?> contents) throws IOException {
 		writeTempFile(target, contentType, contents);
 		renameTempFile(target, contentType);
+		return Files.getLastModifiedTime(Path.of(target));
 	}
 }
