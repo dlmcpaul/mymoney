@@ -75,7 +75,7 @@ public record SuperannuationAccount(String name, String fullName, Money balance,
 	}
 
 	public boolean isClosed() {
-		return balance.compareTo(Money.ZERO) == 0;
+		return balance.isZero();
 	}
 
 	public BigDecimal yearlyReturn() {
@@ -83,7 +83,7 @@ public record SuperannuationAccount(String name, String fullName, Money balance,
 		Money adjustedBalance = openingBalance().add(contributions());
 		Money closingBalance = isClosed() ? transfersOut() : balance();
 
-		if (adjustedBalance.compareTo(Money.ZERO) == 0) {
+		if (adjustedBalance.isZero()) {
 			return BigDecimal.ZERO;
 		}
 
