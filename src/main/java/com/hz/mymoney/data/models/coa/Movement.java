@@ -91,12 +91,6 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 		return sourceAccount.toLowerCase().startsWith(AccountConstants.EQUITY_SUPER_OPENING_BALANCE.toLowerCase());
 	}
 
-	// Should be a transfer in from another super account
-	public boolean isSuperTransferIn() {
-		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_ACCOUNTS.toLowerCase())
-				&& amount.compareTo(Money.ZERO) > 0;
-	}
-
 	public boolean isSuperEarnings() {
 		return sourceAccount.equalsIgnoreCase(AccountConstants.SUPER_RETURNS);
 	}
@@ -117,9 +111,17 @@ public record Movement(LocalDate date, String sourceAccount, String description,
 		return sourceAccount.equalsIgnoreCase(AccountConstants.SUPER_INSURANCE);
 	}
 
-	public boolean isSuperTransferOut() {
+	// Should be a transfer in from another super account
+	public boolean isSuperTransferIn() {
 		return sourceAccount.toLowerCase().startsWith(AccountConstants.SUPER_ACCOUNTS.toLowerCase())
-				&& amount.compareTo(Money.ZERO) < 0;
+				&& amount.isPositive();
+	}
+
+	// Should be a transfer out to another super account or after 60 any account
+	// So assume transfer out is any negative amount that is not otherwise classified.
+	public boolean isSuperTransferOut() {
+		return (isSuperFees() == false && isSuperLosses() == false && isSuperInsurance() == false && isSuperTaxes() == false)
+				&& amount.isNegative();
 	}
 
 	@Override
