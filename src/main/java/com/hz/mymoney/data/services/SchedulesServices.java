@@ -6,6 +6,7 @@ import com.hz.mymoney.data.models.ledger.LedgerEntry;
 import com.hz.mymoney.data.utilities.FileSupport;
 import com.hz.mymoney.data.utilities.LedgerParser;
 import com.hz.mymoney.exceptions.FileSaveFailedException;
+import com.hz.mymoney.exceptions.UnexpectedDataException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
@@ -30,6 +32,7 @@ import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 public class SchedulesServices {
 	private final ResourceLoader resourceLoader;
 	private String schedulesFileName;
+	private static final Pattern RECURRENCE = Pattern.compile("\\d{1,2}[dwmy]");
 
 	@Getter
 	private List<Schedule> scheduledTransactions;
@@ -80,7 +83,11 @@ public class SchedulesServices {
 	}
 
 	private Schedule createSchedule(String recurrence, LedgerEntry ledgerEntry) {
-		return new Schedule(recurrence, ledgerEntry);
+		if (RECURRENCE.matcher(recurrence).matches()) {
+			return new Schedule(recurrence, ledgerEntry);
+		}
+		log.error("Recurrence '{}' is invalid", recurrence);
+		throw new UnexpectedDataException("Recurrence '" + recurrence +"' is invalid");
 	}
 
 	public Optional<Schedule> findSchedule(String scheduleDescription) {
@@ -108,7 +115,17 @@ public class SchedulesServices {
 			throw new FileSaveFailedException("Failed to Save Schedules as it is read-only");
 		}
 
-		FileSupport.writeFile(schedulesFileName, "Schedules", scheduledTransactions);
+		try {
+			if (scheduleLedger.fileChanged(Files.getLastModifiedTime(Path.of(schedulesFileName)))) {
+				log.error("File {} has changed", schedulesFileName);
+				throw new FileSaveFailedException("Failed to Save Ledger as it has been updated");
+			}
+			scheduleLedger.setLedgerFileStamp(FileSupport.writeFile(schedulesFileName, "Schedules", scheduleLedger.getEntries()));
+		} catch (IOException e) {
+			log.error(e.getMessage());
+			throw new FileSaveFailedException("Failed to Save Ledger - " + e.getMessage(), e);
+		}
+
 	}
 
 	public void reloadSchedules() throws IOException {
