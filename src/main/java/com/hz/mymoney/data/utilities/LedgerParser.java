@@ -24,7 +24,9 @@ import java.util.regex.Pattern;
 public class LedgerParser {
 
 	private static final Pattern TWO_SPACES = Pattern.compile(" {2}");
+	private static final Pattern INDENTED = Pattern.compile("^(\\t| {2,})+");
 	private static final Pattern ONE_OR_MORE_SPACES = Pattern.compile("(\\s+)");
+	private static final Pattern STANDARD_SEPARATOR = Pattern.compile("(\\t| {2,})+");
 	private static final Pattern LINE_STARTS_WITH_DATE = Pattern.compile("^\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\s.*");
 	private static final Pattern PRICE_LINE = Pattern.compile("^P\\s\\d{4}[/-]\\d{1,2}[/-]\\d{1,2}\\s.*");
 
@@ -60,16 +62,20 @@ public class LedgerParser {
 	}
 
 	public Ledger loadLedger(Path path) {
-		Ledger ledger = new Ledger();
 
 		try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-			readLedgerEntries(ledger, br);
+			Ledger ledger = new Ledger(path.toString(), Files.getLastModifiedTime(path));
+			try {
+				readLedgerEntries(ledger, br);
+				return ledger;
+			} catch (Exception e) {
+				ledger.addErrorCount();
+				throw e;
+			}
 		} catch (IOException e) {
-			ledger.addErrorCount();
 			log.error(e.getMessage(), e);
 			throw new FileLoadFailedException(e.getMessage(), e);
 		}
-		return ledger;
 	}
 
 	private void readLedgerEntries(Ledger ledger, BufferedReader br) throws IOException {
@@ -131,7 +137,6 @@ public class LedgerParser {
 			}
 			addLedgerEntry(ledger, ledgerEntry);
 		} catch (UnexpectedDataException e) {
-			ledger.addErrorCount();
 			log.error("Error Parsing Line No {} text was [{}]\n{}", lineNo, line, e);
 			throw e;
 		}
@@ -271,14 +276,10 @@ public class LedgerParser {
 		return new FundPosting(account, MoneyParser.parseMoney(amount), getNote(line));
 	}
 
-	private boolean isIndented(String line) {
-		return line.startsWith("  ") || line.startsWith("\t");
-	}
-
 	public LedgerEntryState scanLine(String line) {
 
 		if (isIndented(line)) {
-			// Must be a Posting Line
+			// Cannot be a ledger start, command line or price line
 			if (line.trim().startsWith(";")) {
 				return LedgerEntryState.COMMENT_POSTING;
 			}
@@ -316,6 +317,12 @@ public class LedgerParser {
 		return LINE_STARTS_WITH_DATE.matcher(line).find();
 	}
 
+	// test for a indented line
+	private boolean isIndented(String line) {
+		return INDENTED.matcher(line).find();
+	}
+
+	// test for a price line entry
 	private boolean isPriceEntry(String line) {
 		return PRICE_LINE.matcher(line).find();
 	}
@@ -343,10 +350,10 @@ public class LedgerParser {
 		// trim
 		line = line.trim();
 
-		// split into entries with 2 or more spaces as delimiter
+		// split into entries with tab or 2+ spaces as delimiter
 		// remove any empty tokens
 		// remove any MONEY_SYMBOL tokens
-		return Arrays.stream(TWO_SPACES.split(line))
+		return Arrays.stream(STANDARD_SEPARATOR.split(line))
 				.map(String::trim)
 				.filter(s -> s.isEmpty() == false)
 				.filter(s -> s.equals(Money.DOLLAR_SYMBOL) == false)

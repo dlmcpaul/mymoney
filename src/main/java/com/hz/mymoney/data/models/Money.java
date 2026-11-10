@@ -43,6 +43,10 @@ public record Money(BigDecimal amount, String currency, String currencySymbol) i
 		});
 	}
 
+	public Money(String amount, String currency, String currencySymbol) {
+		this(new BigDecimal(Objects.requireNonNull(amount)), Objects.requireNonNull(currency), Objects.requireNonNull(currencySymbol));
+	}
+
 	public static Money createFrom(BigDecimal newAmount, Money from) {
 		return new Money(newAmount, from.currency, from.currencySymbol);
 	}
@@ -143,19 +147,22 @@ public record Money(BigDecimal amount, String currency, String currencySymbol) i
 	}
 
 	// Used by front end to display currency values
+	// formatCurrency priorities the symbol over the currency code
 	public String formatCurrency() {
 		return switch (currency) {
 			case AUSTRALIAN -> NumberFormat.getCurrencyInstance(Locale.of("en", "au")).format(amount);
 			case USA -> NumberFormat.getCurrencyInstance(Locale.of("en", "us")).format(amount);
-			case EURO -> NumberFormat.getCurrencyInstance(Locale.of("en", "eu")).format(amount);
+			case EURO -> NumberFormat.getCurrencyInstance(Locale.of("en", "IE")).format(amount);
 			default -> toString();
 		};
 	}
 
 	// Used when writing to file
+	// This attempts to display original string parsed
 	@Override
 	public @NotNull String toString() {
 		if (currency.isEmpty() && currencySymbol.isEmpty()) {
+			log.warn("No currency or currency symbol provided.  Is this not money?");
 			return amount.stripTrailingZeros().toPlainString();
 		}
 

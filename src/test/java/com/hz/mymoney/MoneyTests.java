@@ -77,6 +77,19 @@ class MoneyTests {
 		//assertEquals(before, amount.commodityBeforeQuantity());
 	}
 
+	@Test
+	void euroTests() {
+		Money euroCurrency = MoneyParser.parseMoney("600.00 EUR");
+		Money euroSymbol = MoneyParser.parseMoney("€600.00");
+
+		assertEquals(Money.EURO, euroCurrency.currency());
+		assertEquals("€600.00", euroCurrency.formatCurrency()); // Currency priorities symbol over currency code
+		assertEquals("600.00 EUR", euroCurrency.toString());    // to String attempts to display original string
+		assertEquals(Money.EURO_SYMBOL, euroSymbol.currencySymbol());
+		assertEquals("€600.00", euroSymbol.formatCurrency());
+		assertEquals("€600.00", euroSymbol.toString());
+	}
+
 	/** Compares quantities numerically so that scale (1.0 vs 1.00) does not matter. */
 	static void assertQuantity(String expected, BigDecimal actual) {
 		assertEquals(0, new BigDecimal(expected).compareTo(actual),

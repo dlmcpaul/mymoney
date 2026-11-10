@@ -2,18 +2,30 @@ package com.hz.mymoney.data.models.ledger;
 
 import com.hz.mymoney.data.models.Money;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 public class Ledger {
 	private int loadErrorCount = 0;
+	private String ledgerFileName = null;
+	private FileTime ledgerFileStamp;
 	private List<Entry> entries = new ArrayList<>();
+
+	public Ledger() {
+		this.ledgerFileStamp = FileTime.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	public Ledger(String ledgerFileName, FileTime ledgerFileStamp) {
+		this.ledgerFileName = ledgerFileName;
+		this.ledgerFileStamp = ledgerFileStamp;
+	}
 
 	private void addAll(List<LedgerEntry> ledgerEntries) {
 		this.entries.addAll(ledgerEntries);
@@ -26,28 +38,26 @@ public class Ledger {
 		this.add(ledgerEntry);
 	}
 
-	private void addUnique(LedgerEntry ledgerEntry) {
-		if (this.hasLedgerEntry(ledgerEntry) == false) {
-			this.add(ledgerEntry);
-		}
-	}
-
 	public void add(Entry entry) {
 		entries.add(entry);
 	}
 
-	public void add(LocalDate date, String description, List<IPosting> postings) {
+	private void add(LocalDate date, String description, List<IPosting> postings) {
 		this.add(new LedgerEntry(date, description, postings));
 	}
 
-	public void add(String line) {
+	private void add(String line) {
 		this.add(new RawEntry(line));
 	}
 
-	public void add(LocalDate date, String description, Money amount, String to, String from) {
+	private void add(LocalDate date, String description, Money amount, String to, String from) {
 		Posting fromAccount = new Posting(from, amount);
 		Posting toAccount = new Posting(to, amount.negate());
 		this.add(date, description, List.of(toAccount, fromAccount));
+	}
+
+	public boolean fileChanged(FileTime fileTime) {
+		return this.ledgerFileStamp.compareTo(fileTime) != 0;
 	}
 
 	public List<LedgerEntry> getOnlyLedgerEntries() {

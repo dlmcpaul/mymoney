@@ -109,6 +109,15 @@ class LedgerParserTests {
 	}
 
 	@Test
+	void tabCanBeUsedAsSeparator() {
+		LedgerEntry e = single("2024/01/01 T\n\tAssets:Cash\t$10\n\tIncome:Gift\n");
+		assertEquals("Assets:Cash", e.getFirstPosting().getAccount());
+		assertAmount("10", "$", e.getFirstPosting().getAmount());
+		assertEquals("Income:Gift", e.getLastPosting().getAccount());
+		assertAmount("-10", "$", e.getLastPosting().getAmount());
+	}
+
+	@Test
 	void accountNamesMayBeUnicode() {
 		LedgerEntry e = single("""
                     2024/01/01 T

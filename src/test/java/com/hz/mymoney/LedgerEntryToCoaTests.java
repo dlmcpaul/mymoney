@@ -73,7 +73,6 @@ class LedgerEntryToCoaTests {
 	}
 
 	// Ledger Entry with only one positive amount but more than 1 negative amount (Unmatched sources)
-	// Currently not handled
 	@Test
 	void testOnePositiveLedgerEntryToCoa() {
 		ChartOfAccounts coa = new ChartOfAccounts(LocalDate.now());
