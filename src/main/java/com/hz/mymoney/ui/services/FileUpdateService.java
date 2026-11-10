@@ -155,9 +155,10 @@ public class FileUpdateService {
 				});
 
 				if (schedule.isValid() && newLedgerEntry.isBalanced()) {
+					// This probably needs some transaction handling
 					schedulesServices.scheduleRollForward(schedule);
-					schedulesServices.saveSchedules();
 					ledgerServices.addLedgerEntryAndSave(newLedgerEntry);
+					schedulesServices.saveSchedules();
 				} else {
 					log.error("Schedule did not validate");
 					throw new ValidationException("Schedule did not validate " + schedule.isValid());
