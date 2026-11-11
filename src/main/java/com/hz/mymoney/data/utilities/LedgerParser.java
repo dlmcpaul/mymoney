@@ -32,6 +32,8 @@ public class LedgerParser {
 
 	public enum LedgerEntryState {
 		UNKNOWN,
+		BLOCK_COMMENT_START,
+		BLOCK_COMMENT_END,
 		LEDGER_START_ENTRY,
 		COMMENT_ENTRY,
 		PRICE_ENTRY,
@@ -42,6 +44,8 @@ public class LedgerParser {
 		REMAINDER_POSTING,
 		COMMENT_POSTING
 	}
+
+	private LedgerEntryState currentState = LedgerEntryState.UNKNOWN;
 
 	public Ledger loadLedger(InputStream inputStream) {
 		Ledger ledger = new Ledger();
@@ -129,7 +133,7 @@ public class LedgerParser {
 						}
 						addRawPosting(ledgerEntry, line);
 					}
-					case UNKNOWN, COMMENT_ENTRY -> {
+					case UNKNOWN, COMMENT_ENTRY, BLOCK_COMMENT_START, BLOCK_COMMENT_END -> {
 						// Treat Comments as Raw Entries for now
 						ledger.add(new RawEntry(line));
 					}
@@ -278,6 +282,14 @@ public class LedgerParser {
 
 	public LedgerEntryState scanLine(String line) {
 
+		if (currentState.equals(LedgerEntryState.BLOCK_COMMENT_START)) {
+			if (line.equalsIgnoreCase("end comment")) {
+				currentState = LedgerEntryState.UNKNOWN;
+				return LedgerEntryState.BLOCK_COMMENT_END;
+			}
+			return LedgerEntryState.BLOCK_COMMENT_START;
+		}
+
 		if (isIndented(line)) {
 			// Cannot be a ledger start, command line or price line
 			if (line.trim().startsWith(";")) {
@@ -307,6 +319,9 @@ public class LedgerParser {
 			return LedgerEntryState.PRICE_ENTRY;
 		} else if (isLedgerEntryStart(line)) {
 			return LedgerEntryState.LEDGER_START_ENTRY;
+		} else if (line.equalsIgnoreCase("comment")) {
+			currentState = LedgerEntryState.BLOCK_COMMENT_START;
+			return LedgerEntryState.BLOCK_COMMENT_START;
 		}
 
 		return LedgerEntryState.UNKNOWN;

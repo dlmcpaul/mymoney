@@ -150,8 +150,39 @@ public class LedgerExamplesTest {
 				| comment
 				* comment and org-mode outline node
 				""";
-		Ledger ledger1 = parseLedgerString(comment);
-		assertEquals(5, ledger1.getEntries().size());
+		Ledger ledger = parseLedgerString(comment);
+		assertEquals(5, ledger.getEntries().size());
+	}
+
+	@Test
+	void commentBlockIsSkippedEntirely() {
+		Ledger ledger = parseLedgerString("""
+                    comment
+                    2024/01/01 Hidden
+                        A  $1
+                        Unbalanced nonsense  $99
+                    end comment
+
+                    2024/01/02 Visible
+                        A  $1
+                        B
+                    """);
+		assertEquals(1, ledger.getOnlyLedgerEntries().size());
+		assertEquals("Visible", ledger.getOnlyLedgerEntries().getFirst().getDescription());
+	}
+
+	@Test
+	void unterminatedCommentBlockSwallowsTheRestOfTheFile() {
+		Ledger ledger = parseLedgerString("""
+                    2024/01/01 Seen
+                        A  $1
+                        B
+                    comment
+                    2024/01/02 Unseen
+                        A  $1
+                        B
+                    """);
+		assertEquals(1, ledger.getOnlyLedgerEntries().size());
 	}
 
 	@Test
