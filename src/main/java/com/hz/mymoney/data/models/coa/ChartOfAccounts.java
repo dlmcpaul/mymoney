@@ -54,7 +54,7 @@ public class ChartOfAccounts {
 	public SortedSet<Account> getZeroBalanceAccountsOfType(String accountType) {
 		return this.accounts.stream()
 				.filter(account -> isOneOf(accountType, account.getName()))
-				.filter(account -> account.getTotalAmount().compareTo(Money.ZERO) == 0)
+				.filter(account -> account.getTotalAmount().isZero())
 				.collect(Collectors.toCollection(TreeSet::new));
 	}
 
@@ -64,7 +64,7 @@ public class ChartOfAccounts {
 		for (Account account : this.accounts) {
 			if (isOneOf(accountType, account.getName())) {
 				if (filterZeroAmounts) {
-					if (account.getTotalAmount().compareTo(Money.ZERO) != 0) {
+					if (account.getTotalAmount().isNonZero()) {
 						typedAccounts.add(account);
 					}
 				} else {
