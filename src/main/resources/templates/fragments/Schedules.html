@@ -9,7 +9,7 @@
                 <div class="middle aligned row">
                     <div class="left attached left aligned seven wide column">
                         <div class="description">
-                            <i class="small " th:classappend="${txn.isIncoming()} ? 'plus icon' : 'minus icon'"></i>
+                            <i class="small " th:classappend="${txn.isIncoming()} ? 'plus icon' : (${txn.isOutgoing()} ? 'minus icon' : 'exchange alternate icon')"></i>
                             <span th:text="${txn.description()}">Description</span>
                         </div>
                     </div>
