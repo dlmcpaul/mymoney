@@ -25,6 +25,7 @@ public class AccountConstants {
 	public static final String INCOME_OTHER = "Income:Investment:Miscellaneous Income";
 
 	// Expenses
+	public static final String EXPENSES_PREFIX = "Expenses:";
 	public static final String DONATIONS = "Expenses:Cash:Donations";
 	public static final String TAX_DEDUCTIONS = "Expenses:Tax";
 	public static final String PAYG_DEDUCTIONS = "Expenses:Cash:Tax";

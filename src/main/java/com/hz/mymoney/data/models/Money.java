@@ -12,6 +12,7 @@ import java.util.Objects;
 
 @Log4j2
 public record Money(BigDecimal amount, String currency, String currencySymbol) implements Comparable<Money> {
+	public static final Locale formatLocale = Locale.getDefault(Locale.Category.FORMAT);
 	public static final String DOLLAR_SYMBOL = "$";
 	public static final String EURO_SYMBOL = "€";
 
@@ -20,7 +21,7 @@ public record Money(BigDecimal amount, String currency, String currencySymbol) i
 	public static final String EURO = "EUR";
 
 	// Current constant defaults are AUD
-	public static final Money ZERO = Money.zero(AUSTRALIAN, DOLLAR_SYMBOL);
+	public static final Money ZERO = new Money(BigDecimal.ZERO, AUSTRALIAN, DOLLAR_SYMBOL);
 	public static final Money ONE = new Money(BigDecimal.ONE, AUSTRALIAN, DOLLAR_SYMBOL);
 
 	public Money(BigDecimal amount) {
@@ -134,14 +135,6 @@ public record Money(BigDecimal amount, String currency, String currencySymbol) i
 		return this.amount.scale();
 	}
 
-	public static Money zero(String currency) {
-		return new Money(BigDecimal.ZERO, currency);
-	}
-
-	public static Money zero(String currency, String currencySymbol) {
-		return new Money(BigDecimal.ZERO, currency, currencySymbol);
-	}
-
 	public String formatShares() {
 		return amount.stripTrailingZeros().toPlainString();
 	}
@@ -149,6 +142,16 @@ public record Money(BigDecimal amount, String currency, String currencySymbol) i
 	// Used by front end to display currency values
 	// formatCurrency priorities the symbol over the currency code
 	public String formatCurrency() {
+
+		if (currency == null || currency.isEmpty()) {
+			if (currencySymbol.isEmpty()) {
+				return amount.stripTrailingZeros().toPlainString();
+			}
+			if (NumberFormat.getCurrencyInstance(formatLocale).getCurrency().getSymbol().equals(currencySymbol)) {
+				return NumberFormat.getCurrencyInstance(formatLocale).format(amount);
+			}
+			return toString();
+		}
 		return switch (currency) {
 			case AUSTRALIAN -> NumberFormat.getCurrencyInstance(Locale.of("en", "au")).format(amount);
 			case USA -> NumberFormat.getCurrencyInstance(Locale.of("en", "us")).format(amount);
