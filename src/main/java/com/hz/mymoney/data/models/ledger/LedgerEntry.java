@@ -81,6 +81,14 @@ public final class LedgerEntry implements Entry {
 		return Money.ZERO;
 	}
 
+	public boolean hasIncomePosting() {
+	    return postings.stream().anyMatch(IPosting::isIncomePosting);
+	}
+
+	public boolean hasExpensesPosting() {
+		return postings.stream().anyMatch(IPosting::isExpensesPosting);
+	}
+
 	public SharePosting getSharePosting() {
 		return (SharePosting) postings.stream()
 				.filter(p -> p instanceof SharePosting)
@@ -196,4 +204,5 @@ public final class LedgerEntry implements Entry {
 		}
 		return sb.toString();
 	}
+
 }

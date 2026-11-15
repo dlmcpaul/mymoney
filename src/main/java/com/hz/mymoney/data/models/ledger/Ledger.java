@@ -62,21 +62,21 @@ public class Ledger {
 
 	public List<LedgerEntry> getOnlyLedgerEntries() {
 		return entries.stream()
-				.filter(entry -> entry instanceof LedgerEntry)
-				.map(entry -> (LedgerEntry) entry)
+				.filter(LedgerEntry.class::isInstance)
+				.map(LedgerEntry.class::cast)
 				.toList();
 	}
 
 	public List<PriceEntry> getOnlyPriceEntries() {
 		return entries.stream()
-				.filter(entry -> entry instanceof PriceEntry)
-				.map(entry -> (PriceEntry) entry)
+				.filter(PriceEntry.class::isInstance)
+				.map(PriceEntry.class::cast)
 				.toList();
 	}
 
 	public boolean hasLedgerEntry(LedgerEntry ledgerEntry) {
 		return entries.stream()
-				.filter(entry -> entry instanceof LedgerEntry)
+				.filter(LedgerEntry.class::isInstance)
 				.anyMatch(t -> ((LedgerEntry)t).isEquivalent(ledgerEntry));
 	}
 
