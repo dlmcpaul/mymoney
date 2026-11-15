@@ -5,8 +5,7 @@ import com.hz.mymoney.data.models.Money;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import static com.hz.mymoney.configuration.AccountConstants.COMMISSION;
-import static com.hz.mymoney.configuration.AccountConstants.INCOME_PREFIX;
+import static com.hz.mymoney.configuration.AccountConstants.*;
 
 public class Posting implements IPosting {
 	protected final String account;
@@ -113,5 +112,10 @@ public class Posting implements IPosting {
 	@Override
 	public boolean isIncomePosting() {
 		return this.account.toLowerCase().startsWith(INCOME_PREFIX.toLowerCase());
+	}
+
+	@Override
+	public boolean isExpensesPosting() {
+		return this.account.toLowerCase().startsWith(EXPENSES_PREFIX.toLowerCase());
 	}
 }

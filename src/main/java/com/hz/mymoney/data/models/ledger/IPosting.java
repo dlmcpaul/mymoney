@@ -7,6 +7,7 @@ public interface IPosting {
 	boolean isSameAccount(String account);
 	boolean isCommissionPosting();
 	boolean isIncomePosting();
+	boolean isExpensesPosting();
 
 	String postLine();
 	String getAccount();
@@ -18,4 +19,5 @@ public interface IPosting {
 	String getNote();
 
 	void setAmount(Money amount);
+
 }

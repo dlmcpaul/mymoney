@@ -20,6 +20,11 @@ public record RawPosting(String line) implements IPosting {
 	}
 
 	@Override
+	public boolean isExpensesPosting() {
+		return false;
+	}
+
+	@Override
 	public String postLine() {
 		return line;
 	}
