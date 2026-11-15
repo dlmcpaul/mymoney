@@ -44,14 +44,26 @@ public class ModelBuilderService {
 
 	public IncomeExpense createIncomeExpense() {
 		List<ScheduledTransaction> scheduledTransactions = this.getScheduledTransactions();
-		ChartOfAccounts last12Months = dataLoaderService.getCoa();
+		ChartOfAccounts coa = dataLoaderService.getCoa();
+		LocalDate today = LocalDate.now();
+		LocalDate twelveMonthsAgo = today.minusMonths(12);
 
-		Money actualIncome = last12Months.getAccountsOfType(INCOME_PREFIX, true).stream()
-				.map(com.hz.mymoney.data.models.coa.Account::getTotalAmount)
-				.reduce(Money.ZERO, Money::add).abs().setScale(0, RoundingMode.HALF_UP);
-		Money actualExpense = last12Months.getAccountsOfType(EXPENSES_PREFIX, true).stream()
-				.map(com.hz.mymoney.data.models.coa.Account::getTotalAmount)
-				.reduce(Money.ZERO, Money::add).setScale(0, RoundingMode.HALF_UP);
+		Money actualIncome = coa.getAccountsOfType(INCOME_PREFIX, true).stream()
+				.filter(account -> account.hasMovementBetween(twelveMonthsAgo, today))
+				.map(account -> mapMovementsToTransactions(account.getMovementsBetween(twelveMonthsAgo, today), account.getName(), account.isShareAccount()))
+				.flatMap(List::stream)
+				.map(Transaction::amount)
+				.reduce(Money.ZERO, Money::add)
+				.abs()
+				.setScale(0, RoundingMode.HALF_UP);
+		Money actualExpense = coa.getAccountsOfType(EXPENSES_PREFIX, true).stream()
+				.filter(account -> account.hasMovementBetween(twelveMonthsAgo, today))
+				.map(account -> mapMovementsToTransactions(account.getMovementsBetween(twelveMonthsAgo, today), account.getName(), account.isShareAccount()))
+				.flatMap(List::stream)
+				.map(Transaction::amount)
+				.reduce(Money.ZERO, Money::add)
+				.setScale(0, RoundingMode.HALF_UP);
+
 		Money projectedIncome = scheduledTransactions
 				.stream()
 				.filter(ScheduledTransaction::isIncoming)
