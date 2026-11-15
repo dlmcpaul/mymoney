@@ -121,7 +121,7 @@
     </div>
 </div>
 
-<div id="InvestmentChart" th:fragment="InvestmentChart(investmentsData, titleText)"
+<div id="InvestmentChart" th:fragment="InvestmentChart(investmentsData, titleText, totalValue)"
      th:with="showCurrent = ${#strings.contains(titleText,'Current')}"
      th:class="${showCurrent} ? 'ui two column grid' : 'ui two column grid container'">
     <div th:if="${showCurrent}" class="column">
@@ -130,7 +130,7 @@
     <div th:unless="${showCurrent}" class="three wide column"></div>
     <div class="column">
         <canvas id="marketValueChart" class="chart"
-             th:attr="data-chart-data=${investmentsData.getMarketValuesJson()}, data-chart-title=${#strings.contains(titleText,'Current')?'Market Value':'Net Profit/Loss'}">
+             th:attr="data-chart-data=${investmentsData.getMarketValuesJson()}, data-chart-total=${totalValue}, data-chart-title=${#strings.contains(titleText,'Current')?'Market Value':'Net Profit/Loss'}">
         </canvas>
     </div>
 </div>

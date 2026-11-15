@@ -6,7 +6,7 @@
 <main>
     <div th:replace="~{fragments/Investment :: InvestmentTable (${investmentsData}, ${titleText})}"></div>
     <div class="ui horizontal divider">Investment Details</div>
-    <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${titleText})}"></div>
+    <div th:replace="~{fragments/Investment :: InvestmentChart (${investmentsData}, ${titleText}, ${totalValue})}"></div>
     <div th:replace="~{fragments/Investment :: InvestmentList (null, '')}"></div>
 </main>
 <script th:inline="javascript" type="text/javascript">
@@ -48,7 +48,7 @@
                                     adjustScaleRange: false,
                                     xValue: '50%', // X position (50% = center)
                                     yValue: '50%', // Y position (50% = center)
-                                    content: 'Investment Allocation',
+                                    content: 'Allocation',
                                     backgroundColor: 'transparent', // No background
                                     color: '#333', // Text color
                                     font: {
@@ -88,6 +88,7 @@
         const ctx = document.getElementById('marketValueChart');
         const data = JSON.parse(ctx.dataset.chartData);
         const marketValueChartTitle = ctx.dataset.chartTitle;
+        const marketValueChartTotal = ctx.dataset.chartTotal;
 
         new Chart(ctx, {
             type: 'doughnut',
@@ -116,7 +117,7 @@
                                 adjustScaleRange: false,
                                 xValue: '50%', // X position (50% = center)
                                 yValue: '50%', // Y position (50% = center)
-                                content: marketValueChartTitle, // Text content
+                                content: [marketValueChartTitle, marketValueChartTotal], // Text content
                                 backgroundColor: 'transparent', // No background
                                 color: '#333', // Text color
                                 font: {

@@ -29,10 +29,10 @@ public class InvestmentsTemplateData {
 		return investmentSummaries.stream().map(investmentSummary -> new MarketValue(investmentSummary.code(), investmentSummary.balance())).toList();
 	}
 
-	public List<MarketValue> getTotalProfitLossValues() {
+	public List<MarketValue> getTop20Profits() {
 		return investmentSummaries.stream()
 				.map(investmentSummary -> new MarketValue(investmentSummary.code(), investmentSummary.netProfitLoss()))
-				.filter(marketValue -> marketValue.getValue().compareTo(Money.ZERO) > 0)
+				.filter(marketValue -> marketValue.getValue().isPositive())
 				.sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
 				.limit(20)
 				.toList();
@@ -46,7 +46,7 @@ public class InvestmentsTemplateData {
 		if (mode.equalsIgnoreCase("current")) {
 			return mapper.writeValueAsString(getMarketValues());
 		}
-		return mapper.writeValueAsString(getTotalProfitLossValues());
+		return mapper.writeValueAsString(getTop20Profits());
 	}
 
 	public Money getTotalProfitOrLoss() {
@@ -57,4 +57,10 @@ public class InvestmentsTemplateData {
 		return investmentSummaries.stream().map(InvestmentSummary::costBase).reduce(Money.ZERO, Money::add);
 	}
 
+	public String getMarketValue() {
+		if (mode.equalsIgnoreCase("current")) {
+			return getMarketValues().stream().map(MarketValue::getValue).reduce(Money.ZERO, Money::add).formatCurrency();
+		}
+		return getTotalProfitOrLoss().formatCurrency();
+	}
 }

@@ -9,6 +9,7 @@ import java.util.List;
 public record ScheduledTransaction(
 		String description,
 		boolean isIncoming,
+		boolean isOutgoing,
 		LocalDate dueDate,
 		Money amount,
 		int recurrenceAmount,

@@ -1,6 +1,7 @@
 package com.hz.mymoney.ui.controllers;
 
 import com.hz.mymoney.components.ReleaseInfoContributor;
+import com.hz.mymoney.ui.models.templates.InvestmentsTemplateData;
 import com.hz.mymoney.ui.services.FileUpdateService;
 import com.hz.mymoney.ui.services.ModelBuilderService;
 import com.hz.mymoney.ui.utilities.PageSupport;
@@ -28,13 +29,16 @@ public class InvestmentsController {
 	public String showInvestments(Model model, @RequestParam(value = "nextDisplayMode", required = false) String nextDisplayMode) {
 		try {
 			boolean isCurrent = nextDisplayMode == null || nextDisplayMode.equals("current");
+			InvestmentsTemplateData investmentsData = isCurrent ? uiModelBuilderService.createCurrentInvestmentsTemplateData()
+																: uiModelBuilderService.createPriorInvestmentsTemplateData();
 
 			uiDataUpdateService.reloadCommodities();
 			PageSupport.populateDefaultModelData(model, release.getVersion());
 			model.addAttribute("nextDisplayMode", isCurrent ? "historical" : "current");
 			model.addAttribute("titleText", isCurrent ? "Current Investments" : "Historical Investments");
-			model.addAttribute("investmentsData", isCurrent ? uiModelBuilderService.createCurrentInvestmentsTemplateData() : uiModelBuilderService.createPriorInvestmentsTemplateData());
+			model.addAttribute("investmentsData", investmentsData);
 			model.addAttribute("investments", null);
+			model.addAttribute("totalValue", investmentsData.getMarketValue());
 		} catch (Exception e) {
 			log.error("Investments Page Generation Exception {}", e.getMessage(), e);
 		}

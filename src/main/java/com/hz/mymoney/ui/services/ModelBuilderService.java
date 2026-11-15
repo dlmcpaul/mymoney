@@ -42,6 +42,30 @@ public class ModelBuilderService {
 		return dataLoaderService.getLedger().isReadOnly();
 	}
 
+	public IncomeExpense createIncomeExpense() {
+		List<ScheduledTransaction> scheduledTransactions = this.getScheduledTransactions();
+		ChartOfAccounts last12Months = dataLoaderService.getCoa();
+
+		Money actualIncome = last12Months.getAccountsOfType(INCOME_PREFIX, true).stream()
+				.map(com.hz.mymoney.data.models.coa.Account::getTotalAmount)
+				.reduce(Money.ZERO, Money::add).abs().setScale(0, RoundingMode.HALF_UP);
+		Money actualExpense = last12Months.getAccountsOfType(EXPENSES_PREFIX, true).stream()
+				.map(com.hz.mymoney.data.models.coa.Account::getTotalAmount)
+				.reduce(Money.ZERO, Money::add).setScale(0, RoundingMode.HALF_UP);
+		Money projectedIncome = scheduledTransactions
+				.stream()
+				.filter(ScheduledTransaction::isIncoming)
+				.map(ScheduledTransaction::totalForYear)
+				.reduce(Money.ZERO, Money::add).abs().setScale(0, RoundingMode.HALF_UP);
+		Money projectedExpense = scheduledTransactions
+				.stream()
+				.filter(ScheduledTransaction::isOutgoing)
+				.map(ScheduledTransaction::totalForYear)
+				.reduce(Money.ZERO, Money::add).setScale(0, RoundingMode.HALF_UP);
+
+		return new IncomeExpense(actualIncome, actualExpense,projectedIncome, projectedExpense);
+	}
+
 	public TrendsTemplateData createTrendsTemplateData(String accountName, String trendPeriod) {
 		ChartOfAccounts coa = dataLoaderService.getCoa();
 
@@ -77,7 +101,8 @@ public class ModelBuilderService {
 				.map(p -> new Journal(p.getNote() == null ? schedule.ledgerEntry.getDescription() : p.getNote(), p.getAccount(), p.getAmount()))
 				.toList();
 		return new ScheduledTransaction(schedule.ledgerEntry.getDescription(),
-				schedule.ledgerEntry.getFirstPosting().isIncomePosting(),
+				schedule.ledgerEntry.hasIncomePosting(),
+				schedule.ledgerEntry.hasExpensesPosting(),
 				schedule.ledgerEntry.getDate(),
 				schedule.ledgerEntry.getFirstAmount().abs(),
 				schedule.recurrenceAmount(),
