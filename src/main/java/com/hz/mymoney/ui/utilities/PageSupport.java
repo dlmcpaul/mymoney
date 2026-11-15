@@ -16,7 +16,7 @@ public final class PageSupport {
 			new Menu("Investments","investments","Investments"),
 			new Menu("NetWorth","net-worth","Net Worth"),
 			new Menu("Superannuation","super","Superannuation"),
-			new Menu("Recurring","recurring-transactions","Recurring"),
+			new Menu("Scheduled","scheduled","Scheduled"),
 			new Menu("Tax","tax","Taxation"),
 			new Menu("Trends","trends","Trends")
 	);

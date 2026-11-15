@@ -12,18 +12,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-public class RecurringJournalsController {
+public class ScheduledController {
 	private final ReleaseInfoContributor release;
 	private final ModelBuilderService uiModelBuilderService;
 
-	@GetMapping("/recurring-transactions")
+	@GetMapping("/scheduled")
 	public String transactions(Model model) {
 		try {
 			PageSupport.populateDefaultModelData(model, release.getVersion());
 			model.addAttribute("schedules", uiModelBuilderService.getScheduledTransactions());
+			model.addAttribute("incomeExpense", uiModelBuilderService.createIncomeExpense());
 		} catch (Exception e) {
-			log.error("RecurringTransactions Page Generation Exception {}", e.getMessage(), e);
+			log.error("Scheduled Page Generation Exception {}", e.getMessage(), e);
 		}
-		return "RecurringTransactions";
+		return "Scheduled";
 	}
 }

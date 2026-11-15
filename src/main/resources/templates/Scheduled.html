@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/Standard :: layout(header=~{fragments/Common :: PageHeader('Scheduled Transactions')}, content=~{::main}, menucode='Recurring', scripts=~{::script})}"
+      lang="en">
+<body>
+<main>
+    <table class="ui unstackable single line compact celled table">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th>Recurrence</th>
+            <th class="right aligned">Amount</th>
+            <th class="right aligned big-screen-table">Yearly Estimate</th>
+            <th class="center aligned big-screen-table">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="schedule : ${schedules}">
+            <td><i th:classappend="${schedule.isIncoming()} ? 'plus icon' : (${schedule.isOutgoing()}? 'minus icon' : 'exchange alternate icon')"></i></td>
+            <td data-label="Description" th:text="${schedule.description()}">James</td>
+            <td data-label="Due Date" th:text="${#temporals.format(schedule.dueDate(),'dd MMM yyyy', #locale)}">24</td>
+            <td data-label="Recurrence" th:text="${schedule.recurrenceDescription()}">Engineer</td>
+            <td data-label="Amount" class="right aligned " th:classappend="${schedule.isIncoming()} ? 'blue' : (${schedule.isOutgoing()}? 'red' : 'green')" th:text="${schedule.amount().formatCurrency()}"></td>
+            <td data-label="Yearly Estimate" class="right aligned big-screen-table"
+                th:text="${schedule.totalForYear().formatCurrency()}"></td>
+            <td data-label="Actions" class="center aligned big-screen-table">
+                <div class="ui small spaced buttons">
+                    <button class="ui compact button">Edit</button>
+                    <button class="ui compact button">Skip</button>
+                    <button class="ui compact button">Post</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="ui horizontal divider">Comparisons</div>
+    <div class="ui segment">
+        <div class="ui two column grid">
+            <div class="row">
+                <div class="column">
+                    <div class="ui medium header" th:text="|Last 12 Months Actual's ${incomeExpense.sumActual().formatCurrency()}|"></div>
+                </div>
+                <div class="column">
+                    <div class="ui medium header" th:text="|Next 12 Months Projected ${incomeExpense.sumProjected().formatCurrency()}|"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <div class="ui multiple progress"
+                         th:attr="data-total=${incomeExpense.sumActual().amount()}, data-value=${incomeExpense.actualIncome().amount()} + ',' + ${incomeExpense.actualExpense().amount()}"
+                         id="actual-progress"
+                         th:hx-on:load="|$('#actual-progress').progress({ text: { percent : '{bar} {percent}%', bars: ['Income', 'Expenses'] }})|">
+                        <div class="blue bar">
+                            <div class="centered progress"></div>
+                        </div>
+                        <div class="red bar">
+                            <div class="centered progress"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui multiple progress"
+                         th:attr="data-total=${incomeExpense.sumProjected().amount()}, data-value=${incomeExpense.projectedIncome().amount()} + ',' + ${incomeExpense.projectedExpense().amount()}"
+                         id="projected-progress"
+                         th:hx-on:load="|$('#projected-progress').progress({ text: { percent : '{bar} {percent}%', bars: ['Income', 'Expenses'] }})|">
+                        <div class="blue bar">
+                            <div class="centered progress"></div>
+                        </div>
+                        <div class="red bar">
+                            <div class="centered progress"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    function onPageLoad() {
+        console.log("Setting up event listeners for Recurring Transactions Page");
+        // Placing inside onPageLoad ensures these event listeners are registered only once
+
+        document.body.addEventListener("showMessage", function (event) {
+            $.toast({
+                class: event.detail.level,
+                title: event.detail.title,
+                message: event.detail.message,
+                showProgress: 'bottom',
+                classProgress: 'black'
+            });
+        });
+
+        document.body.addEventListener('htmx:error', function (event) {
+            $.toast({
+                class: 'error',
+                title: 'HTMX Error',
+                message: event.detail.error,
+                showProgress: 'bottom',
+                classProgress: 'black'
+            });
+        });
+    }
+</script>
+<link rel="stylesheet" data-th-href="@{/css/default.css}"/>
+</body>
+</html>
