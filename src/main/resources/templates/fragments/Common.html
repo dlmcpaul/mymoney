@@ -46,7 +46,7 @@
             <div class="ui center aligned huge header"><span th:text="${titleText}">Current Investments</span> <a
                     th:href="|@{/investments}?nextDisplayMode=${nextDisplayMode}|"
                     th:attr="hx-get=|@{/investments}?nextDisplayMode=${nextDisplayMode}|,data-tooltip=|Switch to ${nextDisplayMode}|"
-                    hx-target="body" hx-swap="outerHTML"><i class="exchange alternate icon"></i></a>
+                    hx-target="body" hx-swap="outerHTML"><i class="sync alternate icon"></i></a>
             </div>
         </div>
     </div>
