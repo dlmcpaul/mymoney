@@ -14,16 +14,21 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static java.nio.file.Files.newBufferedReader;
+
 @Log4j2
 public class LedgerParser {
 
-	private static final Pattern TWO_SPACES = Pattern.compile(" {2}");
 	private static final Pattern INDENTED = Pattern.compile("^(\\t| {2,})+");
 	private static final Pattern ONE_OR_MORE_SPACES = Pattern.compile("(\\s+)");
 	private static final Pattern STANDARD_SEPARATOR = Pattern.compile("(\\t| {2,})+");
@@ -48,38 +53,34 @@ public class LedgerParser {
 	private LedgerEntryState currentState = LedgerEntryState.UNKNOWN;
 
 	public Ledger loadLedger(InputStream inputStream) {
-		Ledger ledger = new Ledger();
-
-		try (InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-			try (BufferedReader br = new BufferedReader(isr)) {
-				readLedgerEntries(ledger, br);
-			} catch (IOException e) {
-				ledger.addErrorCount();
-				log.error(e.getMessage(), e);
-			}
-		} catch (IOException e) {
-			ledger.addErrorCount();
-			log.error(e.getMessage(), e);
-		}
-
-		return ledger;
-	}
-
-	public Ledger loadLedger(Path path) {
-
-		try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-			Ledger ledger = new Ledger(path.toString(), Files.getLastModifiedTime(path));
-			try {
-				readLedgerEntries(ledger, br);
-				return ledger;
-			} catch (Exception e) {
-				ledger.addErrorCount();
-				throw e;
-			}
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+			return loadLedger("Stream", FileTime.from(LocalDateTime.now(ZoneId.systemDefault()).toInstant(ZoneOffset.UTC)), br);
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 			throw new FileLoadFailedException(e.getMessage(), e);
 		}
+	}
+
+	public Ledger loadLedger(Path path) {
+		try (BufferedReader br = newBufferedReader(path, StandardCharsets.UTF_8)) {
+			return loadLedger(path.toString(), Files.getLastModifiedTime(path), br);
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+			throw new FileLoadFailedException(e.getMessage(), e);
+		}
+	}
+
+	private Ledger loadLedger(String filename, FileTime lastModified, BufferedReader br) throws IOException {
+		Ledger ledger = new Ledger(filename, lastModified);
+		try {
+			readLedgerEntries(ledger, br);
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			ledger.addErrorCount();
+			throw e;
+		}
+		return ledger;
 	}
 
 	private void readLedgerEntries(Ledger ledger, BufferedReader br) throws IOException {
@@ -94,49 +95,14 @@ public class LedgerParser {
 						addLedgerEntry(ledger, ledgerEntry);
 						ledgerEntry = newLedgerEntry(line);
 					}
-					case PRICE_ENTRY -> {
-						addPriceEntry(ledger, line);
-					}
-					case CASH_POSTING -> {
-						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Cash posting has no header");
-						}
-						addPosting(ledgerEntry, parseCashPosting(line));
-					}
-					case FUND_POSTING -> {
-						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Fund posting has no header");
-						}
-						addPosting(ledgerEntry, parseFundPosting(line));
-					}
-					case SHARE_POSTING -> {
-						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Share posting has no header");
-						}
-						addPosting(ledgerEntry, parseSharePosting(line));
-					}
-					case SHARE_RESET_POSTING -> {
-						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Share reset posting has no header");
-						}
-						addPosting(ledgerEntry, parseShareResetPosting(line));
-					}
-					case REMAINDER_POSTING -> {
-						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Cash remainder posting has no header");
-						}
-						addPosting(ledgerEntry, parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
-					}
-					case COMMENT_POSTING -> {
-						if (ledgerEntry == null) {
-							throw new UnexpectedDataException("Comment posting has no header");
-						}
-						addRawPosting(ledgerEntry, line);
-					}
-					case UNKNOWN, COMMENT_ENTRY, BLOCK_COMMENT_START, BLOCK_COMMENT_END -> {
-						// Treat Comments as Raw Entries for now
-						ledger.add(new RawEntry(line));
-					}
+					case PRICE_ENTRY -> addPriceEntry(ledger, line);
+					case CASH_POSTING -> addPosting(ledgerEntry, parseCashPosting(line));
+					case FUND_POSTING -> addPosting(ledgerEntry, parseFundPosting(line));
+					case SHARE_POSTING -> addPosting(ledgerEntry, parseSharePosting(line));
+					case SHARE_RESET_POSTING -> addPosting(ledgerEntry, parseShareResetPosting(line));
+					case REMAINDER_POSTING -> addRemainderPosting(ledgerEntry, line);
+					case COMMENT_POSTING -> addRawPosting(ledgerEntry, line);
+					case UNKNOWN, COMMENT_ENTRY, BLOCK_COMMENT_START, BLOCK_COMMENT_END -> ledger.add(new RawEntry(line)); // Treat Comments as Raw Entries for now
 				}
 			}
 			addLedgerEntry(ledger, ledgerEntry);
@@ -146,7 +112,17 @@ public class LedgerParser {
 		}
 	}
 
+	private void addRemainderPosting(LedgerEntry ledgerEntry, String line) {
+		if (ledgerEntry == null) {
+			throw new UnexpectedDataException("Cash remainder posting has no header");
+		}
+		addPosting(ledgerEntry, parseRemainderPosting(line, ledgerEntry.getRemainingBalance()));
+	}
+
 	private void addPosting(LedgerEntry ledgerEntry, IPosting posting) {
+		if (ledgerEntry == null) {
+			throw new UnexpectedDataException("Cash remainder posting has no header");
+		}
 		ledgerEntry.getPostings().add(posting);
 	}
 
@@ -188,6 +164,9 @@ public class LedgerParser {
 	}
 
 	private void addRawPosting(LedgerEntry ledgerEntry, String line) {
+		if (ledgerEntry == null) {
+			throw new UnexpectedDataException("Comment posting has no header");
+		}
 		ledgerEntry.getPostings().add(new RawPosting(line));
 	}
 
@@ -291,28 +270,7 @@ public class LedgerParser {
 		}
 
 		if (isIndented(line)) {
-			// Cannot be a ledger start, command line or price line
-			if (line.trim().startsWith(";")) {
-				return LedgerEntryState.COMMENT_POSTING;
-			}
-			// Remove any comments for parsing
-			if (line.contains(";")) {
-				line = line.substring(0, line.indexOf(";"));
-			}
-			if (line.contains("@")) {
-				return LedgerEntryState.SHARE_POSTING;
-			} else if (line.contains(":Fund:")) {
-				// Quirk for my files
-				return LedgerEntryState.FUND_POSTING;
-			} else if (countTokens(line) == 1) {
-				return LedgerEntryState.REMAINDER_POSTING;
-			} else if (countTokens(line) == 2) {
-				return LedgerEntryState.CASH_POSTING;
-			} else if (countTokens(line) == 3) {
-				return LedgerEntryState.SHARE_POSTING;
-			} else if (countTokens(line) == 4) {
-				return LedgerEntryState.SHARE_RESET_POSTING;
-			}
+			return scanIndentLine(line);
 		} else if (line.isBlank() || isCommentLine(line)) {
 			return LedgerEntryState.COMMENT_ENTRY;
 		} else if (isPriceEntry(line)) {
@@ -322,6 +280,33 @@ public class LedgerParser {
 		} else if (line.equalsIgnoreCase("comment")) {
 			currentState = LedgerEntryState.BLOCK_COMMENT_START;
 			return LedgerEntryState.BLOCK_COMMENT_START;
+		}
+
+		return LedgerEntryState.UNKNOWN;
+	}
+
+	private LedgerEntryState scanIndentLine(String line) {
+		// Cannot be a ledger start, command line or price line
+		if (line.trim().startsWith(";")) {
+			return LedgerEntryState.COMMENT_POSTING;
+		}
+		// Remove any comments for parsing
+		if (line.contains(";")) {
+			line = line.substring(0, line.indexOf(";"));
+		}
+		if (line.contains("@")) {
+			return LedgerEntryState.SHARE_POSTING;
+		} else if (line.contains(":Fund:")) {
+			// Quirk for my files
+			return LedgerEntryState.FUND_POSTING;
+		} else if (countTokens(line) == 1) {
+			return LedgerEntryState.REMAINDER_POSTING;
+		} else if (countTokens(line) == 2) {
+			return LedgerEntryState.CASH_POSTING;
+		} else if (countTokens(line) == 3) {
+			return LedgerEntryState.SHARE_POSTING;
+		} else if (countTokens(line) == 4) {
+			return LedgerEntryState.SHARE_RESET_POSTING;
 		}
 
 		return LedgerEntryState.UNKNOWN;
