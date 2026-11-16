@@ -91,7 +91,7 @@ public final class LedgerEntry implements Entry {
 
 	public SharePosting getSharePosting() {
 		return (SharePosting) postings.stream()
-				.filter(p -> p instanceof SharePosting)
+				.filter(SharePosting.class::isInstance)
 				.findFirst()
 				.orElse(null);
 	}
