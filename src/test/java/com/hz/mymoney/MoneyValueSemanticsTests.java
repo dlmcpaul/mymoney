@@ -190,7 +190,7 @@ class MoneyValueSemanticsTests {
 
 	@Test
 	void zeroConstantTakesCurrencyOnAdd() {
-		Money zero = Money.zero(EURO, EURO_SYMBOL);
+		Money zero = new Money(BigDecimal.ZERO, EURO, EURO_SYMBOL);
 		Money one = new Money(BigDecimal.ONE, AUSTRALIAN, DOLLAR_SYMBOL);
 
 		// Adding anything to zero constant the sum retains the currency and symbol of the added value
