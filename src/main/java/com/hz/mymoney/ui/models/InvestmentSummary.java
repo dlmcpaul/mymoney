@@ -35,7 +35,7 @@ public record InvestmentSummary(
 	}
 
 	public boolean isClosed() {
-		return count.equals(BigDecimal.ZERO);
+		return count.compareTo(BigDecimal.ZERO) == 0;
 	}
 
 	public BigDecimal yearlyReturn() {
