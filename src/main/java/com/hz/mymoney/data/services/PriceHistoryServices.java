@@ -89,6 +89,7 @@ public class PriceHistoryServices {
 				case DEMO_HISTORY_FILE -> log.info("Successfully loaded {} Commodities from TEST file {}", investmentHistory.commodityMap().size(), historyFileName);
 				case QUICKEN_HISTORY_FILE -> log.info("Successfully loaded {} Commodities from Quicken file {}", investmentHistory.commodityMap().size(), historyFileName);
 				case LEDGER_HISTORY_FILE -> log.info("Successfully loaded {} Commodities from PTA file {}", investmentHistory.commodityMap().size(), historyFileName);
+				default -> throw new IllegalStateException("Unexpected value: " + historyType);
 			}
 		}
 	}
