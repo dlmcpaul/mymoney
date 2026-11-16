@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class LedgerParserTests {
 
 	@Test
-	public void SharePostParseStandardTests() {
+	void SharePostParseStandardTests() {
 		LedgerParser ledgerParser = new LedgerParser();
 		String line = "  a:b:c  100  COL @ $12.00";
 
@@ -35,7 +35,7 @@ class LedgerParserTests {
 	}
 
 	@Test
-	public void SharePostParseMalformedTests() {
+	void SharePostParseMalformedTests() {
 		LedgerParser ledgerParser = new LedgerParser();
 
 		var singleSpaceResult = ledgerParser.parseSharePosting("  a:b:c  100 COL @ $12.00");
