@@ -66,6 +66,6 @@ public record RawPosting(String line) implements IPosting {
 
 	@Override
 	public void setAmount(Money amount) {
-
+        // Cannot set an amount on a Raw posting
 	}
 }
