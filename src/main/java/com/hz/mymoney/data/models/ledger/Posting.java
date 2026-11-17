@@ -4,8 +4,7 @@ import com.hz.mymoney.data.models.Money;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
-import static com.hz.mymoney.configuration.AccountConstants.*;
+import java.util.Arrays;
 
 public class Posting implements IPosting {
 	protected final String account;
@@ -50,6 +49,14 @@ public class Posting implements IPosting {
 
 	public boolean isSameAccount(String account) {
 		return this.account.equals(account);
+	}
+
+	// check if this account is matched by the accounts supplied
+	@Override
+	public boolean isAccountOneOf(String accounts) {
+		return Arrays.stream(accounts.toLowerCase()
+				.split(","))
+				.anyMatch(acc -> account.toLowerCase().startsWith(acc));
 	}
 
 	public String postLine() {
@@ -102,20 +109,5 @@ public class Posting implements IPosting {
 	@Override
 	public String toString() {
 		return postLine();
-	}
-
-	@Override
-	public boolean isCommissionPosting() {
-		return this.account.equalsIgnoreCase(COMMISSION);
-	}
-
-	@Override
-	public boolean isIncomePosting() {
-		return this.account.toLowerCase().startsWith(INCOME_PREFIX.toLowerCase());
-	}
-
-	@Override
-	public boolean isExpensesPosting() {
-		return this.account.toLowerCase().startsWith(EXPENSES_PREFIX.toLowerCase());
 	}
 }

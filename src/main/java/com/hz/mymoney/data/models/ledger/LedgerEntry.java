@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalUnit;
 import java.util.List;
 
+import static com.hz.mymoney.configuration.AccountConstants.COMMISSION;
+
 @Data
 public final class LedgerEntry implements Entry {
 	private LocalDate date;
@@ -70,23 +72,15 @@ public final class LedgerEntry implements Entry {
 	}
 
 	public boolean hasCommissionPosting() {
-		return postings.stream().anyMatch(IPosting::isCommissionPosting);
+		return postings.stream().anyMatch(p -> p.isAccountOneOf(COMMISSION));
 	}
 
 	public Money getCommission() {
 		if (hasCommissionPosting()) {
-			return postings.stream().filter(IPosting::isCommissionPosting)
+			return postings.stream().filter(p -> p.isAccountOneOf(COMMISSION))
 					.findFirst().orElseThrow().getValue();
 		}
 		return Money.ZERO;
-	}
-
-	public boolean hasIncomePosting() {
-	    return postings.stream().anyMatch(IPosting::isIncomePosting);
-	}
-
-	public boolean hasExpensesPosting() {
-		return postings.stream().anyMatch(IPosting::isExpensesPosting);
 	}
 
 	public SharePosting getSharePosting() {

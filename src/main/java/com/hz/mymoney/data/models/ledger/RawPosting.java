@@ -10,17 +10,7 @@ public record RawPosting(String line) implements IPosting {
 	}
 
 	@Override
-	public boolean isCommissionPosting() {
-		return false;
-	}
-
-	@Override
-	public boolean isIncomePosting() {
-		return false;
-	}
-
-	@Override
-	public boolean isExpensesPosting() {
+	public boolean isAccountOneOf(String accounts) {
 		return false;
 	}
 

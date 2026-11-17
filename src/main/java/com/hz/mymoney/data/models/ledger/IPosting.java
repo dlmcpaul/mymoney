@@ -5,9 +5,7 @@ import com.hz.mymoney.data.models.Money;
 public interface IPosting {
 
 	boolean isSameAccount(String account);
-	boolean isCommissionPosting();
-	boolean isIncomePosting();
-	boolean isExpensesPosting();
+	boolean isAccountOneOf(String accounts);
 
 	String postLine();
 	String getAccount();
@@ -19,5 +17,4 @@ public interface IPosting {
 	String getNote();
 
 	void setAmount(Money amount);
-
 }
