@@ -152,7 +152,7 @@ public class Account implements Comparable<Account> {
 
 	private @NonNull Money getManagedFundCostBase() {
 		return sumBigDecimals(movements.stream()
-				.filter(movement -> movement.amount().compareTo(Money.ZERO) > 0
+				.filter(movement -> movement.amount().isPositive()
 						&& (movement.sourceAccount().toLowerCase().startsWith(EQUITY_FUND_OPENING_BALANCE.toLowerCase())  // Opening balances prior to tracking
 						|| movement.sourceAccount().toLowerCase().startsWith(REINVESTMENT_INCOME.toLowerCase()) // Reinvestment schemes
 						|| movement.description().toLowerCase().startsWith(OPENING_BALANCE_DESCRIPTION.toLowerCase())))   // Opening balances after tracking (MEF)
@@ -164,11 +164,11 @@ public class Account implements Comparable<Account> {
 	public @NonNull Money getSales() {
 		if (isShareAccount) {
 			return sumBigDecimals(movements.stream()
-					.filter(movement -> movement.amount().compareTo(Money.ZERO) < 0)
+					.filter(movement -> movement.amount().isNegative())
 					.map(movement -> movement.amount().multiply(movement.price()).abs().subtract(movement.commission())));
 		} else if (isManagedFund()) {
 			return sumBigDecimals(movements.stream()
-					.filter(movement -> movement.amount().compareTo(Money.ZERO) < 0 && movement.description().startsWith(SHARES_SOLD_DESCRIPTION))
+					.filter(movement -> movement.amount().isNegative() && movement.description().startsWith(SHARES_SOLD_DESCRIPTION))
 					.map(movement -> movement.amount().abs()));
 		}
 		// Only shares and Managed Funds have sales
