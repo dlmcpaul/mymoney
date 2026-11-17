@@ -5,6 +5,7 @@ import com.hz.mymoney.data.models.Money;
 import com.hz.mymoney.data.models.coa.ChartOfAccounts;
 import com.hz.mymoney.data.models.coa.Movement;
 import com.hz.mymoney.data.models.coa.Schedule;
+import com.hz.mymoney.data.models.ledger.LedgerEntry;
 import com.hz.mymoney.data.services.LedgerServices;
 import com.hz.mymoney.data.services.PriceHistoryServices;
 import com.hz.mymoney.data.services.SchedulesServices;
@@ -107,14 +108,18 @@ public class ModelBuilderService {
 				.map(this::createScheduledTransaction).toList();
 	}
 
+	private boolean hasPostingsOfType(LedgerEntry ledgerEntry, String postingType) {
+		return ledgerEntry.getPostings().stream().anyMatch(p -> p.isAccountOneOf(postingType));
+	}
+
 	private ScheduledTransaction createScheduledTransaction(Schedule schedule) {
 		List<Journal> journals = schedule.ledgerEntry.getPostings()
 				.stream()
 				.map(p -> new Journal(p.getNote() == null ? schedule.ledgerEntry.getDescription() : p.getNote(), p.getAccount(), p.getAmount()))
 				.toList();
 		return new ScheduledTransaction(schedule.ledgerEntry.getDescription(),
-				schedule.ledgerEntry.hasIncomePosting(),
-				schedule.ledgerEntry.hasExpensesPosting(),
+				hasPostingsOfType(schedule.ledgerEntry, INCOMING),
+				hasPostingsOfType(schedule.ledgerEntry, OUTGOING),
 				schedule.ledgerEntry.getDate(),
 				schedule.ledgerEntry.getFirstAmount().abs(),
 				schedule.recurrenceAmount(),
@@ -202,24 +207,24 @@ public class ModelBuilderService {
 
 	public List<Transaction> getInvestmentTransactionsFor(String code) {
 		ChartOfAccounts coa = dataLoaderService.getCoa();
-		List<Transaction> investmentTransactions = new ArrayList<>();
 
-		investmentTransactions .addAll(coa.getAccountsOfType(AccountConstants.SHARE_ACCOUNTS, false).stream()
+		List<Transaction> investmentTransactions = new ArrayList<>(coa.getAccountsOfType(AccountConstants.SHARE_ACCOUNTS, false).stream()
 				.filter(account -> account.getCode().equals(code))
 				.map(account -> mapMovementsToTransactions(account.getMovementsForCode(code), account.getName(), account.isShareAccount()))
 				.flatMap(List::stream)
 				.toList());
 
-		investmentTransactions.addAll(coa.getAccountsOfType(AccountConstants.FUND_ACCOUNTS, false).stream()
-				.filter(account -> account.getCode().equals(code))
-				.map(account -> mapMovementsToTransactions(account.getMovementsForCode(code), account.getName(), account.isShareAccount()))
-				.flatMap(List::stream)
-				.toList());
-
-		investmentTransactions.addAll(coa.getInvestmentMovementsForCode(code).stream()
-				.map(m -> new Transaction(m.date(), m.getNote(), m.amount().negate(), "", "", false, Money.ZERO))
-						.toList());
-
+		if (investmentTransactions.isEmpty()) {
+			investmentTransactions.addAll(coa.getAccountsOfType(AccountConstants.FUND_ACCOUNTS, false).stream()
+					.filter(account -> account.getCode().equals(code))
+					.map(account -> mapMovementsToTransactions(account.getMovementsForCode(code), account.getName(), account.isShareAccount()))
+					.flatMap(List::stream)
+					.toList());
+		} else {
+			investmentTransactions.addAll(coa.getInvestmentMovementsForCode(code).stream()
+					.map(m -> new Transaction(m.date(), m.getNote(), m.amount().negate(), "", "", false, Money.ZERO))
+					.toList());
+		}
 		investmentTransactions.sort(Comparator.comparing(Transaction::asAt));
 
 		return investmentTransactions;
@@ -345,7 +350,7 @@ public class ModelBuilderService {
 		Money currentShareValue = account.isShareAccount() ? shareValueService.getInvestmentValue(account.getCode(), asAt) : Money.ZERO;
 		Money yesterdayShareValue = account.isShareAccount() ? shareValueService.getPreviousInvestmentValue(account.getCode(), asAt) : Money.ZERO;
 		Money currentValue = account.getTotalAmount().multiply(currentShareValue);
-		Money netProfitLoss = currentValue.compareTo(Money.ZERO) != 0
+		Money netProfitLoss = currentValue.isNonZero()
 				? currentValue.subtract(account.getCostBase().subtract(earnings).subtract(account.getSales()))
 				: earnings.add(account.getSales()).subtract(account.getCostBase());
 
